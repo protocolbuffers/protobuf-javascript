@@ -33,16 +33,11 @@
 goog.setTestOnly();
 
 goog.require('goog.json');
-goog.require('goog.string');
 goog.require('goog.testing.asserts');
 goog.require('goog.userAgent');
 
 // CommonJS-LoadFromFile: google-protobuf jspb
 goog.require('jspb.Message');
-
-// CommonJS-LoadFromFile: test8_pb proto.jspb.exttest.nested
-goog.require('proto.jspb.exttest.nested.TestNestedExtensionsMessage');
-goog.require('proto.jspb.exttest.nested.TestOuterMessage');
 
 // CommonJS-LoadFromFile: test5_pb proto.jspb.exttest.beta
 goog.require('proto.jspb.exttest.beta.floatingStrField');
@@ -65,13 +60,11 @@ goog.require('proto.jspb.test.floatingStrField');
 goog.require('proto.jspb.test.HasExtensions');
 goog.require('proto.jspb.test.IndirectExtension');
 goog.require('proto.jspb.test.IsExtension');
-goog.require('proto.jspb.test.MessageWithLargeFieldTags');
 goog.require('proto.jspb.test.OptionalFields');
 goog.require('proto.jspb.test.OuterEnum');
 goog.require('proto.jspb.test.OuterMessage.Complex');
 goog.require('proto.jspb.test.Simple1');
 goog.require('proto.jspb.test.Simple2');
-goog.require('proto.jspb.test.SingularsWithLargeFieldTags');
 goog.require('proto.jspb.test.SpecialCases');
 goog.require('proto.jspb.test.TestClone');
 goog.require('proto.jspb.test.TestEndsWithBytes');
@@ -84,6 +77,8 @@ goog.require('proto.jspb.test.TestReservedNamesExtension');
 // CommonJS-LoadFromFile: test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ExtensionMessage');
 goog.require('proto.jspb.test.TestExtensionsMessage');
+
+
 
 
 describe('Message test suite', function() {
@@ -585,14 +580,6 @@ describe('Message test suite', function() {
     assertNotUndefined(proto.jspb.exttest.beta.floatingStrField);
   });
 
-  it('testNestedExtensions', function() {
-    var extendable = new proto.jspb.exttest.nested.TestNestedExtensionsMessage();
-    var extension = new proto.jspb.exttest.nested.TestOuterMessage.NestedExtensionMessage(['s1']);
-    extendable.setExtension(proto.jspb.exttest.nested.TestOuterMessage.innerExtension, extension);
-    assertObjectEquals(extension,
-        extendable.getExtension(proto.jspb.exttest.nested.TestOuterMessage.innerExtension));
-  });
-
   it('testToObject_extendedObject', function() {
     var extension1 = new proto.jspb.test.IsExtension(['ext1field']);
     var extension2 = new proto.jspb.test.Simple1(['str', ['s1', 's2'], true]);
@@ -656,7 +643,12 @@ describe('Message test suite', function() {
 
   it('testInitialization_emptyArray', function() {
     var msg = new proto.jspb.test.HasExtensions([]);
-    assertArrayEquals([], msg.toArray());
+    if (jspb.Message.MINIMIZE_MEMORY_ALLOCATIONS) {
+      assertArrayEquals([], msg.toArray());
+    } else {
+      // Extension object is created past all regular fields.
+      assertArrayEquals([,,, {}], msg.toArray());
+    }
   });
 
   it('testInitialization_justExtensionObject', function() {
@@ -684,11 +676,10 @@ describe('Message test suite', function() {
      });
 
   it('testToObject_hasExtensionField', function() {
-    var data = new proto.jspb.test.HasExtensions(['str1', {100: ['ext1'], 102: ''}]);
+    var data = new proto.jspb.test.HasExtensions(['str1', {100: ['ext1']}]);
     var obj = data.toObject();
     assertEquals('str1', obj.str1);
     assertEquals('ext1', obj.extField.ext1);
-    assertEquals('', obj.str);
   });
 
   it('testGetExtension', function() {

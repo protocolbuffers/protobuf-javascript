@@ -1,5 +1,5 @@
 // Protocol Buffers - Google's data interchange format
-// Copyright 2008 Google Inc.  All rights reserved.
+// Copyright 2016 Google Inc.  All rights reserved.
 // https://developers.google.com/protocol-buffers/
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,53 +28,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/* This code will be inserted into generated code for
- * google/protobuf/any.proto. */
+syntax = "proto3";
 
-/**
- * Returns the type name contained in this instance, if any.
- * @return {string|undefined}
- */
-proto.google.protobuf.Any.prototype.getTypeName = function() {
-  return this.getTypeUrl().split('/').pop();
-};
+option java_package = "com.google.apps.jspb.proto";
+option java_multiple_files = true;
 
+package jspb.test.framing;
 
-/**
- * Packs the given message instance into this Any.
- * @param {!Uint8Array} serialized The serialized data to pack.
- * @param {string} name The type name of this message object.
- * @param {string=} opt_typeUrlPrefix the type URL prefix.
- */
-proto.google.protobuf.Any.prototype.pack = function(serialized, name,
-                                                    opt_typeUrlPrefix) {
-  if (!opt_typeUrlPrefix) {
-    opt_typeUrlPrefix = 'type.googleapis.com/';
-  }
+import "test6/test6.proto";
 
-  if (opt_typeUrlPrefix.substr(-1) != '/') {
-    this.setTypeUrl(opt_typeUrlPrefix + '/' + name);
-  } else {
-    this.setTypeUrl(opt_typeUrlPrefix + name);
-  }
-
-  this.setValue(serialized);
-};
-
-
-/**
- * @template T
- * Unpacks this Any into the given message object.
- * @param {function(Uint8Array):T} deserialize Function that will deserialize
- *     the binary data properly.
- * @param {string} name The expected type name of this message object.
- * @return {?T} If the name matched the expected name, returns the deserialized
- *     object, otherwise returns null.
- */
-proto.google.protobuf.Any.prototype.unpack = function(deserialize, name) {
-  if (this.getTypeName() == name) {
-    return deserialize(this.getValue_asU8());
-  } else {
-    return null;
-  }
-};
+message FramingMessage {
+  jspb.test.importing.ImportedMessage imported_message = 1;
+}
