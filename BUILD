@@ -1,6 +1,6 @@
 # Protobuf JS runtime
 #
-# See also code generation logic under /src/google/protobuf/compiler/js.
+# See also code generation logic under compiler/
 
 load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
 
