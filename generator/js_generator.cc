@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
-#include <google/protobuf/compiler/js/js_generator.h>
 #include <google/protobuf/compiler/js/well_known_types_embed.h>
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/descriptor.h>
@@ -48,6 +47,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "generator/js_generator.h"
 
 namespace google {
 namespace protobuf {

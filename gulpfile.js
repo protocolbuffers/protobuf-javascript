@@ -6,7 +6,7 @@ function exec(command, cb) {
   execFile('sh', ['-c', command], cb);
 }
 
-var protoc = process.env.PROTOC || '../src/protoc';
+var protoc = process.env.PROTOC || 'bazel-bin/external/com_google_protobuf/protoc --plugin=protoc-gen-js=bazel-bin/generator/protoc-gen-js';
 
 var wellKnownTypes = [
   '../src/google/protobuf/any.proto',
