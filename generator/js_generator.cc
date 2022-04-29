@@ -48,6 +48,8 @@
 #include <utility>
 #include <vector>
 
+#include "generator/js_generator.h"
+
 namespace google {
 namespace protobuf {
 namespace compiler {
