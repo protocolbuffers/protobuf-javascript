@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
+#include <google/protobuf/compiler/js/js_generator.h>
 #include <google/protobuf/compiler/js/well_known_types_embed.h>
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/descriptor.h>
@@ -47,8 +48,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "generator/js_generator.h"
 
 namespace google {
 namespace protobuf {
@@ -295,6 +294,64 @@ std::vector<std::string> ParseUpperCamel(const std::string& input) {
   return words;
 }
 
+std::vector<std::string> ParseLowerCamel(const std::string& input) {
+  std::vector<std::string> words;
+  std::string running = "";
+  for (int i = 0; i < input.size(); i++) {
+    if (i != 0 && input[i] >= 'A' && input[i] <= 'Z' && !running.empty()) {
+      words.push_back(running);
+      running.clear();
+    }
+    running += ToLowerASCII(input[i]);
+  }
+  if (!running.empty()) {
+    words.push_back(running);
+  }
+  return words;
+}
+
+bool HasUpper(const std::string& input) {
+    for (int i = 0; i < input.size(); i++) {
+        if (input[i] >= 'A' && input[i] <= 'Z') {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool IsUpperCamel(const std::string& input) {
+    if (input.empty()) {
+        return false;
+    }
+
+    if (input.find('_') != std::string::npos) {
+        return false;
+    }
+
+    if (input[0] < 'A' || input[0] > 'Z') {
+        return false;
+    }
+
+    return HasUpper(input);
+}
+
+bool IsLowerCamel(const std::string& input) {
+    if (input.empty()) {
+        return false;
+    }
+
+    if (input.find('_') != std::string::npos) {
+        return false;
+    }
+
+    if (input[0] >= 'A' && input[0] <= 'Z') {
+        return false;
+    }
+
+    return HasUpper(input);
+}
+
 std::string ToLowerCamel(const std::vector<std::string>& words) {
   std::string result;
   for (int i = 0; i < words.size(); i++) {
@@ -407,7 +464,7 @@ std::string GetMessagesFileName(const GeneratorOptions& options, const SCC* scc,
           GetSnakeFilename(scc->GetRepresentative()->file()->name()));
       (*long_name_dict)[scc->GetRepresentative()] =
           StrCat(snake_name, "_long_sccs_",
-                 static_cast<uint64_t>((*long_name_dict).size()));
+                 static_cast<uint64>((*long_name_dict).size()));
     }
     filename_base = (*long_name_dict)[scc->GetRepresentative()];
   }
@@ -463,14 +520,27 @@ std::string JSIdent(const GeneratorOptions& options,
                     const FieldDescriptor* field, bool is_upper_camel,
                     bool is_map, bool drop_list) {
   std::string result;
+
   if (field->type() == FieldDescriptor::TYPE_GROUP) {
-    result = is_upper_camel
-                 ? ToUpperCamel(ParseUpperCamel(field->message_type()->name()))
-                 : ToLowerCamel(ParseUpperCamel(field->message_type()->name()));
+      result = is_upper_camel
+               ? ToUpperCamel(ParseUpperCamel(field->message_type()->name()))
+               : ToLowerCamel(ParseUpperCamel(field->message_type()->name()));
   } else {
-    result = is_upper_camel ? ToUpperCamel(ParseLowerUnderscore(field->name()))
-                            : ToLowerCamel(ParseLowerUnderscore(field->name()));
+      if (is_upper_camel && IsUpperCamel(field->name())) {
+          result = field->name();
+      } else if (is_upper_camel && IsLowerCamel(field->name())) {
+          result = ToUpperCamel(ParseLowerCamel(field->name()));
+      } else if (!is_upper_camel && IsLowerCamel(field->name())) {
+          result = field->name();
+      } else if (!is_upper_camel && IsUpperCamel(field->name())) {
+          result = ToLowerCamel(ParseUpperCamel(field->name()));
+      } else if (is_upper_camel) {
+          result = ToUpperCamel(ParseLowerUnderscore(field->name()));
+      } else {
+          result = ToLowerCamel(ParseLowerUnderscore(field->name()));
+      }
   }
+
   if (is_map || field->is_map()) {
     // JSPB-style or proto3-style map.
     result += "Map";
@@ -576,7 +646,7 @@ std::string JSOneofIndex(const OneofDescriptor* oneof) {
 }
 
 // Decodes a codepoint in \x0000 -- \xFFFF.
-uint16_t DecodeUTF8Codepoint(uint8_t* bytes, size_t* length) {
+uint16 DecodeUTF8Codepoint(uint8* bytes, size_t* length) {
   if (*length == 0) {
     return 0;
   }
@@ -621,13 +691,13 @@ uint16_t DecodeUTF8Codepoint(uint8_t* bytes, size_t* length) {
 bool EscapeJSString(const std::string& in, std::string* out) {
   size_t decoded = 0;
   for (size_t i = 0; i < in.size(); i += decoded) {
-    uint16_t codepoint = 0;
+    uint16 codepoint = 0;
     // Decode the next UTF-8 codepoint.
     size_t have_bytes = in.size() - i;
-    uint8_t bytes[3] = {
-        static_cast<uint8_t>(in[i]),
-        static_cast<uint8_t>(((i + 1) < in.size()) ? in[i + 1] : 0),
-        static_cast<uint8_t>(((i + 2) < in.size()) ? in[i + 2] : 0),
+    uint8 bytes[3] = {
+        static_cast<uint8>(in[i]),
+        static_cast<uint8>(((i + 1) < in.size()) ? in[i + 1] : 0),
+        static_cast<uint8>(((i + 2) < in.size()) ? in[i + 2] : 0),
     };
     codepoint = DecodeUTF8Codepoint(bytes, &have_bytes);
     if (have_bytes == 0) {
@@ -815,13 +885,13 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
       // integer values as signed integer values. In order to exactly match the
       // output, we need to reinterpret as base-2 signed. Ugh.
       return MaybeNumberString(
-          field, StrCat(static_cast<int32_t>(field->default_value_uint32())));
+          field, StrCat(static_cast<int32>(field->default_value_uint32())));
     case FieldDescriptor::CPPTYPE_INT64:
       return MaybeNumberString(field, StrCat(field->default_value_int64()));
     case FieldDescriptor::CPPTYPE_UINT64:
       // See above note for uint32 -- reinterpreting as signed.
       return MaybeNumberString(
-          field, StrCat(static_cast<int64_t>(field->default_value_uint64())));
+          field, StrCat(static_cast<int64>(field->default_value_uint64())));
     case FieldDescriptor::CPPTYPE_ENUM:
       return StrCat(field->default_value_enum()->number());
     case FieldDescriptor::CPPTYPE_BOOL:
