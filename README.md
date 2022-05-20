@@ -129,7 +129,7 @@ The syntax of the `--js_out` flag is:
 Where `OPTIONS` are separated by commas.  Options are either `opt=val` or
 just `opt` (for options that don't take a value).  The available options
 are specified and documented in the `GeneratorOptions` struct in
-[src/google/protobuf/compiler/js/js_generator.h](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/js/js_generator.h#L53).
+[src/google/protobuf/compiler/js/js_generator.h](https://github.com/protocolbuffers/protobuf-javascript/blob/main/generator/js_generator.h).
 
 Some examples:
 
