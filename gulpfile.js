@@ -57,22 +57,22 @@ var group3Protos = [
   'test10.proto'
 ];
 
+function make_exec_logging_callback(cb) {
+  return (err, stdout, stderr) => {
+    console.log(stdout);
+    console.error(stderr);
+    cb(err);
+  }
+}
+
 function genproto_well_known_types_closure(cb) {
   exec(protoc + ' --js_out=one_output_file_per_input_file,binary:. -I ' + protocInc + ' -I . ' + wellKnownTypes.join(' '),
-       function (err, stdout, stderr) {
-         console.log(stdout);
-         console.log(stderr);
-         cb(err);
-       });
+       make_exec_logging_callback(cb));
 }
 
 function genproto_group1_closure(cb) {
   exec(protoc + ' --js_out=library=testproto_libs1,binary:.  -I ' + protocInc + ' -I . ' + group1Protos.join(' '),
-       function (err, stdout, stderr) {
-         console.log(stdout);
-         console.log(stderr);
-         cb(err);
-       });
+       make_exec_logging_callback(cb));
 }
 
 function genproto_group2_closure(cb) {
@@ -81,29 +81,17 @@ function genproto_group2_closure(cb) {
         ' --experimental_allow_proto3_optional' +
         ' --js_out=library=testproto_libs2,binary:.  -I ' + protocInc + ' -I . -I commonjs ' +
         group2Protos.join(' '),
-      function(err, stdout, stderr) {
-        console.log(stdout);
-        console.log(stderr);
-        cb(err);
-      });
+      make_exec_logging_callback(cb));
 }
 
 function genproto_well_known_types_commonjs(cb) {
             exec('mkdir -p commonjs_out && ' + protoc + ' --js_out=import_style=commonjs,binary:commonjs_out -I ' + protocInc + ' ' + wellKnownTypes.join(' '),
-                 function (err, stdout, stderr) {
-                   console.log(stdout);
-                   console.log(stderr);
-                   cb(err);
-                 });
+                 make_exec_logging_callback(cb));
 }
 
 function genproto_group1_commonjs(cb) {
             exec('mkdir -p commonjs_out && ' + protoc + ' --js_out=import_style=commonjs,binary:commonjs_out -I ' + protocInc + ' -I commonjs -I . ' + group1Protos.join(' '),
-                 function (err, stdout, stderr) {
-                   console.log(stdout);
-                   console.log(stderr);
-                   cb(err);
-                 });
+                 make_exec_logging_callback(cb));
 }
 
 function genproto_group2_commonjs(cb) {
@@ -111,38 +99,22 @@ function genproto_group2_commonjs(cb) {
       'mkdir -p commonjs_out && ' + protoc +
         ' --experimental_allow_proto3_optional --js_out=import_style=commonjs,binary:commonjs_out -I ' + protocInc + ' -I commonjs -I . ' +
         group2Protos.join(' '),
-      function(err, stdout, stderr) {
-        console.log(stdout);
-        console.log(stderr);
-        cb(err);
-      });
+      make_exec_logging_callback(cb));
 }
 
 function genproto_commonjs_wellknowntypes(cb) {
             exec('mkdir -p commonjs_out/node_modules/google-protobuf && ' + protoc + ' --js_out=import_style=commonjs,binary:commonjs_out/node_modules/google-protobuf -I ' + protocInc + ' ' + wellKnownTypes.join(' '),
-                 function (err, stdout, stderr) {
-                   console.log(stdout);
-                   console.log(stderr);
-                   cb(err);
-                 });
+                 make_exec_logging_callback(cb));
 }
 
 function genproto_wellknowntypes(cb) {
             exec(protoc + ' --js_out=import_style=commonjs,binary:. -I ' + protocInc + ' ' + wellKnownTypes.join(' '),
-                 function (err, stdout, stderr) {
-                   console.log(stdout);
-                   console.log(stderr);
-                   cb(err);
-                 });
+                 make_exec_logging_callback(cb));
 }
 
 function genproto_group3_commonjs_strict(cb) {
             exec('mkdir -p commonjs_out && ' + protoc + ' --js_out=import_style=commonjs_strict,binary:commonjs_out -I ' + protocInc + ' -I commonjs -I . ' + group3Protos.join(' '),
-                 function (err, stdout, stderr) {
-                   console.log(stdout);
-                   console.log(stderr);
-                   cb(err);
-                 });
+                 make_exec_logging_callback(cb));
 }
 
 
@@ -165,16 +137,7 @@ function gen_google_protobuf_js(cb) {
   var log_file = fs.createWriteStream('/usr/local/google/home/dibenede/gulp.log', {flags:'w'});
   exec(
       getClosureCompilerCommand('commonjs/export.js', 'google-protobuf.js'),
-      function(err, stdout, stderr) {
-        log_file.write('building google-protobuf.js');
-        if (err) {
-          log_file.write('there was an error:',err);
-        }
-        log_file.write('done');
-        console.log(stdout);
-        console.log(stderr);
-        cb(err);
-      });
+      make_exec_logging_callback(cb));
 }
 
 
@@ -184,11 +147,7 @@ function commonjs_asserts(cb) {
                   getClosureCompilerCommand(
                       'commonjs/export_asserts.js',
                       'commonjs_out/test_node_modules/closure_asserts_commonjs.js'),
-                function(err, stdout, stderr) {
-                  console.log(stdout);
-                  console.log(stderr);
-                  cb(err);
-                });
+                make_exec_logging_callback(cb));
 }
 
 function commonjs_testdeps(cb) {
@@ -197,11 +156,7 @@ function commonjs_testdeps(cb) {
                   getClosureCompilerCommand(
                       'commonjs/export_testdeps.js',
                       'commonjs_out/test_node_modules/testdeps_commonjs.js'),
-                function(err, stdout, stderr) {
-                  console.log(stdout);
-                  console.log(stderr);
-                  cb(err);
-                });
+                make_exec_logging_callback(cb));
 }
 
 function commonjs_out(cb) {
@@ -222,11 +177,7 @@ function commonjs_out(cb) {
                 'cp google-protobuf.js commonjs_out/test_node_modules && ' +
                 'cp commonjs/strict_test.js commonjs_out/strict_test.js &&' +
                 'cp commonjs/import_test.js commonjs_out/import_test.js',
-              function(err, stdout, stderr) {
-                console.log(stdout);
-                console.log(stderr);
-                cb(err);
-              });
+              make_exec_logging_callback(cb));
 }
 
 
@@ -234,39 +185,23 @@ function commonjs_out(cb) {
 function closure_make_deps(cb) {
   exec(
       './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js binary/arith.js binary/constants.js binary/decoder.js binary/encoder.js binary/reader.js binary/utils.js binary/writer.js debug.js map.js message.js node_loader.js test_bootstrap.js > deps.js',
-      function(err, stdout, stderr) {
-        console.log(stdout);
-        console.log(stderr);
-        cb(err);
-      });
+      make_exec_logging_callback(cb));
 }
 
 function test_closure(cb) {
   exec(
       'JASMINE_CONFIG_PATH=jasmine.json ./node_modules/.bin/jasmine',
-      function(err, stdout, stderr) {
-        console.log(stdout);
-        console.log(stderr);
-        cb(err);
-      });
+      make_exec_logging_callback(cb));
 }
 
 function test_commonjs(cb) {
   exec('cd commonjs_out && JASMINE_CONFIG_PATH=jasmine.json NODE_PATH=test_node_modules ../node_modules/.bin/jasmine',
-       function (err, stdout, stderr) {
-         console.log(stdout);
-         console.log(stderr);
-         cb(err);
-       });
+       make_exec_logging_callback(cb));
 }
 
 exports.build_protoc_plugin = function (cb) {
   exec('bazel build generator:protoc-gen-js',
-       function (err, stdout, stderr) {
-         console.log(stdout);
-         console.log(stderr);
-         cb(err);
-       });
+       make_exec_logging_callback(cb));
 }
 
 exports.dist = series(exports.build_protoc_plugin,
