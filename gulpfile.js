@@ -134,7 +134,6 @@ function getClosureCompilerCommand(exportsFile, outputFile) {
 function gen_google_protobuf_js(cb) {
   // TODO(haberman): minify this more aggressively.
   // Will require proper externs/exports.
-  var log_file = fs.createWriteStream('/usr/local/google/home/dibenede/gulp.log', {flags:'w'});
   exec(
       getClosureCompilerCommand('commonjs/export.js', 'google-protobuf.js'),
       make_exec_logging_callback(cb));
