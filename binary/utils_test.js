@@ -739,8 +739,5 @@ describe('binaryUtilsTest', function() {
 
     // Converting base64-encoded strings into Uint8Arrays should work.
     check(convert(sourceBase64));
-
-    // Existing Uint8Array into Uint8Arrays should work.
-    check(convert(sourceUint8Array));
   });
 });
