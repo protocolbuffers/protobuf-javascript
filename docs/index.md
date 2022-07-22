@@ -27,7 +27,7 @@ the output files are computed by taking the `library` value or message name
 So, for example, let's say you invoke the compiler as follows:
 
 ```
-protoc --proto_path=src --js_out=library=whizz/ponycopter,binary:build/gen src/foo.proto src/bar/baz.proto
+protoc --plugin=protoc-gen-js=/path/to/protobuf-javascript/bazel-bin/generator/protoc-gen-js --proto_path=src --js_out=library=whizz/ponycopter,binary:build/gen src/foo.proto src/bar/baz.proto
 ```
 
 The compiler will read the files `src/foo.proto` and `src/bar/baz.proto` and
@@ -45,7 +45,7 @@ You should be able to import your generated types with statements like:
 
 ```js
 goog.require('proto.my.package.MyMessage');
-var message = proto.my.package.MyMessage();
+const message = proto.my.package.MyMessage();
 ```
 
 ### CommonJS Imports
@@ -59,7 +59,7 @@ names of the output files are computed by taking the name of the each input
 So, for example, let's say you invoke the compiler as follows:
 
 ```
-protoc --proto_path=src --js_out=import_style=commonjs,binary:build/gen src/foo.proto src/bar/baz.proto
+protoc --plugin=protoc-gen-js=/path/to/protobuf-javascript/bazel-bin/generator/protoc-gen-js --proto_path=src --js_out=import_style=commonjs,binary:build/gen src/foo.proto src/bar/baz.proto
 ```
 
 The compiler will read the files `src/foo.proto` and `src/bar/baz.proto` and
@@ -80,8 +80,8 @@ PROTOC=/path/to/protoc PROTOC_INC=/path/to/proto/include gulp dist
 You should be able to import your generated types with statements like:
 
 ```js
-var messages = require('./messages_pb');
-var message = new messages.MyMessage();
+const messages = require('./messages_pb');
+const message = new messages.MyMessage();
 ```
 
 ### Compiler Options
