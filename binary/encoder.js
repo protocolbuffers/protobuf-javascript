@@ -474,7 +474,7 @@ jspb.BinaryEncoder.prototype.writeString = function(value) {
   var oldLength = this.buffer_.length;
 
   // Protect against non-string values being silently ignored.
-  goog.asserts.assert(value.charCodeAt);
+  goog.asserts.assertString(value);
 
   for (var i = 0; i < value.length; i++) {
 
