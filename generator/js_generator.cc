@@ -3638,14 +3638,13 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       // may be blocked by things like CSP.
       //   Function('') is almost the same as eval('')
       printer->Print(
-          "var global = (function() {\n"
-          "  if (this) { return this; }\n"
-          "  if (typeof globalThis !== 'undefined') { return globalThis; }\n"
-          "  if (typeof window !== 'undefined') { return window; }\n"
-          "  if (typeof global !== 'undefined') { return global; }\n"
-          "  if (typeof self !== 'undefined') { return self; }\n"
-          "  return Function('return this')();\n"
-          "}).call(null);\n\n");
+          "var globalThis = typeof globalThis !== 'undefined' && globalThis;\n"
+          "var window = typeof window !== 'undefined' && window;\n"
+          "var global = typeof global !== 'undefined' && global;\n"
+          "var self = typeof self !== 'undefined' && self;\n"
+          "var global = globalThis || window || global || self ||\n"
+          "  (function () { return this; }).call(null) ||\n"
+          "  Function('return this')();\n\n");
     }
 
     for (int i = 0; i < file->dependency_count(); i++) {
