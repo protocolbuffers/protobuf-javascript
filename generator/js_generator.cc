@@ -3630,6 +3630,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       // set "this" inside the function to the global object. This does not work
       // if we are running in strict mode ("use strict"), so we fallback to the
       // following things (in order from first to last):
+      // - globalThis: defined in browsers
       // - window: defined in browsers
       // - global: defined in most server side environments like NodeJS
       // - self: defined inside Web Workers (WorkerGlobalScope)
@@ -3639,6 +3640,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       printer->Print(
           "var global = (function() {\n"
           "  if (this) { return this; }\n"
+          "  if (typeof globalThis !== 'undefined') { return globalThis; }\n"
           "  if (typeof window !== 'undefined') { return window; }\n"
           "  if (typeof global !== 'undefined') { return global; }\n"
           "  if (typeof self !== 'undefined') { return self; }\n"
