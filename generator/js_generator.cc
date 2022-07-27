@@ -3630,6 +3630,8 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       // set "this" inside the function to the global object. This does not work
       // if we are running in strict mode ("use strict"), so we fallback to the
       // following things (in order from first to last):
+      // - globalThis: cross-platform standard, might not be defined in older
+      // versions of browsers
       // - window: defined in browsers
       // - global: defined in most server side environments like NodeJS
       // - self: defined inside Web Workers (WorkerGlobalScope)
@@ -3637,8 +3639,13 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       // may be blocked by things like CSP.
       //   Function('') is almost the same as eval('')
       printer->Print(
-          "var global = (function() { return this || window || global || self "
-          "|| Function('return this')(); }).call(null);\n\n");
+          "var global =\n"
+          "    (typeof globalThis !== 'undefined' && globalThis) ||\n"
+          "    (typeof window !== 'undefined' && window) ||\n"
+          "    (typeof global !== 'undefined' && global) ||\n"
+          "    (typeof self !== 'undefined' && self) ||\n"
+          "    (function () { return this; }).call(null) ||\n"
+          "    Function('return this')();\n\n");
     }
 
     for (int i = 0; i < file->dependency_count(); i++) {
