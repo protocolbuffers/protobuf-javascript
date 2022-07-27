@@ -3630,7 +3630,8 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       // set "this" inside the function to the global object. This does not work
       // if we are running in strict mode ("use strict"), so we fallback to the
       // following things (in order from first to last):
-      // - globalThis: defined in browsers
+      // - globalThis: cross-platform standard, might not be defined in older
+      // versions of browsers
       // - window: defined in browsers
       // - global: defined in most server side environments like NodeJS
       // - self: defined inside Web Workers (WorkerGlobalScope)
