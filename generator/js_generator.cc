@@ -29,7 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
-#include <google/protobuf/compiler/js/well_known_types_embed.h>
+#include "generator/well_known_types_embed.h"
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
