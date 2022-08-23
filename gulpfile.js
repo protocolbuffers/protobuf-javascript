@@ -118,7 +118,12 @@ function genproto_group3_commonjs_strict(cb) {
 }
 
 
-function getClosureCompilerCommand(exportsFile, outputFile) {
+function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
+  var compilationLevel = 'ADVANCED_OPTIMIZATIONS';
+  if (keepSymbols === true) {
+    compilationLevel = 'SIMPLE_OPTIMIZATIONS';
+  }
+
   const closureLib = 'node_modules/google-closure-library';
   return [
     'node_modules/.bin/google-closure-compiler',
@@ -127,6 +132,8 @@ function getClosureCompilerCommand(exportsFile, outputFile) {
     '--js=message.js', '--js=binary/arith.js', '--js=binary/constants.js',
     '--js=binary/decoder.js', '--js=binary/encoder.js', '--js=binary/reader.js',
     '--js=binary/utils.js', '--js=binary/writer.js', `--js=${exportsFile}`,
+    `--compilation_level=${compilationLevel}"`, '--generate_exports',
+    '--export_local_property_definitions"',
     `--entry_point=${exportsFile}`, `> ${outputFile}`
   ].join(' ');
 }
@@ -145,7 +152,8 @@ function commonjs_asserts(cb) {
                 'mkdir -p commonjs_out/test_node_modules && ' +
                   getClosureCompilerCommand(
                       'commonjs/export_asserts.js',
-                      'commonjs_out/test_node_modules/closure_asserts_commonjs.js'),
+                      'commonjs_out/test_node_modules/closure_asserts_commonjs.js',
+                      true),
                 make_exec_logging_callback(cb));
 }
 
@@ -154,7 +162,8 @@ function commonjs_testdeps(cb) {
                 'mkdir -p commonjs_out/test_node_modules && ' +
                   getClosureCompilerCommand(
                       'commonjs/export_testdeps.js',
-                      'commonjs_out/test_node_modules/testdeps_commonjs.js'),
+                      'commonjs_out/test_node_modules/testdeps_commonjs.js',
+                      true),
                 make_exec_logging_callback(cb));
 }
 
