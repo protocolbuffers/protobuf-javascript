@@ -192,6 +192,7 @@ jspb.BinaryReader.prototype.getBuffer = function() {
 /**
  * @return {number} The field number of the next field in the buffer, or
  *     INVALID_FIELD_NUMBER if there is no next field.
+ * @export
  */
 jspb.BinaryReader.prototype.getFieldNumber = function() {
   return this.nextField_;
@@ -219,6 +220,7 @@ jspb.BinaryReader.prototype.isDelimited = function() {
 /**
  * @return {boolean} Whether the current wire type is an end-group tag. Used as
  * an exit condition in decoder loops in generated code.
+ * @export
  */
 jspb.BinaryReader.prototype.isEndGroup = function() {
   return this.nextWireType_ == jspb.BinaryConstants.WireType.END_GROUP;
@@ -272,6 +274,7 @@ jspb.BinaryReader.prototype.advance = function(count) {
  * we saw a valid field header or false if we've read the whole stream.
  * Throws an error if we encountered a deprecated START_GROUP/END_GROUP field.
  * @return {boolean} True if the stream contains more fields.
+ * @export
  */
 jspb.BinaryReader.prototype.nextField = function() {
   // If we're at the end of the block, there are no more fields.
@@ -541,6 +544,7 @@ jspb.BinaryReader.prototype.readAny = function(fieldType) {
  * @template T
  * @param {T} message
  * @param {function(T, !jspb.BinaryReader)} reader
+ * @export
  */
 jspb.BinaryReader.prototype.readMessage = function(message, reader) {
   goog.asserts.assert(
@@ -614,6 +618,7 @@ jspb.BinaryReader.prototype.getFieldDecoder = function() {
  * error if the next field in the stream is not of the correct wire type.
  *
  * @return {number} The value of the signed 32-bit integer field.
+ * @export
  */
 jspb.BinaryReader.prototype.readInt32 = function() {
   goog.asserts.assert(
@@ -643,6 +648,7 @@ jspb.BinaryReader.prototype.readInt32String = function() {
  * error if the next field in the stream is not of the correct wire type.
  *
  * @return {number} The value of the signed 64-bit integer field.
+ * @export
  */
 jspb.BinaryReader.prototype.readInt64 = function() {
   goog.asserts.assert(
@@ -928,6 +934,7 @@ jspb.BinaryReader.prototype.readEnum = function() {
  * field in the stream is not of the correct wire type.
  *
  * @return {string} The value of the string field.
+ * @export
  */
 jspb.BinaryReader.prototype.readString = function() {
   goog.asserts.assert(
@@ -942,6 +949,7 @@ jspb.BinaryReader.prototype.readString = function() {
  * null if the next field in the stream has an invalid length value.
  *
  * @return {!Uint8Array} The block of bytes.
+ * @export
  */
 jspb.BinaryReader.prototype.readBytes = function() {
   goog.asserts.assert(
