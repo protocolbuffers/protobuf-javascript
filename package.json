@@ -16,6 +16,7 @@
     "jasmine": "~3.4.0"
   },
   "scripts": {
+    "build": "node ./node_modules/gulp/bin/gulp.js dist",
     "test": "node ./node_modules/gulp/bin/gulp.js test"
   },
   "repository": {

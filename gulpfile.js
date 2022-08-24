@@ -1,17 +1,16 @@
-var {series} = require('gulp');
-var execFile = require('child_process').execFile;
-var glob = require('glob');
-var fs = require('fs');
+const {series} = require('gulp');
+const execFile = require('child_process').execFile;
+const glob = require('glob');
 
 function exec(command, cb) {
   execFile('sh', ['-c', command], cb);
 }
 
-var plugin =   '--plugin=protoc-gen-js=bazel-bin/generator/protoc-gen-js';
-var protoc = [(process.env.PROTOC || 'protoc'), plugin].join(' ');
-var protocInc = process.env.PROTOC_INC || '../src';
+const plugin =   '--plugin=protoc-gen-js=bazel-bin/generator/protoc-gen-js';
+const protoc = [(process.env.PROTOC || 'protoc'), plugin].join(' ');
+const protocInc = process.env.PROTOC_INC || '../src';
 
-var wellKnownTypes = [
+const wellKnownTypes = [
   'google/protobuf/any.proto',
   'google/protobuf/api.proto',
   'google/protobuf/compiler/plugin.proto',
@@ -26,9 +25,9 @@ var wellKnownTypes = [
   'google/protobuf/wrappers.proto',
 ];
 
-wellKnownTypes.forEach((path, i) => protocInc + '/' + path);
+wellKnownTypes.forEach((path) => protocInc + '/' + path);
 
-var group1Protos = [
+const group1Protos = [
   'data.proto',
   'test3.proto',
   'test5.proto',
@@ -45,14 +44,14 @@ var group1Protos = [
   'testlargenumbers.proto',
 ];
 
-var group2Protos = [
+const group2Protos = [
   'proto3_test.proto',
   'test2.proto',
   'test4.proto',
   'commonjs/test7/test7.proto',
 ];
 
-var group3Protos = [
+const group3Protos = [
   'test9.proto',
   'test10.proto'
 ];
@@ -119,9 +118,9 @@ function genproto_group3_commonjs_strict(cb) {
 
 
 function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
-  var compilationLevel = 'ADVANCED_OPTIMIZATIONS';
+  let compilationLevel = 'ADVANCED';
   if (keepSymbols === true) {
-    compilationLevel = 'SIMPLE_OPTIMIZATIONS';
+    compilationLevel = 'SIMPLE';
   }
 
   const closureLib = 'node_modules/google-closure-library';
@@ -132,8 +131,8 @@ function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
     '--js=message.js', '--js=binary/arith.js', '--js=binary/constants.js',
     '--js=binary/decoder.js', '--js=binary/encoder.js', '--js=binary/reader.js',
     '--js=binary/utils.js', '--js=binary/writer.js', `--js=${exportsFile}`,
-    `--compilation_level=${compilationLevel}"`, '--generate_exports',
-    '--export_local_property_definitions"',
+    `--compilation_level="${compilationLevel}"`, '--generate_exports',
+    '--export_local_property_definitions',
     `--entry_point=${exportsFile}`, `> ${outputFile}`
   ].join(' ');
 }
@@ -170,7 +169,7 @@ function commonjs_testdeps(cb) {
 function commonjs_out(cb) {
           // TODO(haberman): minify this more aggressively.
           // Will require proper externs/exports.
-          var cmd =
+          let cmd =
               'mkdir -p commonjs_out/binary && mkdir -p commonjs_out/test_node_modules && ';
           function addTestFile(file) {
             cmd += 'node commonjs/rewrite_tests_for_commonjs.js < ' + file +
