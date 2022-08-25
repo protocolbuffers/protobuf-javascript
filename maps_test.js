@@ -29,6 +29,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 goog.require('goog.testing.asserts');
+goog.require('goog.testing.TestCase');
 goog.require('goog.userAgent');
 
 // CommonJS-LoadFromFile: testbinary_pb proto.jspb.test

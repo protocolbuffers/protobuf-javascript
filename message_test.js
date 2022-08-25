@@ -34,6 +34,7 @@ goog.setTestOnly();
 
 goog.require('goog.testing.PropertyReplacer');
 goog.require('goog.testing.asserts');
+goog.require('goog.testing.TestCase');
 goog.require('goog.userAgent');
 
 // CommonJS-LoadFromFile: google-protobuf jspb
