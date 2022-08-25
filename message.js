@@ -705,7 +705,6 @@ jspb.Message.getField = function(msg, fieldNumber) {
  * @param {number} fieldNumber The field number.
  * @return {!Array}
  * The field's value.
- * @protected
  * @export
  */
 jspb.Message.getRepeatedField = function(msg, fieldNumber) {
@@ -718,7 +717,6 @@ jspb.Message.getRepeatedField = function(msg, fieldNumber) {
  * @param {!jspb.Message} msg A jspb proto.
  * @param {number} fieldNumber The field number.
  * @return {?number|undefined} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getOptionalFloatingPointField = function(msg, fieldNumber) {
@@ -733,7 +731,6 @@ jspb.Message.getOptionalFloatingPointField = function(msg, fieldNumber) {
  * @param {!jspb.Message} msg A jspb proto.
  * @param {number} fieldNumber The field number.
  * @return {?boolean|undefined} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getBooleanField = function(msg, fieldNumber) {
@@ -748,7 +745,6 @@ jspb.Message.getBooleanField = function(msg, fieldNumber) {
  * @param {!jspb.Message} msg A jspb proto.
  * @param {number} fieldNumber The field number.
  * @return {!Array<number>} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getRepeatedFloatingPointField = function(msg, fieldNumber) {
@@ -772,7 +768,6 @@ jspb.Message.getRepeatedFloatingPointField = function(msg, fieldNumber) {
  * @param {!jspb.Message} msg A jspb proto.
  * @param {number} fieldNumber The field number.
  * @return {!Array<boolean>} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getRepeatedBooleanField = function(msg, fieldNumber) {
@@ -910,7 +905,6 @@ jspb.Message.getFieldWithDefault = function(msg, fieldNumber, defaultValue) {
  * @param {number} fieldNumber The field number.
  * @param {boolean} defaultValue The default value.
  * @return {boolean} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getBooleanFieldWithDefault = function(
@@ -933,7 +927,6 @@ jspb.Message.getBooleanFieldWithDefault = function(
  * @param {number} fieldNumber The field number.
  * @param {number} defaultValue The default value.
  * @return {number} The field's value.
- * @protected
  * @export
  */
 jspb.Message.getFloatingPointFieldWithDefault = function(
@@ -1006,7 +999,6 @@ jspb.Message.getMapField = function(msg, fieldNumber, noLazyCreate,
  * @param {string|number|boolean|Uint8Array|Array|undefined} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setField = function(msg, fieldNumber, value) {
@@ -1029,7 +1021,6 @@ jspb.Message.setField = function(msg, fieldNumber, value) {
  * @param {number} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3IntField = function(msg, fieldNumber, value) {
@@ -1044,7 +1035,6 @@ jspb.Message.setProto3IntField = function(msg, fieldNumber, value) {
  * @param {number} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3FloatField = function(msg, fieldNumber, value) {
@@ -1059,7 +1049,6 @@ jspb.Message.setProto3FloatField = function(msg, fieldNumber, value) {
  * @param {boolean} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3BooleanField = function(msg, fieldNumber, value) {
@@ -1074,7 +1063,6 @@ jspb.Message.setProto3BooleanField = function(msg, fieldNumber, value) {
  * @param {string} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3StringField = function(msg, fieldNumber, value) {
@@ -1089,7 +1077,6 @@ jspb.Message.setProto3StringField = function(msg, fieldNumber, value) {
  * @param {!Uint8Array|string} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3BytesField = function(msg, fieldNumber, value) {
@@ -1104,7 +1091,6 @@ jspb.Message.setProto3BytesField = function(msg, fieldNumber, value) {
  * @param {number} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3EnumField = function(msg, fieldNumber, value) {
@@ -1120,7 +1106,6 @@ jspb.Message.setProto3EnumField = function(msg, fieldNumber, value) {
  * @param {string} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setProto3StringIntField = function(msg, fieldNumber, value) {
@@ -1163,7 +1148,6 @@ jspb.Message.setFieldIgnoringDefault_ = function(
  * @param {number=} opt_index Index where to put new value.
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.addToRepeatedField = function(msg, fieldNumber, value, opt_index) {
@@ -1188,7 +1172,6 @@ jspb.Message.addToRepeatedField = function(msg, fieldNumber, value, opt_index) {
  * @param {string|number|boolean|Uint8Array|Array|undefined} value New value
  * @return {T} return msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setOneofField = function(msg, fieldNumber, oneof, value) {
@@ -1220,7 +1203,6 @@ jspb.Message.setOneofField = function(msg, fieldNumber, oneof, value) {
  * @param {!jspb.Message} msg A jspb proto.
  * @param {!Array<number>} oneof The field numbers belonging to the union.
  * @return {number} The field number currently set in the union, or 0 if none.
- * @protected
  * @export
  */
 jspb.Message.computeOneofCase = function(msg, oneof) {
@@ -1256,7 +1238,6 @@ jspb.Message.computeOneofCase = function(msg, oneof) {
  * @param {number} fieldNumber The field number.
  * @param {number=} opt_required True (1) if this is a required field.
  * @return {jspb.Message} The field as a jspb proto.
- * @protected
  * @export
  */
 jspb.Message.getWrapperField = function(msg, ctor, fieldNumber, opt_required) {
@@ -1281,7 +1262,6 @@ jspb.Message.getWrapperField = function(msg, ctor, fieldNumber, opt_required) {
  * @param {function(new:jspb.Message, Array)} ctor Constructor for the field.
  * @param {number} fieldNumber The field number.
  * @return {!Array<!jspb.Message>} The repeated field as an array of protos.
- * @protected
  * @export
  */
 jspb.Message.getRepeatedWrapperField = function(msg, ctor, fieldNumber) {
@@ -1324,7 +1304,6 @@ jspb.Message.wrapRepeatedField_ = function(msg, ctor, fieldNumber) {
  * field.
  * @return {T} the msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setWrapperField = function(msg, fieldNumber, value) {
@@ -1348,7 +1327,6 @@ jspb.Message.setWrapperField = function(msg, fieldNumber, value) {
  * @param {jspb.Message|undefined} value A new value for this proto field.
  * @return {T} the msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setOneofWrapperField = function(msg, fieldNumber, oneof, value) {
@@ -1370,7 +1348,6 @@ jspb.Message.setOneofWrapperField = function(msg, fieldNumber, oneof, value) {
  * @param {Array<!jspb.Message>|undefined} value An array of protos.
  * @return {T} the msg
  * @template T
- * @protected
  * @export
  */
 jspb.Message.setRepeatedWrapperField = function(msg, fieldNumber, value) {
@@ -1408,7 +1385,6 @@ jspb.Message.setRepeatedWrapperField = function(msg, fieldNumber, value) {
  *       mapunion(T_CHILD, (X) =>
  *         cond(eq(X, 'undefined'), none(), X)))
  * =:
- * @protected
  * @export
  */
 jspb.Message.addToRepeatedWrapperField = function(
