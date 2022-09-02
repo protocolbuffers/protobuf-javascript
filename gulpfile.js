@@ -29,32 +29,32 @@ var wellKnownTypes = [
 wellKnownTypes.forEach((path, i) => protocInc + '/' + path);
 
 var group1Protos = [
-  'data.proto',
-  'test3.proto',
-  'test5.proto',
+  'protos/data.proto',
+  'protos/test3.proto',
+  'protos/test5.proto',
   'commonjs/test6/test6.proto',
-  'test8.proto',
-  'test11.proto',
-  'test12.proto',
-  'test13.proto',
-  'test14.proto',
-  'test15.proto',
-  'testbinary.proto',
-  'testempty.proto',
-  'test.proto',
-  'testlargenumbers.proto',
+  'protos/test8.proto',
+  'protos/test11.proto',
+  'protos/test12.proto',
+  'protos/test13.proto',
+  'protos/test14.proto',
+  'protos/test15.proto',
+  'protos/testbinary.proto',
+  'protos/testempty.proto',
+  'protos/test.proto',
+  'protos/testlargenumbers.proto',
 ];
 
 var group2Protos = [
-  'proto3_test.proto',
-  'test2.proto',
-  'test4.proto',
+  'protos/proto3_test.proto',
+  'protos/test2.proto',
+  'protos/test4.proto',
   'commonjs/test7/test7.proto',
 ];
 
 var group3Protos = [
-  'test9.proto',
-  'test10.proto'
+  'protos/test9.proto',
+  'protos/test10.proto'
 ];
 
 function make_exec_logging_callback(cb) {

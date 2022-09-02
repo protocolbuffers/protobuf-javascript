@@ -31,7 +31,7 @@
 goog.require('goog.testing.asserts');
 goog.require('goog.userAgent');
 
-// CommonJS-LoadFromFile: testbinary_pb proto.jspb.test
+// CommonJS-LoadFromFile: protos/testbinary_pb proto.jspb.test
 goog.require('proto.jspb.test.MapValueEnum');
 goog.require('proto.jspb.test.MapValueMessage');
 goog.require('proto.jspb.test.TestMapFields');
@@ -49,7 +49,7 @@ goog.require('proto.jspb.test.MapEntryOptionalValuesDoubleValue');
 goog.require('proto.jspb.test.MapEntryOptionalValuesEnumValue');
 goog.require('proto.jspb.test.MapEntryOptionalValuesMessageValue');
 
-// CommonJS-LoadFromFile: test_pb proto.jspb.test
+// CommonJS-LoadFromFile: protos/test_pb proto.jspb.test
 goog.require('proto.jspb.test.MapValueMessageNoBinary');
 goog.require('proto.jspb.test.TestMapFieldsNoBinary');
 

@@ -35,7 +35,7 @@ goog.require('goog.testing.asserts');
 goog.require('jspb.BinaryWriter');
 goog.require('jspb.Message');
 
-// CommonJS-LoadFromFile: ../testbinary_pb proto.jspb.test
+// CommonJS-LoadFromFile: ../protos/testbinary_pb proto.jspb.test
 goog.require('proto.jspb.test.ExtendsWithMessage');
 goog.require('proto.jspb.test.ForeignEnum');
 goog.require('proto.jspb.test.ForeignMessage');
