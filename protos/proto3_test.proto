@@ -32,7 +32,7 @@ syntax = "proto3";
 
 package jspb.test;
 
-import "testbinary.proto";
+import "protos/testbinary.proto";
 
 message TestProto3 {
   int32 singular_int32 = 1;
