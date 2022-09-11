@@ -37,20 +37,20 @@ goog.require('goog.testing.asserts');
 goog.require('goog.testing.TestCase');
 goog.require('goog.userAgent');
 
-// CommonJS-LoadFromFile: google-protobuf jspb
+// CommonJS-LoadFromFile: protos/google-protobuf jspb
 goog.require('jspb.Message');
 
-// CommonJS-LoadFromFile: test15_pb proto.jspb.filenametest.package1
+// CommonJS-LoadFromFile: protos/test15_pb proto.jspb.filenametest.package1
 goog.require('proto.jspb.filenametest.package1.b');
 
-// CommonJS-LoadFromFile: test14_pb proto.jspb.filenametest.package2
+// CommonJS-LoadFromFile: protos/test14_pb proto.jspb.filenametest.package2
 goog.require('proto.jspb.filenametest.package2.TestMessage');
 
-// CommonJS-LoadFromFile: test13_pb proto.jspb.filenametest.package1
+// CommonJS-LoadFromFile: protos/test13_pb proto.jspb.filenametest.package1
 goog.require('proto.jspb.filenametest.package1.a');
 goog.require('proto.jspb.filenametest.package1.TestMessage');
 
-// CommonJS-LoadFromFile: test12_pb proto.jspb.circulartest
+// CommonJS-LoadFromFile: protos/test12_pb proto.jspb.circulartest
 goog.require('proto.jspb.circulartest.ExtensionContainingType1');
 goog.require('proto.jspb.circulartest.ExtensionContainingType2');
 goog.require('proto.jspb.circulartest.ExtensionField1');
@@ -67,25 +67,25 @@ goog.require('proto.jspb.circulartest.NestedMessage2');
 goog.require('proto.jspb.circulartest.RepeatedMessageField1');
 goog.require('proto.jspb.circulartest.RepeatedMessageField2');
 
-// CommonJS-LoadFromFile: test11_pb proto.jspb.exttest.reverse
+// CommonJS-LoadFromFile: protos/test11_pb proto.jspb.exttest.reverse
 goog.require('proto.jspb.exttest.reverse.TestExtensionReverseOrderMessage1');
 goog.require('proto.jspb.exttest.reverse.TestExtensionReverseOrderMessage2');
 goog.require('proto.jspb.exttest.reverse.c');
 
-// CommonJS-LoadFromFile: test8_pb proto.jspb.exttest.nested
+// CommonJS-LoadFromFile: protos/test8_pb proto.jspb.exttest.nested
 goog.require('proto.jspb.exttest.nested.TestNestedExtensionsMessage');
 goog.require('proto.jspb.exttest.nested.TestOuterMessage');
 
-// CommonJS-LoadFromFile: test5_pb proto.jspb.exttest.beta
+// CommonJS-LoadFromFile: protos/test5_pb proto.jspb.exttest.beta
 goog.require('proto.jspb.exttest.beta.floatingStrField');
 
-// CommonJS-LoadFromFile: test3_pb proto.jspb.exttest
+// CommonJS-LoadFromFile: protos/test3_pb proto.jspb.exttest
 goog.require('proto.jspb.exttest.floatingMsgField');
 
-// CommonJS-LoadFromFile: test4_pb proto.jspb.exttest
+// CommonJS-LoadFromFile: protos/test4_pb proto.jspb.exttest
 goog.require('proto.jspb.exttest.floatingMsgFieldTwo');
 
-// CommonJS-LoadFromFile: test_pb proto.jspb.test
+// CommonJS-LoadFromFile: protos/test_pb proto.jspb.test
 goog.require('proto.jspb.test.BooleanFields');
 goog.require('proto.jspb.test.CloneExtension');
 goog.require('proto.jspb.test.Complex');
@@ -114,12 +114,12 @@ goog.require('proto.jspb.test.TestMessageWithOneof');
 goog.require('proto.jspb.test.TestReservedNames');
 goog.require('proto.jspb.test.TestReservedNamesExtension');
 
-// CommonJS-LoadFromFile: test2_pb proto.jspb.test
+// CommonJS-LoadFromFile: protos/test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ExtensionMessage');
 goog.require('proto.jspb.test.TestExtensionsMessage');
 
 goog.require('proto.jspb.test.TestAllowAliasEnum');
-// CommonJS-LoadFromFile: testlargenumbers_pb proto.jspb.test
+// CommonJS-LoadFromFile: protos/testlargenumbers_pb proto.jspb.test
 goog.require('proto.jspb.test.MessageWithLargeFieldNumbers');
 
 goog.require('proto.jspb.test.simple1');

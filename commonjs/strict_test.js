@@ -39,8 +39,8 @@ var global = Function('return this')();
 // Bring asserts into the global namespace.
 googleProtobuf.object.extend(global, asserts);
 
-var test9_pb = require('./test9_pb');
-var test10_pb = require('./test10_pb');
+var test9_pb = require('./protos/test9_pb');
+var test10_pb = require('./protos/test10_pb');
 
 describe('Strict test suite', function() {
   it('testImportedMessage', function() {
