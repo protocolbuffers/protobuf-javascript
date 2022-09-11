@@ -40,7 +40,6 @@ goog.provide('jspb.ExtensionFieldInfo');
 goog.provide('jspb.Message');
 
 goog.require('goog.array');
-goog.require('goog.asserts');
 goog.require('goog.crypt.base64');
 goog.require('jspb.BinaryReader');
 goog.require('jspb.Map');
@@ -1825,8 +1824,10 @@ jspb.Message.cloneMessage = function(msg) {
 jspb.Message.copyInto = function(fromMessage, toMessage) {
   goog.asserts.assertInstanceof(fromMessage, jspb.Message);
   goog.asserts.assertInstanceof(toMessage, jspb.Message);
-  goog.asserts.assert(fromMessage.constructor == toMessage.constructor,
-      'Copy source and target message should have the same type.');
+
+  if(fromMessage.constructor !== toMessage.constructor)
+      throw new Error('Copy source and target message should have the same type.');
+
   var copyOfFrom = jspb.Message.clone(fromMessage);
 
   var to = toMessage.toArray();
