@@ -427,9 +427,19 @@ describe('binaryDecoderTest', function() {
         1, 0xFFFFFFFF, Math.round);
 
     doTestUnsignedValue(
+      jspb.BinaryDecoder.prototype.readUnsignedVarint32,
+      jspb.BinaryEncoder.prototype.writeUnsignedVarint32,
+      1, 0xFFFFFFFF, Math.round);
+  
+    doTestUnsignedValue(
         jspb.BinaryDecoder.prototype.readUint64,
         jspb.BinaryEncoder.prototype.writeUint64,
         1, Math.pow(2, 64) - 1025, Math.round);
+
+    doTestUnsignedValue(
+      jspb.BinaryDecoder.prototype.readUnsignedVarint64,
+      jspb.BinaryEncoder.prototype.writeUnsignedVarint64,
+      1, Math.pow(2, 64) - 1025, Math.round);
   });
 
 
@@ -453,9 +463,19 @@ describe('binaryDecoderTest', function() {
         1, -0x80000000, 0x7FFFFFFF, Math.round);
 
     doTestSignedValue(
+      jspb.BinaryDecoder.prototype.readSignedVarint32,
+      jspb.BinaryEncoder.prototype.writeSignedVarint32,
+      1, -0x80000000, 0x7FFFFFFF, Math.round);
+
+    doTestSignedValue(
         jspb.BinaryDecoder.prototype.readInt64,
         jspb.BinaryEncoder.prototype.writeInt64,
         1, -Math.pow(2, 63), Math.pow(2, 63) - 513, Math.round);
+
+    doTestSignedValue(
+      jspb.BinaryDecoder.prototype.readSignedVarint64,
+      jspb.BinaryEncoder.prototype.writeSignedVarint64,
+      1, -Math.pow(2, 63), Math.pow(2, 63) - 513, Math.round);
   });
 
 

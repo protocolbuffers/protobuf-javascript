@@ -481,13 +481,15 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
 
 
 /**
- * The readUnsignedVarint32 above deals with signed 32-bit varints correctly,
- * so this is just an alias.
+ * Coerces the output of readUnsignedVarint32 to an int32.
  *
  * @return {number} The decoded signed 32-bit varint.
  */
-jspb.BinaryDecoder.prototype.readSignedVarint32 =
-    jspb.BinaryDecoder.prototype.readUnsignedVarint32;
+jspb.BinaryDecoder.prototype.readSignedVarint32 = function() {
+  // The `~` operator coerces to int32, and `~~` is the shortest expression of a cast.
+  // This has some edge cases (e.g. NaN becomes 0) but should be okay here.
+  return ~~(this.readUnsignedVarint32());
+}
 
 
 /**
