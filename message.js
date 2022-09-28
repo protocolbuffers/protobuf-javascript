@@ -198,7 +198,6 @@ jspb.Message.GENERATE_FROM_OBJECT = goog.define(
  * @define {boolean} Whether to generate toString methods for objects. Turn
  *     this off if you do not use toString in your project and want to trim it
  *     from the compiled JS.
- * @export
  */
 jspb.Message.GENERATE_TO_STRING =
     goog.define('jspb.Message.GENERATE_TO_STRING', true);
@@ -219,7 +218,7 @@ jspb.Message.ASSUME_LOCAL_ARRAYS =
  *     reduces the size of serialized protos. The price is an extra iteration of
  *     the proto before serialization. This is enabled by default to be
  *     backwards compatible. Projects are advised to turn this flag always off.
- * @export
+ * @private
  */
 jspb.Message.SERIALIZE_EMPTY_TRAILING_FIELDS =
     goog.define('jspb.Message.SERIALIZE_EMPTY_TRAILING_FIELDS', true);
@@ -236,7 +235,7 @@ jspb.Message.SUPPORTS_UINT8ARRAY_ = (typeof Uint8Array == 'function');
 /**
  * The internal data array.
  * @type {!Array}
- * @export
+ * @private
  */
 jspb.Message.prototype.array;
 
