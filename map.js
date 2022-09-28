@@ -60,6 +60,7 @@ goog.requireType('jspb.BinaryWriter');
  *
  * @constructor
  * @struct
+ * @export
  */
 jspb.Map = function(arr, opt_valueCtor) {
   /** @const @private */
@@ -73,6 +74,7 @@ jspb.Map = function(arr, opt_valueCtor) {
   /**
    * Is `this.arr_ updated with respect to `this.map_`?
    * @type {boolean}
+   * @export
    */
   this.arrClean = true;
 
@@ -100,6 +102,7 @@ jspb.Map.prototype.loadFromArray_ = function() {
 /**
  * Synchronize content to underlying array, if needed, and return it.
  * @return {!Array<!Array<!Object>>}
+ * @export
  */
 jspb.Map.prototype.toArray = function() {
   if (this.arrClean) {
@@ -144,6 +147,7 @@ jspb.Map.prototype.toArray = function() {
  * @param {function((boolean|undefined),V):!Object=} valueToObject
  *    The static toObject() method, if V is a message type.
  * @return {!Array<!Array<!Object>>}
+ * @export
  */
 jspb.Map.prototype.toObject = function(includeInstance, valueToObject) {
   var rawArray = this.toArray();
@@ -175,6 +179,7 @@ jspb.Map.prototype.toObject = function(includeInstance, valueToObject) {
  * @param {function(!Object):V} valueFromObject
  *    The fromObject function for type V.
  * @return {!jspb.Map<K, V>}
+ * @export
  */
 jspb.Map.fromObject = function(entries, valueCtor, valueFromObject) {
   var result = new jspb.Map([], valueCtor);
@@ -224,6 +229,7 @@ if (typeof(Symbol) != 'undefined') {
 /**
  * Returns the map's length (number of key/value pairs).
  * @return {number}
+ * @export
  */
 jspb.Map.prototype.getLength = function() {
   return this.stringKeys_().length;
@@ -232,6 +238,7 @@ jspb.Map.prototype.getLength = function() {
 
 /**
  * Clears the map.
+ * @export
  */
 jspb.Map.prototype.clear = function() {
   this.map_ = {};
@@ -246,6 +253,7 @@ jspb.Map.prototype.clear = function() {
  * @this {jspb.Map}
  * @param {K} key
  * @return {boolean} Whether any entry with this key was deleted.
+ * @export
  */
 jspb.Map.prototype.del = function(key) {
   var keyValue = key.toString();
@@ -264,6 +272,7 @@ jspb.Map.prototype.del = function(key) {
  * option.
  *
  * @return {!Array<!Array<K|V>>}
+ * @export
  */
 jspb.Map.prototype.getEntryList = function() {
   var entries = [];
@@ -281,6 +290,7 @@ jspb.Map.prototype.getEntryList = function() {
  * Returns an iterator-iterable over [key, value] pairs in the map.
  * Closure compiler sadly doesn't support tuples, ie. Iterator<[K,V]>.
  * @return {!IteratorIterable<!Array<K|V>>} The iterator-iterable.
+ * @export
  */
 jspb.Map.prototype.entries = function() {
   var entries = [];
@@ -297,6 +307,7 @@ jspb.Map.prototype.entries = function() {
 /**
  * Returns an iterator-iterable over keys in the map.
  * @return {!IteratorIterable<K>} The iterator-iterable.
+ * @export
  */
 jspb.Map.prototype.keys = function() {
   var keys = [];
@@ -313,6 +324,7 @@ jspb.Map.prototype.keys = function() {
 /**
  * Returns an iterator-iterable over values in the map.
  * @return {!IteratorIterable<V>} The iterator-iterable.
+ * @export
  */
 jspb.Map.prototype.values = function() {
   var values = [];
@@ -331,6 +343,7 @@ jspb.Map.prototype.values = function() {
  * @template T
  * @param {function(this:T, V, K, ?jspb.Map<K, V>)} cb
  * @param {T=} opt_thisArg
+ * @export
  */
 jspb.Map.prototype.forEach = function(cb, opt_thisArg) {
   var strKeys = this.stringKeys_();
@@ -347,6 +360,7 @@ jspb.Map.prototype.forEach = function(cb, opt_thisArg) {
  * @param {K} key The key
  * @param {V} value The value
  * @return {!jspb.Map<K,V>}
+ * @export
  */
 jspb.Map.prototype.set = function(key, value) {
   var entry = new jspb.Map.Entry_(key);
@@ -387,6 +401,7 @@ jspb.Map.prototype.wrapEntry_ = function(entry) {
  * Gets the value corresponding to a key in the map.
  * @param {K} key
  * @return {V|undefined} The value, or `undefined` if key not present
+ * @export
  */
 jspb.Map.prototype.get = function(key) {
   var keyValue = key.toString();
@@ -403,6 +418,7 @@ jspb.Map.prototype.get = function(key) {
  * Determines whether the given key is present in the map.
  * @param {K} key
  * @return {boolean} `true` if the key is present
+ * @export
  */
 jspb.Map.prototype.has = function(key) {
   var keyValue = key.toString();
@@ -424,6 +440,7 @@ jspb.Map.prototype.has = function(key) {
  * @param {function(V,!jspb.BinaryWriter)=} opt_valueWriterCallback
  *    The BinaryWriter serialization callback for type V, if V is a message
  *    type.
+ * @export
  */
 jspb.Map.prototype.serializeBinary = function(
     fieldNumber, writer, keyWriterFn, valueWriterFn, opt_valueWriterCallback) {
@@ -474,6 +491,7 @@ jspb.Map.prototype.serializeBinary = function(
  *    The default value for the type of map values. Accepting map entries with
  *    unset values is required for maps to be backwards compatible with the
  *    repeated message representation described here: goo.gl/zuoLAC
+ * @export
  *
  */
 jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
