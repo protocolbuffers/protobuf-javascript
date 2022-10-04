@@ -37,7 +37,7 @@
 
 goog.provide('jspb.BinaryEncoder');
 
-goog.require('goog.asserts');
+goog.require('jspb.asserts');
 goog.require('jspb.BinaryConstants');
 goog.require('jspb.utils');
 
@@ -81,12 +81,12 @@ jspb.BinaryEncoder.prototype.end = function() {
  * @param {number} highBits The high 32 bits of the int.
  */
 jspb.BinaryEncoder.prototype.writeSplitVarint64 = function(lowBits, highBits) {
-  goog.asserts.assert(lowBits == Math.floor(lowBits));
-  goog.asserts.assert(highBits == Math.floor(highBits));
-  goog.asserts.assert((lowBits >= 0) &&
-                      (lowBits < jspb.BinaryConstants.TWO_TO_32));
-  goog.asserts.assert((highBits >= 0) &&
-                      (highBits < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(lowBits == Math.floor(lowBits));
+  jspb.asserts.jspbAssert(highBits == Math.floor(highBits));
+  jspb.asserts.jspbAssert(
+      (lowBits >= 0) && (lowBits < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(
+      (highBits >= 0) && (highBits < jspb.BinaryConstants.TWO_TO_32));
 
   // Break the binary representation into chunks of 7 bits, set the 8th bit
   // in each chunk if it's not the final chunk, and append to the result.
@@ -106,12 +106,12 @@ jspb.BinaryEncoder.prototype.writeSplitVarint64 = function(lowBits, highBits) {
  * @param {number} highBits The high 32 bits of the int.
  */
 jspb.BinaryEncoder.prototype.writeSplitFixed64 = function(lowBits, highBits) {
-  goog.asserts.assert(lowBits == Math.floor(lowBits));
-  goog.asserts.assert(highBits == Math.floor(highBits));
-  goog.asserts.assert((lowBits >= 0) &&
-                      (lowBits < jspb.BinaryConstants.TWO_TO_32));
-  goog.asserts.assert((highBits >= 0) &&
-                      (highBits < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(lowBits == Math.floor(lowBits));
+  jspb.asserts.jspbAssert(highBits == Math.floor(highBits));
+  jspb.asserts.jspbAssert(
+      (lowBits >= 0) && (lowBits < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(
+      (highBits >= 0) && (highBits < jspb.BinaryConstants.TWO_TO_32));
   this.writeUint32(lowBits);
   this.writeUint32(highBits);
 };
@@ -123,9 +123,9 @@ jspb.BinaryEncoder.prototype.writeSplitFixed64 = function(lowBits, highBits) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeUnsignedVarint32 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) &&
-                      (value < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_32));
 
   while (value > 127) {
     this.buffer_.push((value & 0x7f) | 0x80);
@@ -142,9 +142,10 @@ jspb.BinaryEncoder.prototype.writeUnsignedVarint32 = function(value) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeSignedVarint32 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_31) &&
-                      (value < jspb.BinaryConstants.TWO_TO_31));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_31) &&
+      (value < jspb.BinaryConstants.TWO_TO_31));
 
   // Use the unsigned version if the value is not negative.
   if (value >= 0) {
@@ -171,12 +172,11 @@ jspb.BinaryEncoder.prototype.writeSignedVarint32 = function(value) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeUnsignedVarint64 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) &&
-                      (value < jspb.BinaryConstants.TWO_TO_64));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_64));
   jspb.utils.splitInt64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low,
-                          jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
 };
 
 
@@ -187,12 +187,12 @@ jspb.BinaryEncoder.prototype.writeUnsignedVarint64 = function(value) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeSignedVarint64 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_63) &&
-                      (value < jspb.BinaryConstants.TWO_TO_63));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_63) &&
+      (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitInt64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low,
-                          jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
 };
 
 
@@ -202,9 +202,10 @@ jspb.BinaryEncoder.prototype.writeSignedVarint64 = function(value) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarint32 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_31) &&
-                      (value < jspb.BinaryConstants.TWO_TO_31));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_31) &&
+      (value < jspb.BinaryConstants.TWO_TO_31));
   this.writeUnsignedVarint32(((value << 1) ^ (value >> 31)) >>> 0);
 };
 
@@ -216,12 +217,12 @@ jspb.BinaryEncoder.prototype.writeZigzagVarint32 = function(value) {
  * @param {number} value The integer to convert.
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarint64 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_63) &&
-                      (value < jspb.BinaryConstants.TWO_TO_63));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_63) &&
+      (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitZigzag64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low,
-                          jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
 };
 
 
@@ -257,8 +258,8 @@ jspb.BinaryEncoder.prototype.writeZigzagVarintHash64 = function(hash) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeUint8 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) && (value < 256));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert((value >= 0) && (value < 256));
   this.buffer_.push((value >>> 0) & 0xFF);
 };
 
@@ -269,8 +270,8 @@ jspb.BinaryEncoder.prototype.writeUint8 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeUint16 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) && (value < 65536));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert((value >= 0) && (value < 65536));
   this.buffer_.push((value >>> 0) & 0xFF);
   this.buffer_.push((value >>> 8) & 0xFF);
 };
@@ -282,9 +283,9 @@ jspb.BinaryEncoder.prototype.writeUint16 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeUint32 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) &&
-                      (value < jspb.BinaryConstants.TWO_TO_32));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_32));
   this.buffer_.push((value >>> 0) & 0xFF);
   this.buffer_.push((value >>> 8) & 0xFF);
   this.buffer_.push((value >>> 16) & 0xFF);
@@ -298,9 +299,9 @@ jspb.BinaryEncoder.prototype.writeUint32 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeUint64 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= 0) &&
-                      (value < jspb.BinaryConstants.TWO_TO_64));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_64));
   jspb.utils.splitUint64(value);
   this.writeUint32(jspb.utils.split64Low);
   this.writeUint32(jspb.utils.split64High);
@@ -313,8 +314,8 @@ jspb.BinaryEncoder.prototype.writeUint64 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeInt8 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -128) && (value < 128));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert((value >= -128) && (value < 128));
   this.buffer_.push((value >>> 0) & 0xFF);
 };
 
@@ -325,8 +326,8 @@ jspb.BinaryEncoder.prototype.writeInt8 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeInt16 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -32768) && (value < 32768));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert((value >= -32768) && (value < 32768));
   this.buffer_.push((value >>> 0) & 0xFF);
   this.buffer_.push((value >>> 8) & 0xFF);
 };
@@ -338,9 +339,10 @@ jspb.BinaryEncoder.prototype.writeInt16 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeInt32 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_31) &&
-                      (value < jspb.BinaryConstants.TWO_TO_31));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_31) &&
+      (value < jspb.BinaryConstants.TWO_TO_31));
   this.buffer_.push((value >>> 0) & 0xFF);
   this.buffer_.push((value >>> 8) & 0xFF);
   this.buffer_.push((value >>> 16) & 0xFF);
@@ -354,9 +356,10 @@ jspb.BinaryEncoder.prototype.writeInt32 = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeInt64 = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_63) &&
-                      (value < jspb.BinaryConstants.TWO_TO_63));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_63) &&
+      (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitInt64(value);
   this.writeSplitFixed64(jspb.utils.split64Low, jspb.utils.split64High);
 };
@@ -368,9 +371,10 @@ jspb.BinaryEncoder.prototype.writeInt64 = function(value) {
  * @param {string} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeInt64String = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((+value >= -jspb.BinaryConstants.TWO_TO_63) &&
-                      (+value < jspb.BinaryConstants.TWO_TO_63));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (+value >= -jspb.BinaryConstants.TWO_TO_63) &&
+      (+value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitHash64(jspb.utils.decimalStringToHash64(value));
   this.writeSplitFixed64(jspb.utils.split64Low, jspb.utils.split64High);
 };
@@ -382,7 +386,7 @@ jspb.BinaryEncoder.prototype.writeInt64String = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeFloat = function(value) {
-  goog.asserts.assert(
+  jspb.asserts.jspbAssert(
       value === Infinity || value === -Infinity || isNaN(value) ||
       ((value >= -jspb.BinaryConstants.FLOAT32_MAX) &&
        (value <= jspb.BinaryConstants.FLOAT32_MAX)));
@@ -397,7 +401,7 @@ jspb.BinaryEncoder.prototype.writeFloat = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeDouble = function(value) {
-  goog.asserts.assert(
+  jspb.asserts.jspbAssert(
       value === Infinity || value === -Infinity || isNaN(value) ||
       ((value >= -jspb.BinaryConstants.FLOAT64_MAX) &&
        (value <= jspb.BinaryConstants.FLOAT64_MAX)));
@@ -414,7 +418,8 @@ jspb.BinaryEncoder.prototype.writeDouble = function(value) {
  * @param {boolean|number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeBool = function(value) {
-  goog.asserts.assert(typeof value === 'boolean' || typeof value === 'number');
+  jspb.asserts.jspbAssert(
+      typeof value === 'boolean' || typeof value === 'number');
   this.buffer_.push(value ? 1 : 0);
 };
 
@@ -424,9 +429,10 @@ jspb.BinaryEncoder.prototype.writeBool = function(value) {
  * @param {number} value The value to write.
  */
 jspb.BinaryEncoder.prototype.writeEnum = function(value) {
-  goog.asserts.assert(value == Math.floor(value));
-  goog.asserts.assert((value >= -jspb.BinaryConstants.TWO_TO_31) &&
-                      (value < jspb.BinaryConstants.TWO_TO_31));
+  jspb.asserts.jspbAssert(value == Math.floor(value));
+  jspb.asserts.jspbAssert(
+      (value >= -jspb.BinaryConstants.TWO_TO_31) &&
+      (value < jspb.BinaryConstants.TWO_TO_31));
   this.writeSignedVarint32(value);
 };
 
@@ -447,8 +453,7 @@ jspb.BinaryEncoder.prototype.writeBytes = function(bytes) {
  */
 jspb.BinaryEncoder.prototype.writeVarintHash64 = function(hash) {
   jspb.utils.splitHash64(hash);
-  this.writeSplitVarint64(jspb.utils.split64Low,
-                          jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
 };
 
 
@@ -474,10 +479,9 @@ jspb.BinaryEncoder.prototype.writeString = function(value) {
   var oldLength = this.buffer_.length;
 
   // Protect against non-string values being silently ignored.
-  goog.asserts.assertString(value);
+  jspb.asserts.jspbAssertString(value);
 
   for (var i = 0; i < value.length; i++) {
-
     var c = value.charCodeAt(i);
 
     if (c < 128) {
@@ -489,18 +493,17 @@ jspb.BinaryEncoder.prototype.writeString = function(value) {
       // Look for surrogates
       if (c >= 0xD800 && c <= 0xDBFF && i + 1 < value.length) {
         var second = value.charCodeAt(i + 1);
-        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+        if (second >= 0xDC00 && second <= 0xDFFF) {  // low surrogate
           // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
           c = (c - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
 
           this.buffer_.push((c >> 18) | 240);
-          this.buffer_.push(((c >> 12) & 63 ) | 128);
+          this.buffer_.push(((c >> 12) & 63) | 128);
           this.buffer_.push(((c >> 6) & 63) | 128);
           this.buffer_.push((c & 63) | 128);
           i++;
         }
-      }
-      else {
+      } else {
         this.buffer_.push((c >> 12) | 224);
         this.buffer_.push(((c >> 6) & 63) | 128);
         this.buffer_.push((c & 63) | 128);

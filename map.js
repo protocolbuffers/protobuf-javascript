@@ -35,7 +35,7 @@
  */
 goog.provide('jspb.Map');
 
-goog.require('goog.asserts');
+goog.require('jspb.asserts');
 
 goog.requireType('jspb.BinaryReader');
 goog.requireType('jspb.BinaryWriter');
@@ -157,7 +157,7 @@ jspb.Map.prototype.toObject = function(includeInstance, valueToObject) {
     this.wrapEntry_(entry);
     var valueWrapper = /** @type {V|undefined} */ (entry.valueWrapper);
     if (valueWrapper) {
-      goog.asserts.assert(valueToObject);
+      jspb.asserts.jspbAssert(valueToObject);
       entries.push([entry.key, valueToObject(includeInstance, valueWrapper)]);
     } else {
       entries.push([entry.key, entry.value]);
@@ -512,7 +512,7 @@ jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
     } else if (field == 2) {
       // Value.
       if (map.valueCtor_) {
-        goog.asserts.assert(opt_valueReaderCallback);
+        jspb.asserts.jspbAssert(opt_valueReaderCallback);
         if (!value) {
           // Old generator still doesn't provide default value message.
           // Need this for backward compatibility.
@@ -527,8 +527,8 @@ jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
     }
   }
 
-  goog.asserts.assert(key != undefined);
-  goog.asserts.assert(value != undefined);
+  jspb.asserts.jspbAssert(key != undefined);
+  jspb.asserts.jspbAssert(value != undefined);
   map.set(key, value);
 };
 

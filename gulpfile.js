@@ -127,33 +127,29 @@ function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
   return [
     'node_modules/.bin/google-closure-compiler',
     `--js=${closureLib}/closure/goog/**.js`,
-    `--js=${closureLib}/third_party/closure/goog/**.js`, '--js=map.js',
-    '--js=message.js', '--js=binary/arith.js', '--js=binary/constants.js',
-    '--js=binary/decoder.js', '--js=binary/encoder.js', '--js=binary/reader.js',
-    '--js=binary/utils.js', '--js=binary/writer.js', `--js=${exportsFile}`,
-    `--compilation_level="${compilationLevel}"`, '--generate_exports',
+    `--js=${closureLib}/third_party/closure/goog/**.js`,
+    '--js=asserts.js',
+    '--js=map.js',
+    '--js=message.js',
+    '--js=binary/arith.js',
+    '--js=binary/constants.js',
+    '--js=binary/decoder.js',
+    '--js=binary/encoder.js',
+    '--js=binary/reader.js',
+    '--js=binary/utils.js',
+    '--js=binary/writer.js',
+    `--js=${exportsFile}`,
+    `--compilation_level="${compilationLevel}"`,
+    '--generate_exports',
     '--export_local_property_definitions',
     `--entry_point=${exportsFile}`, `> ${outputFile}`
   ].join(' ');
 }
 
 function gen_google_protobuf_js(cb) {
-  // TODO(haberman): minify this more aggressively.
-  // Will require proper externs/exports.
   exec(
       getClosureCompilerCommand('commonjs/export.js', 'google-protobuf.js'),
       make_exec_logging_callback(cb));
-}
-
-
-function commonjs_asserts(cb) {
-            exec(
-                'mkdir -p commonjs_out/test_node_modules && ' +
-                  getClosureCompilerCommand(
-                      'commonjs/export_asserts.js',
-                      'commonjs_out/test_node_modules/closure_asserts_commonjs.js',
-                      true),
-                make_exec_logging_callback(cb));
 }
 
 function commonjs_testdeps(cb) {
@@ -167,8 +163,6 @@ function commonjs_testdeps(cb) {
 }
 
 function commonjs_out(cb) {
-          // TODO(haberman): minify this more aggressively.
-          // Will require proper externs/exports.
           let cmd =
               'mkdir -p commonjs_out/binary && mkdir -p commonjs_out/test_node_modules && ';
           function addTestFile(file) {
@@ -191,7 +185,7 @@ function commonjs_out(cb) {
 
 function closure_make_deps(cb) {
   exec(
-      './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js binary/arith.js binary/constants.js binary/decoder.js binary/encoder.js binary/reader.js binary/utils.js binary/writer.js debug.js map.js message.js node_loader.js test_bootstrap.js > deps.js',
+      './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js binary/arith.js binary/constants.js binary/decoder.js binary/encoder.js binary/reader.js binary/utils.js binary/writer.js asserts.js debug.js map.js message.js node_loader.js test_bootstrap.js > deps.js',
       make_exec_logging_callback(cb));
 }
 
@@ -219,7 +213,7 @@ exports.make_commonjs_out = series(
     exports.dist,
     genproto_well_known_types_commonjs,
     genproto_group1_commonjs, genproto_group2_commonjs,
-    genproto_commonjs_wellknowntypes, commonjs_asserts,
+    genproto_commonjs_wellknowntypes,
     commonjs_testdeps, genproto_group3_commonjs_strict,
     commonjs_out);
 
