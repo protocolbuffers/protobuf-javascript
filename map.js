@@ -157,7 +157,7 @@ jspb.Map.prototype.toObject = function(includeInstance, valueToObject) {
     this.wrapEntry_(entry);
     var valueWrapper = /** @type {V|undefined} */ (entry.valueWrapper);
     if (valueWrapper) {
-      jspb.asserts.jspbAssert(valueToObject);
+      jspb.asserts.assert(valueToObject);
       entries.push([entry.key, valueToObject(includeInstance, valueWrapper)]);
     } else {
       entries.push([entry.key, entry.value]);
@@ -512,7 +512,7 @@ jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
     } else if (field == 2) {
       // Value.
       if (map.valueCtor_) {
-        jspb.asserts.jspbAssert(opt_valueReaderCallback);
+        jspb.asserts.assert(opt_valueReaderCallback);
         if (!value) {
           // Old generator still doesn't provide default value message.
           // Need this for backward compatibility.
@@ -527,8 +527,8 @@ jspb.Map.deserializeBinary = function(map, reader, keyReaderFn, valueReaderFn,
     }
   }
 
-  jspb.asserts.jspbAssert(key != undefined);
-  jspb.asserts.jspbAssert(value != undefined);
+  jspb.asserts.assert(key != undefined);
+  jspb.asserts.assert(value != undefined);
   map.set(key, value);
 };
 

@@ -630,7 +630,7 @@ jspb.utils.hash64ArrayToDecimalStrings = function(hashes, signed) {
  * @return {string}
  */
 jspb.utils.decimalStringToHash64 = function(dec) {
-  jspb.asserts.jspbAssert(dec.length > 0);
+  jspb.asserts.assert(dec.length > 0);
 
   // Check for minus sign.
   var minus = false;
@@ -733,9 +733,9 @@ jspb.utils.hash64ToHexString = function(hash) {
  */
 jspb.utils.hexStringToHash64 = function(hex) {
   hex = hex.toLowerCase();
-  jspb.asserts.jspbAssert(hex.length == 18);
-  jspb.asserts.jspbAssert(hex[0] == '0');
-  jspb.asserts.jspbAssert(hex[1] == 'x');
+  jspb.asserts.assert(hex.length == 18);
+  jspb.asserts.assert(hex[0] == '0');
+  jspb.asserts.assert(hex[1] == 'x');
 
   var result = '';
   for (var i = 0; i < 8; i++) {
@@ -1066,6 +1066,6 @@ jspb.utils.byteSourceToUint8Array = function(data) {
         new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
   }
 
-  jspb.asserts.jspbFail('Type not convertible to Uint8Array.');
+  jspb.asserts.fail('Type not convertible to Uint8Array.');
   return /** @type {!Uint8Array} */ (new Uint8Array(0));
 };

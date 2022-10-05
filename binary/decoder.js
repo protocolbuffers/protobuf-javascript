@@ -235,7 +235,7 @@ jspb.BinaryDecoder.prototype.setCursor = function(cursor) {
  */
 jspb.BinaryDecoder.prototype.advance = function(count) {
   this.cursor_ += count;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
 };
 
 
@@ -316,7 +316,7 @@ jspb.BinaryDecoder.prototype.readSplitVarint64 = function(convert) {
   }
 
   // If we did not see the terminator, the encoding was invalid.
-  jspb.asserts.jspbFail('Failed to read varint, encoding is invalid.');
+  jspb.asserts.fail('Failed to read varint, encoding is invalid.');
   this.error_ = true;
 };
 
@@ -422,7 +422,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   var x = (temp & 0x7F);
   if (temp < 128) {
     this.cursor_ += 1;
-    jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -430,7 +430,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 7;
   if (temp < 128) {
     this.cursor_ += 2;
-    jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -438,7 +438,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 14;
   if (temp < 128) {
     this.cursor_ += 3;
-    jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -446,7 +446,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 21;
   if (temp < 128) {
     this.cursor_ += 4;
-    jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -456,7 +456,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
     // We're reading the high bits of an unsigned varint. The byte we just read
     // also contains bits 33 through 35, which we're going to discard.
     this.cursor_ += 5;
-    jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x >>> 0;
   }
 
@@ -467,10 +467,10 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
       bytes[this.cursor_++] >= 128 && bytes[this.cursor_++] >= 128 &&
       bytes[this.cursor_++] >= 128) {
     // If we get here, the varint is too long.
-    jspb.asserts.jspbAssert(false);
+    jspb.asserts.assert(false);
   }
 
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return x;
 };
 
@@ -638,7 +638,7 @@ jspb.BinaryDecoder.prototype.readZigzagVarint64String = function() {
 jspb.BinaryDecoder.prototype.readUint8 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   this.cursor_ += 1;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return a;
 };
 
@@ -652,7 +652,7 @@ jspb.BinaryDecoder.prototype.readUint16 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   var b = this.bytes_[this.cursor_ + 1];
   this.cursor_ += 2;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 0) | (b << 8);
 };
 
@@ -668,7 +668,7 @@ jspb.BinaryDecoder.prototype.readUint32 = function() {
   var c = this.bytes_[this.cursor_ + 2];
   var d = this.bytes_[this.cursor_ + 3];
   this.cursor_ += 4;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return ((a << 0) | (b << 8) | (c << 16) | (d << 24)) >>> 0;
 };
 
@@ -710,7 +710,7 @@ jspb.BinaryDecoder.prototype.readUint64String = function() {
 jspb.BinaryDecoder.prototype.readInt8 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   this.cursor_ += 1;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 24) >> 24;
 };
 
@@ -724,7 +724,7 @@ jspb.BinaryDecoder.prototype.readInt16 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   var b = this.bytes_[this.cursor_ + 1];
   this.cursor_ += 2;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (((a << 0) | (b << 8)) << 16) >> 16;
 };
 
@@ -740,7 +740,7 @@ jspb.BinaryDecoder.prototype.readInt32 = function() {
   var c = this.bytes_[this.cursor_ + 2];
   var d = this.bytes_[this.cursor_ + 3];
   this.cursor_ += 4;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 0) | (b << 8) | (c << 16) | (d << 24);
 };
 
@@ -902,14 +902,14 @@ jspb.BinaryDecoder.prototype.readStringWithLength = function() {
 jspb.BinaryDecoder.prototype.readBytes = function(length) {
   if (length < 0 || this.cursor_ + length > this.bytes_.length) {
     this.error_ = true;
-    jspb.asserts.jspbFail('Invalid byte length!');
+    jspb.asserts.fail('Invalid byte length!');
     return new Uint8Array(0);
   }
 
   var result = this.bytes_.subarray(this.cursor_, this.cursor_ + length);
 
   this.cursor_ += length;
-  jspb.asserts.jspbAssert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return result;
 };
 

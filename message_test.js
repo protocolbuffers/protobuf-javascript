@@ -565,8 +565,7 @@ describe('Message test suite', function() {
     const b = new proto.jspb.test.Simple1(['str', ['s1', 's2']]);
 
     expect(() => {jspb.Message.copyInto(a, b)})
-        .toThrowError(
-            jspb.asserts.JspbAssertionError, /should have the same type/);
+        .toThrowError(Error, /should have the same type/);
   });
 
   it('testExtensions', function() {
