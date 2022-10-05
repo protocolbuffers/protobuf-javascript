@@ -32,36 +32,32 @@
 
 
 
-var googleProtobuf = require('google-protobuf');
-var asserts = require('closure_asserts_commonjs');
-var global = Function('return this')();
+const googleProtobuf = require('google-protobuf');
+const global = Function('return this')();
 
-// Bring asserts into the global namespace.
-googleProtobuf.object.extend(global, asserts);
-
-var test9_pb = require('./protos/test9_pb');
-var test10_pb = require('./protos/test10_pb');
+const test9_pb = require('./protos/test9_pb');
+const test10_pb = require('./protos/test10_pb');
 
 describe('Strict test suite', function() {
   it('testImportedMessage', function() {
-    var simple1 = new test9_pb.jspb.exttest.strict.nine.Simple9()
-    var simple2 = new test9_pb.jspb.exttest.strict.nine.Simple9()
-    assertObjectEquals(simple1.toObject(), simple2.toObject());
+    const simple1 = new test9_pb.jspb.exttest.strict.nine.Simple9()
+    const simple2 = new test9_pb.jspb.exttest.strict.nine.Simple9()
+    expect(simple1.toObject()).toEqual(simple2.toObject());
   });
 
   it('testGlobalScopePollution', function() {
-    assertObjectEquals(global.jspb.exttest, undefined);
+    expect(global.jspb.exttest).toBeUndefined();
   });
 
   describe('with imports', function() {
     it('testImportedMessage', function() {
-      var simple1 = new test10_pb.jspb.exttest.strict.ten.Simple10()
-      var simple2 = new test10_pb.jspb.exttest.strict.ten.Simple10()
-      assertObjectEquals(simple1.toObject(), simple2.toObject());
+      const simple1 = new test10_pb.jspb.exttest.strict.ten.Simple10()
+      const simple2 = new test10_pb.jspb.exttest.strict.ten.Simple10()
+      expect(simple1.toObject()).toEqual(simple2.toObject());
     });
 
     it('testGlobalScopePollution', function() {
-      assertObjectEquals(global.jspb.exttest, undefined);
+      expect(global.jspb.exttest).toBeUndefined();
     });
   });
 });
