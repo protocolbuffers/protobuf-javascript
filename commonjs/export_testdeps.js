@@ -13,3 +13,9 @@ goog.require('goog.crypt.base64');
 goog.require('goog.testing.PropertyReplacer');
 
 exports.goog = goog;
+
+// The COMPILED variable is set by Closure compiler to "true" when it compiles
+// JavaScript, so in practice this is equivalent to "exports.COMPILED = true".
+// This will disable some debugging functionality in debug.js, such as
+// attempting to check names that have been optimized away.
+exports.COMPILED = COMPILED
