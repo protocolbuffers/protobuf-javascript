@@ -88,8 +88,8 @@ goog.require('proto.jspb.test.extendRepeatedStringList');
 goog.require('proto.jspb.test.extendRepeatedUint32List');
 goog.require('proto.jspb.test.extendRepeatedUint64List');
 
-// CommonJS-LoadFromFile: ../node_modules/google-protobuf/google/protobuf/any_pb
-// proto.google.protobuf
+// clang-format off
+// CommonJS-LoadFromFile: ../node_modules/google-protobuf/google/protobuf/any_pb proto.google.protobuf
 goog.require('proto.google.protobuf.Any');
 
 
