@@ -1,50 +1,52 @@
-"""
-Generates package naming variables for use with rules_pkg.
-"""
+"""Generates package naming variables for use with rules_pkg."""
 
 load("@rules_pkg//:providers.bzl", "PackageVariablesInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 _PROTOBUF_JAVASCRIPT_VERSION = "3.21.1"
 
+
 def _package_naming_impl(ctx):
-    values = {}
-    values["version"] = _PROTOBUF_JAVASCRIPT_VERSION
+  values = {}
+  values["version"] = _PROTOBUF_JAVASCRIPT_VERSION
 
-    # infer from the current cpp toolchain.
-    toolchain = find_cpp_toolchain(ctx)
-    cpu = toolchain.cpu
-    system_name = toolchain.target_gnu_system_name
+  # infer from the current cpp toolchain.
+  toolchain = find_cpp_toolchain(ctx)
+  cpu = toolchain.cpu
+  system_name = toolchain.target_gnu_system_name
 
-    # rename cpus to match what we want artifacts to be
-    if cpu == "systemz":
-        cpu = "s390_64"
-    elif cpu == "aarch64":
-        cpu = "aarch_64"
-    elif cpu == "ppc64":
-        cpu = "ppcle_64"
+  # rename cpus to match what we want artifacts to be
+  if cpu == "systemz":
+    cpu = "s390_64"
+  elif cpu == "aarch64":
+    cpu = "aarch_64"
+  elif cpu == "ppc64":
+    cpu = "ppcle_64"
 
-    # use the system name to determine the os and then create platform names
-    if "apple" in system_name:
-        values["platform"] = "osx-" + cpu
-    elif "linux" in system_name:
-        values["platform"] = "linux-" + cpu
-    elif "mingw" in system_name:
-        if cpu == "x86_64":
-            values["platform"] = "win64"
-        else:
-            values["platform"] = "win32"
+  # use the system name to determine the os and then create platform names
+  if "apple" in system_name:
+    values["platform"] = "osx-" + cpu
+  elif "linux" in system_name:
+    values["platform"] = "linux-" + cpu
+  elif "mingw" in system_name:
+    if cpu == "x86_64":
+      values["platform"] = "win64"
     else:
-        values["platform"] = "unknown"
+      values["platform"] = "win32"
+  else:
+    values["platform"] = "unknown"
 
-    return PackageVariablesInfo(values = values)
+  return PackageVariablesInfo(values=values)
+
 
 package_naming = rule(
-    implementation = _package_naming_impl,
-    attrs = {
+    implementation=_package_naming_impl,
+    attrs={
         # Necessary data dependency for find_cpp_toolchain.
-        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        "_cc_toolchain":
+            attr.label(
+                default=Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
     },
-    toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
-    incompatible_use_toolchain_transition = True,
+    toolchains=["@bazel_tools//tools/cpp:toolchain_type"],
+    incompatible_use_toolchain_transition=True,
 )
