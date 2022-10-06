@@ -84,10 +84,10 @@ function doTestUnsignedValue(
   }
 
   // Encoding values outside the valid range should assert.
-  expect(function() {
+  expect(() => {
     writeValue.call(encoder, -1);
   }).toThrow();
-  expect(function() {
+  expect(() => {
     writeValue.call(encoder, upperLimit * 1.1);
   }).toThrow();
 }
@@ -155,11 +155,11 @@ function doTestSignedValue(
   }
 }
 
-describe('binaryDecoderTest', function() {
+describe('binaryDecoderTest', () => {
   /**
    * Tests the decoder instance cache.
    */
-  it('testInstanceCache', /** @suppress {visibility} */ function() {
+  it('testInstanceCache', /** @suppress {visibility} */ () => {
     // Empty the instance caches.
     jspb.BinaryDecoder.instanceCache_ = [];
 
@@ -183,7 +183,7 @@ describe('binaryDecoderTest', function() {
   });
 
 
-  describe('varint64', function() {
+  describe('varint64', () => {
     let /** !jspb.BinaryEncoder */ encoder;
     let /** !jspb.BinaryDecoder */ decoder;
 
@@ -195,7 +195,7 @@ describe('binaryDecoderTest', function() {
         String.fromCharCode(0x12, 0x34, 0x56, 0x78, 0x87, 0x65, 0x43, 0x21);
     const hashD =
         String.fromCharCode(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
-    beforeEach(function() {
+    beforeEach(() => {
       encoder = new jspb.BinaryEncoder();
 
       encoder.writeVarintHash64(hashA);
@@ -211,7 +211,7 @@ describe('binaryDecoderTest', function() {
       decoder = jspb.BinaryDecoder.alloc(encoder.end());
     });
 
-    it('reads 64-bit integers as hash strings', function() {
+    it('reads 64-bit integers as hash strings', () => {
       expect(hashA).toEqual(decoder.readVarintHash64());
       expect(hashB).toEqual(decoder.readVarintHash64());
       expect(hashC).toEqual(decoder.readVarintHash64());
@@ -223,7 +223,7 @@ describe('binaryDecoderTest', function() {
       expect(hashD).toEqual(decoder.readFixedHash64());
     });
 
-    it('reads split 64 bit integers', function() {
+    it('reads split 64 bit integers', () => {
       function hexJoin(bitsLow, bitsHigh) {
         return `0x${(bitsHigh >>> 0).toString(16)}:0x${
             (bitsLow >>> 0).toString(16)}`;
@@ -245,7 +245,7 @@ describe('binaryDecoderTest', function() {
     });
   });
 
-  describe('sint64', function() {
+  describe('sint64', () => {
     let /** !jspb.BinaryDecoder */ decoder;
 
     const hashA =
@@ -256,7 +256,7 @@ describe('binaryDecoderTest', function() {
         String.fromCharCode(0x12, 0x34, 0x56, 0x78, 0x87, 0x65, 0x43, 0x21);
     const hashD =
         String.fromCharCode(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
-    beforeEach(function() {
+    beforeEach(() => {
       const encoder = new jspb.BinaryEncoder();
 
       encoder.writeZigzagVarintHash64(hashA);
@@ -267,7 +267,7 @@ describe('binaryDecoderTest', function() {
       decoder = jspb.BinaryDecoder.alloc(encoder.end());
     });
 
-    it('reads 64-bit integers as decimal strings', function() {
+    it('reads 64-bit integers as decimal strings', () => {
       const signed = true;
       expect(decoder.readZigzagVarint64String())
           .toEqual(jspb.utils.hash64ToDecimalString(hashA, signed));
@@ -279,14 +279,14 @@ describe('binaryDecoderTest', function() {
           .toEqual(jspb.utils.hash64ToDecimalString(hashD, signed));
     });
 
-    it('reads 64-bit integers as hash strings', function() {
+    it('reads 64-bit integers as hash strings', () => {
       expect(decoder.readZigzagVarintHash64()).toEqual(hashA);
       expect(decoder.readZigzagVarintHash64()).toEqual(hashB);
       expect(decoder.readZigzagVarintHash64()).toEqual(hashC);
       expect(decoder.readZigzagVarintHash64()).toEqual(hashD);
     });
 
-    it('reads split 64 bit zigzag integers', function() {
+    it('reads split 64 bit zigzag integers', () => {
       function hexJoin(bitsLow, bitsHigh) {
         return `0x${(bitsHigh >>> 0).toString(16)}:0x${
             (bitsLow >>> 0).toString(16)}`;
@@ -306,7 +306,7 @@ describe('binaryDecoderTest', function() {
           .toEqual(hexJoinHash(hashD));
     });
 
-    it('does zigzag encoding properly', function() {
+    it('does zigzag encoding properly', () => {
       // Test cases directly from the protobuf dev guide.
       // https://engdoc.corp.google.com/eng/howto/protocolbuffers/developerguide/encoding.shtml?cl=head#types
       const testCases = [
@@ -340,7 +340,7 @@ describe('binaryDecoderTest', function() {
   /**
    * Tests reading and writing large strings
    */
-  it('testLargeStrings', function() {
+  it('testLargeStrings', () => {
     const encoder = new jspb.BinaryEncoder();
 
     const len = 150000;
@@ -359,7 +359,7 @@ describe('binaryDecoderTest', function() {
   /**
    * Test encoding and decoding utf-8.
    */
-  it('testUtf8', function() {
+  it('testUtf8', () => {
     const encoder = new jspb.BinaryEncoder();
 
     const ascii = 'ASCII should work in 3, 2, 1...';
@@ -384,13 +384,13 @@ describe('binaryDecoderTest', function() {
   /**
    * Verifies that passing a non-string to writeString raises an error.
    */
-  it('testBadString', function() {
+  it('testBadString', () => {
     const encoder = new jspb.BinaryEncoder();
 
-    expect(function() {
+    expect(() => {
       encoder.writeString(42)
     }).toThrow();
-    expect(function() {
+    expect(() => {
       encoder.writeString(null)
     }).toThrow();
   });
@@ -398,29 +398,29 @@ describe('binaryDecoderTest', function() {
   /**
    * Verifies that misuse of the decoder class triggers assertions.
    */
-  it('testDecodeErrors', function() {
+  it('testDecodeErrors', () => {
     // Reading a value past the end of the stream should trigger an assertion.
     const decoder = jspb.BinaryDecoder.alloc([0, 1, 2]);
-    expect(function() {
+    expect(() => {
       decoder.readUint64()
     }).toThrow();
 
     // Overlong varints should trigger assertions.
     decoder.setBlock(
         [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0]);
-    expect(function() {
+    expect(() => {
       decoder.readUnsignedVarint64()
     }).toThrow();
     decoder.reset();
-    expect(function() {
+    expect(() => {
       decoder.readSignedVarint64()
     }).toThrow();
     decoder.reset();
-    expect(function() {
+    expect(() => {
       decoder.readZigzagVarint64()
     }).toThrow();
     decoder.reset();
-    expect(function() {
+    expect(() => {
       decoder.readUnsignedVarint32()
     }).toThrow();
   });
@@ -429,7 +429,7 @@ describe('binaryDecoderTest', function() {
   /**
    * Tests encoding and decoding of unsigned integers.
    */
-  it('testUnsignedIntegers', function() {
+  it('testUnsignedIntegers', () => {
     doTestUnsignedValue(
         jspb.BinaryDecoder.prototype.readUint8,
         jspb.BinaryEncoder.prototype.writeUint8, 1, 0xFF, Math.round);
@@ -462,7 +462,7 @@ describe('binaryDecoderTest', function() {
   /**
    * Tests encoding and decoding of signed integers.
    */
-  it('testSignedIntegers', function() {
+  it('testSignedIntegers', () => {
     doTestSignedValue(
         jspb.BinaryDecoder.prototype.readInt8,
         jspb.BinaryEncoder.prototype.writeInt8, 1, -0x80, 0x7F, Math.round);
@@ -497,7 +497,7 @@ describe('binaryDecoderTest', function() {
   /**
    * Tests encoding and decoding of floats.
    */
-  it('testFloats', function() {
+  it('testFloats', () => {
     /**
      * @param {number} x
      * @return {number}

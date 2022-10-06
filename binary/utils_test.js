@@ -69,11 +69,11 @@ function toHashString(bitsLow, bitsHigh) {
 }
 
 
-describe('binaryUtilsTest', function() {
+describe('binaryUtilsTest', () => {
   /**
    * Tests lossless binary-to-decimal conversion.
    */
-  it('testDecimalConversion', function() {
+  it('testDecimalConversion', () => {
     // Check some magic numbers.
     let result = jspb.utils.joinUnsignedDecimalString(0x89e80001, 0x8ac72304);
     expect(result).toEqual('10000000000000000001');
@@ -153,7 +153,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hash strings to decimal strings should also be lossless.
    */
-  it('testHashToDecimalConversion', function() {
+  it('testHashToDecimalConversion', () => {
     let result;
     const convert = jspb.utils.hash64ToDecimalString;
 
@@ -198,7 +198,7 @@ describe('binaryUtilsTest', function() {
   /*
    * Going from decimal strings to hash strings should be lossless.
    */
-  it('testDecimalToHashConversion', function() {
+  it('testDecimalToHashConversion', () => {
     let result;
     const convert = jspb.utils.decimalStringToHash64;
 
@@ -234,7 +234,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hash strings to hex strings should be lossless.
    */
-  it('testHashToHexConversion', function() {
+  it('testHashToHexConversion', () => {
     let result;
     const convert = jspb.utils.hash64ToHexString;
 
@@ -252,7 +252,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hex strings to hash strings should be lossless.
    */
-  it('testHexToHashConversion', function() {
+  it('testHexToHashConversion', () => {
     let result;
     const convert = jspb.utils.hexStringToHash64;
 
@@ -280,7 +280,7 @@ describe('binaryUtilsTest', function() {
    * Going from numbers to hash strings should be lossless for up to 53 bits of
    * precision.
    */
-  it('testNumberToHashConversion', function() {
+  it('testNumberToHashConversion', () => {
     let result;
     const convert = jspb.utils.numberToHash64;
 
@@ -311,7 +311,7 @@ describe('binaryUtilsTest', function() {
    * Sanity check the behavior of Javascript's strings when doing funny things
    * with unicode characters.
    */
-  it('sanityCheckUnicodeStrings', function() {
+  it('sanityCheckUnicodeStrings', () => {
     const strings = new Array(65536);
 
     // All possible unsigned 16-bit values should be storable in a string, they
@@ -335,7 +335,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests conversion from 32-bit floating point numbers to split64 numbers.
    */
-  it('testFloat32ToSplit64', function() {
+  it('testFloat32ToSplit64', () => {
     const f32_eps = jspb.BinaryConstants.FLOAT32_EPS;
     const f32_min = jspb.BinaryConstants.FLOAT32_MIN;
     const f32_max = jspb.BinaryConstants.FLOAT32_MAX;
@@ -413,7 +413,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests conversion from 64-bit floating point numbers to split64 numbers.
    */
-  it('testFloat64ToSplit64', function() {
+  it('testFloat64ToSplit64', () => {
     const f64_eps = jspb.BinaryConstants.FLOAT64_EPS;
     const f64_min = jspb.BinaryConstants.FLOAT64_MIN;
     const f64_max = jspb.BinaryConstants.FLOAT64_MAX;
@@ -498,7 +498,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests zigzag conversions.
    */
-  it('can encode and decode zigzag 64', function() {
+  it('can encode and decode zigzag 64', () => {
     function stringToHiLoPair(str) {
       jspb.utils.splitDecimalString(str);
       return {
@@ -546,7 +546,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting packed varints.
    */
-  it('testCountVarints', function() {
+  it('testCountVarints', () => {
     const values = [];
     for (let i = 1; i < 1000000000; i *= 1.1) {
       values.push(Math.floor(i));
@@ -567,7 +567,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching varint fields.
    */
-  it('testCountVarintFields', function() {
+  it('testCountVarintFields', () => {
     let writer = new jspb.BinaryWriter();
 
     let count = 0;
@@ -599,7 +599,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching fixed32 fields.
    */
-  it('testCountFixed32Fields', function() {
+  it('testCountFixed32Fields', () => {
     let writer = new jspb.BinaryWriter();
 
     let count = 0;
@@ -631,7 +631,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching fixed64 fields.
    */
-  it('testCountFixed64Fields', function() {
+  it('testCountFixed64Fields', () => {
     let writer = new jspb.BinaryWriter();
 
     let count = 0;
@@ -663,7 +663,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching delimited fields.
    */
-  it('testCountDelimitedFields', function() {
+  it('testCountDelimitedFields', () => {
     let writer = new jspb.BinaryWriter();
 
     let count = 0;
@@ -695,7 +695,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests byte format for debug strings.
    */
-  it('testDebugBytesToTextFormat', function() {
+  it('testDebugBytesToTextFormat', () => {
     expect(jspb.utils.debugBytesToTextFormat(null)).toEqual('""');
     expect(jspb.utils.debugBytesToTextFormat([
       0, 16, 255
@@ -706,7 +706,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests converting byte blob sources into byte blobs.
    */
-  it('testByteSourceToUint8Array', function() {
+  it('testByteSourceToUint8Array', () => {
     const convert = jspb.utils.byteSourceToUint8Array;
 
     const sourceData = [];

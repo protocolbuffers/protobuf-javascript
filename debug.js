@@ -56,7 +56,7 @@ jspb.debug.dump = function(message) {
   if (!goog.DEBUG) {
     return null;
   }
-  jspb.asserts.assert(message instanceof jspb.Message,
+  jspb.asserts.assertInstanceof(message, jspb.Message,
       'jspb.Message instance expected');
   /** @type {Object} */
   var object = message;
@@ -102,7 +102,7 @@ jspb.debug.dump_ = function(thing) {
     return mapObject;
   }
 
-  jspb.asserts.assert(message instanceof jspb.Message,
+  jspb.asserts.assertInstanceof(message, jspb.Message,
       'Only messages expected: ' + thing);
   var ctor = message.constructor;
   var messageName = ctor.name || ctor.displayName;

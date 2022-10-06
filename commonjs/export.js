@@ -8,7 +8,6 @@
 goog.provide('jspb.Export');
 
 goog.require('goog.object');
-goog.require('jspb.asserts');
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
 goog.require('jspb.ExtensionFieldBinaryInfo');
@@ -23,7 +22,6 @@ if (typeof exports === 'object') {
   exports['BinaryWriter'] = jspb.BinaryWriter;
   exports['ExtensionFieldInfo'] = jspb.ExtensionFieldInfo;
   exports['ExtensionFieldBinaryInfo'] = jspb.ExtensionFieldBinaryInfo;
-  exports['asserts'] = jspb.asserts;
 
   // These are used by generated code but should not be used directly by clients.
   exports['exportSymbol'] = goog.exportSymbol;

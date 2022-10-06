@@ -68,11 +68,11 @@ function bytesCompare(arr, expected) {
 }
 
 
-describe('proto3Test', function() {
+describe('proto3Test', () => {
   /**
    * Test default values don't affect equality test.
    */
-  it('testEqualsProto3', function() {
+  it('testEqualsProto3', () => {
     const msg1 = new proto.jspb.test.TestProto3();
     const msg2 = new proto.jspb.test.TestProto3();
     msg2.setSingularString('');
@@ -84,7 +84,7 @@ describe('proto3Test', function() {
   /**
    * Test setting when a field has default semantics.
    */
-  it('testSetProto3ToValueAndBackToDefault', function() {
+  it('testSetProto3ToValueAndBackToDefault', () => {
     const msg = new proto.jspb.test.TestProto3();
 
     // Setting should work normally.
@@ -103,7 +103,7 @@ describe('proto3Test', function() {
   /**
    * Test defaults for proto3 message fields.
    */
-  it('testProto3FieldDefaults', function() {
+  it('testProto3FieldDefaults', () => {
     const msg = new proto.jspb.test.TestProto3();
 
     expect(msg.getSingularInt32()).toEqual(0);
@@ -154,7 +154,7 @@ describe('proto3Test', function() {
   /**
    * Test presence for proto3 optional fields.
    */
-  it('testProto3Optional', function() {
+  it('testProto3Optional', () => {
     const msg = new proto.jspb.test.TestProto3();
 
     expect(msg.getOptionalInt32()).toEqual(0);
@@ -221,7 +221,7 @@ describe('proto3Test', function() {
   /**
    * Test that all fields can be set ,and read via a serialization roundtrip.
    */
-  it('testProto3FieldSetGet', function() {
+  it('testProto3FieldSetGet', () => {
     let msg = new proto.jspb.test.TestProto3();
 
     msg.setSingularInt32(-42);
@@ -317,7 +317,7 @@ describe('proto3Test', function() {
   /**
    * Test that oneofs continue to have a notion of field presence.
    */
-  it('testOneofs', function() {
+  it('testOneofs', () => {
     // Default instance.
     const msg = new proto.jspb.test.TestProto3();
     expect(msg.getOneofUint32()).toEqual(0);
@@ -385,7 +385,7 @@ describe('proto3Test', function() {
   /**
    * Test that "default"-valued primitive fields are not emitted on the wire.
    */
-  it('testNoSerializeDefaults', function() {
+  it('testNoSerializeDefaults', () => {
     const msg = new proto.jspb.test.TestProto3();
 
     // Set each primitive to a non-default value, then back to its default, to
@@ -416,7 +416,7 @@ describe('proto3Test', function() {
   /**
    * Test that base64 string and Uint8Array are interchangeable in bytes fields.
    */
-  it('testBytesFieldsInterop', function() {
+  it('testBytesFieldsInterop', () => {
     let msg = new proto.jspb.test.TestProto3();
     // Set as a base64 string and check all the getters work.
     msg.setSingularBytes(BYTES_B64);
@@ -438,7 +438,7 @@ describe('proto3Test', function() {
     expect(bytesCompare(msg.getSingularBytes(), BYTES)).toBeTrue();
   });
 
-  it('testTimestampWellKnownType', function() {
+  it('testTimestampWellKnownType', () => {
     const msg = new proto.google.protobuf.Timestamp();
     msg.fromDate(new Date(123456789));
     expect(msg.getSeconds()).toEqual(123456);
@@ -450,7 +450,7 @@ describe('proto3Test', function() {
     expect(anotherMsg.getNanos()).toEqual(msg.getNanos());
   });
 
-  it('testStructWellKnownType', function() {
+  it('testStructWellKnownType', () => {
     const jsObj = {
       abc: 'def',
       number: 12345.678,

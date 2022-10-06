@@ -28,7 +28,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-goog.require('goog.testing.TestCase');
 goog.require('goog.userAgent');
 
 // CommonJS-LoadFromFile: protos/testbinary_pb proto.jspb.test
@@ -166,7 +165,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
     });
   };
 
-  it('testMapStringStringField' + suffix, function () {
+  it('testMapStringStringField' + suffix, () => {
     let msg = new msgInfo.constructor();
     expect(msg.getMapStringStringMap().getLength()).toEqual(0);
     expect(msg.getMapStringInt32Map().getLength()).toEqual(0);
@@ -221,7 +220,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
   /**
    * Tests operations on maps with all key and value types.
    */
-  it('testAllMapTypes' + suffix, function () {
+  it('testAllMapTypes' + suffix, () => {
     const msg = new msgInfo.constructor();
     fillMapFields(msg);
     checkMapFields(msg);
@@ -232,7 +231,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
     /**
      * Tests serialization and deserialization in binary format.
      */
-    it('testBinaryFormat' + suffix, function () {
+    it('testBinaryFormat' + suffix, () => {
       if (goog.userAgent.IE && !goog.userAgent.isDocumentModeOrHigher(10)) {
         // IE8/9 currently doesn't support binary format because they lack
         // TypedArray.
@@ -267,7 +266,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
      * Tests deserialization of undefined map keys go to default values in
      * binary format.
      */
-    it('testMapDeserializationForUndefinedKeys', function () {
+    it('testMapDeserializationForUndefinedKeys', () => {
       const testMessageOptionalKeys =
         new proto.jspb.test.TestMapFieldsOptionalKeys();
       const mapEntryStringKey =
@@ -295,7 +294,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
      * Tests deserialization of undefined map values go to default values in
      * binary format.
      */
-    it('testMapDeserializationForUndefinedValues', function () {
+    it('testMapDeserializationForUndefinedValues', () => {
       const testMessageOptionalValues =
         new proto.jspb.test.TestMapFieldsOptionalValues();
       const mapEntryStringValue =
@@ -342,7 +341,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
   /**
    * Exercises the lazy map<->underlying array sync.
    */
-  it('testLazyMapSync' + suffix, function () {
+  it('testLazyMapSync' + suffix, () => {
     // Start with a JSPB array containing a few map entries.
     const entries = [['a', 'entry 1'], ['c', 'entry 2'], ['b', 'entry 3']];
     const msg = new msgInfo.constructor([entries]);
@@ -364,7 +363,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
   /**
    * Returns IteratorIterables for entries(), keys() and values().
    */
-  it('testIteratorIterables' + suffix, function () {
+  it('testIteratorIterables' + suffix, () => {
     const msg = new msgInfo.constructor();
     const m = msg.getMapStringStringMap();
     m.set('key1', 'value1');
@@ -424,7 +423,7 @@ function makeTests(msgInfo, submessageCtor, suffix) {
   });
 }
 
-describe('mapsTest', function () {
+describe('mapsTest', () => {
   makeTests(
     {
       constructor: proto.jspb.test.TestMapFields,

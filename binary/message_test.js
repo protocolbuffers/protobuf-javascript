@@ -38,10 +38,10 @@ goog.require('proto.jspb.test.Deeply.Nested.Message');
 // CommonJS-LoadFromFile: test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ForeignNestedFieldMessage');
 
-describe('Message test suite', function() {
+describe('Message test suite', () => {
   // Verify that we can successfully use a field referring to a nested message
   // from a different .proto file.
-  it('testForeignNestedMessage', function() {
+  it('testForeignNestedMessage', () => {
     const msg = new proto.jspb.test.ForeignNestedFieldMessage();
     const nested = new proto.jspb.test.Deeply.Nested.Message();
     nested.setCount(5);

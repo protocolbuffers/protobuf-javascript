@@ -50,11 +50,11 @@ goog.require('jspb.utils');
 goog.requireType('jspb.BinaryMessage');
 
 
-describe('binaryReaderTest', function() {
+describe('binaryReaderTest', () => {
   /**
    * Tests the reader instance cache.
    */
-  it('testInstanceCaches', /** @suppress {visibility} */ function() {
+  it('testInstanceCaches', /** @suppress {visibility} */ () => {
     const writer = new jspb.BinaryWriter();
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
     writer.writeMessage(1, dummyMessage, () => {});
@@ -95,15 +95,15 @@ describe('binaryReaderTest', function() {
     // Processing the message reuses the current reader.
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(1);
-    reader.readMessage(dummyMessage, function() {
-      expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
-    });
+    reader.readMessage(dummyMessage, () => {
+        expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+      });
 
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(2);
-    reader.readMessage(dummyMessage, function() {
-      expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
-    });
+    reader.readMessage(dummyMessage, () => {
+        expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+      });
 
     expect(reader.nextField()).toEqual(false);
 
@@ -132,105 +132,105 @@ describe('binaryReaderTest', function() {
   /**
    * Verifies that misuse of the reader class triggers assertions.
    */
-  it('testReadErrors', /** @suppress {checkTypes|visibility} */ function() {
-    // Calling readMessage on a non-delimited field should trigger an
-    // assertion.
-    let reader = jspb.BinaryReader.alloc([8, 1]);
-    const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
-    reader.nextField();
-    expect(function() {
-      reader.readMessage(dummyMessage, () => {});
-    }).toThrow();
-
-    // Reading past the end of the stream should trigger an assertion.
-    reader = jspb.BinaryReader.alloc([9, 1]);
-    reader.nextField();
-    expect(function() {
-      reader.readFixed64()
-    }).toThrow();
-
-    // Reading past the end of a submessage should trigger an assertion.
-    reader = jspb.BinaryReader.alloc([10, 4, 13, 1, 1, 1]);
-    reader.nextField();
-    reader.readMessage(dummyMessage, function() {
+  it('testReadErrors', /** @suppress {checkTypes|visibility} */ () => {
+      // Calling readMessage on a non-delimited field should trigger an
+      // assertion.
+      let reader = jspb.BinaryReader.alloc([8, 1]);
+      const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
       reader.nextField();
-      expect(function() {
-        reader.readFixed32()
+      expect(() => {
+        reader.readMessage(dummyMessage, () => { });
+      }).toThrow();
+
+      // Reading past the end of the stream should trigger an assertion.
+      reader = jspb.BinaryReader.alloc([9, 1]);
+      reader.nextField();
+      expect(() => {
+        reader.readFixed64();
+      }).toThrow();
+
+      // Reading past the end of a submessage should trigger an assertion.
+      reader = jspb.BinaryReader.alloc([10, 4, 13, 1, 1, 1]);
+      reader.nextField();
+      reader.readMessage(dummyMessage, () => {
+          reader.nextField();
+          expect(() => {
+            reader.readFixed32();
+          }).toThrow();
+        });
+
+      // Skipping an invalid field should trigger an assertion.
+      reader = jspb.BinaryReader.alloc([12, 1]);
+      reader.nextWireType_ = 1000;
+      expect(() => {
+        reader.skipField();
+      }).toThrow();
+
+      // Reading fields with the wrong wire type should assert.
+      reader = jspb.BinaryReader.alloc([9, 0, 0, 0, 0, 0, 0, 0, 0]);
+      reader.nextField();
+      expect(() => {
+        reader.readInt32();
+      }).toThrow();
+      expect(function () {
+        reader.readInt32String();
+      }).toThrow();
+      expect(function () {
+        reader.readInt64();
+      }).toThrow();
+      expect(function () {
+        reader.readInt64String();
+      }).toThrow();
+      expect(function () {
+        reader.readUint32();
+      }).toThrow();
+      expect(function () {
+        reader.readUint32String();
+      }).toThrow();
+      expect(function () {
+        reader.readUint64();
+      }).toThrow();
+      expect(function () {
+        reader.readUint64String();
+      }).toThrow();
+      expect(function () {
+        reader.readSint32();
+      }).toThrow();
+      expect(function () {
+        reader.readBool();
+      }).toThrow();
+      expect(function () {
+        reader.readEnum();
+      }).toThrow();
+
+      reader = jspb.BinaryReader.alloc([8, 1]);
+      reader.nextField();
+      expect(function () {
+        reader.readFixed32();
+      }).toThrow();
+      expect(function () {
+        reader.readFixed64();
+      }).toThrow();
+      expect(function () {
+        reader.readSfixed32();
+      }).toThrow();
+      expect(function () {
+        reader.readSfixed64();
+      }).toThrow();
+      expect(function () {
+        reader.readFloat();
+      }).toThrow();
+      expect(function () {
+        reader.readDouble();
+      }).toThrow();
+
+      expect(function () {
+        reader.readString();
+      }).toThrow();
+      expect(function () {
+        reader.readBytes();
       }).toThrow();
     });
-
-    // Skipping an invalid field should trigger an assertion.
-    reader = jspb.BinaryReader.alloc([12, 1]);
-    reader.nextWireType_ = 1000;
-    expect(function() {
-      reader.skipField()
-    }).toThrow();
-
-    // Reading fields with the wrong wire type should assert.
-    reader = jspb.BinaryReader.alloc([9, 0, 0, 0, 0, 0, 0, 0, 0]);
-    reader.nextField();
-    expect(function() {
-      reader.readInt32()
-    }).toThrow();
-    expect(function() {
-      reader.readInt32String()
-    }).toThrow();
-    expect(function() {
-      reader.readInt64()
-    }).toThrow();
-    expect(function() {
-      reader.readInt64String()
-    }).toThrow();
-    expect(function() {
-      reader.readUint32()
-    }).toThrow();
-    expect(function() {
-      reader.readUint32String()
-    }).toThrow();
-    expect(function() {
-      reader.readUint64()
-    }).toThrow();
-    expect(function() {
-      reader.readUint64String()
-    }).toThrow();
-    expect(function() {
-      reader.readSint32()
-    }).toThrow();
-    expect(function() {
-      reader.readBool()
-    }).toThrow();
-    expect(function() {
-      reader.readEnum()
-    }).toThrow();
-
-    reader = jspb.BinaryReader.alloc([8, 1]);
-    reader.nextField();
-    expect(function() {
-      reader.readFixed32()
-    }).toThrow();
-    expect(function() {
-      reader.readFixed64()
-    }).toThrow();
-    expect(function() {
-      reader.readSfixed32()
-    }).toThrow();
-    expect(function() {
-      reader.readSfixed64()
-    }).toThrow();
-    expect(function() {
-      reader.readFloat()
-    }).toThrow();
-    expect(function() {
-      reader.readDouble()
-    }).toThrow();
-
-    expect(function() {
-      reader.readString()
-    }).toThrow();
-    expect(function() {
-      reader.readBytes()
-    }).toThrow();
-  });
 
 
   /**
@@ -357,7 +357,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests fields that use varint encoding.
    */
-  it('testVarintFields', function() {
+  it('testVarintFields', () => {
     expect(jspb.BinaryReader.prototype.readUint32).not.toBeUndefined();
     expect(jspb.BinaryWriter.prototype.writeUint32).not.toBeUndefined();
     expect(jspb.BinaryReader.prototype.readUint64).not.toBeUndefined();
@@ -418,7 +418,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests non-canonical redundant varint decoding.
    */
-  it('testRedundantVarintFields', function() {
+  it('testRedundantVarintFields', () => {
     expect(jspb.BinaryReader.prototype.readUint32).not.toBeNull();
     expect(jspb.BinaryReader.prototype.readUint64).not.toBeNull();
     expect(jspb.BinaryReader.prototype.readSint32).not.toBeNull();
@@ -448,7 +448,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests reading 64-bit integers as split values.
    */
-  it('handles split 64 fields', function() {
+  it('handles split 64 fields', () => {
     const writer = new jspb.BinaryWriter();
     writer.writeInt64String(1, '4294967296');
     writer.writeSfixed64String(2, '4294967298');
@@ -474,7 +474,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests 64-bit fields that are handled as strings.
    */
-  it('testStringInt64Fields', function() {
+  it('testStringInt64Fields', () => {
     const writer = new jspb.BinaryWriter();
 
     const testSignedData = [
@@ -511,7 +511,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests fields that use zigzag encoding.
    */
-  it('testZigzagFields', function() {
+  it('testZigzagFields', () => {
     doTestSignedField_(
         jspb.BinaryReader.prototype.readSint32,
         jspb.BinaryWriter.prototype.writeSint32, 1, -Math.pow(2, 31),
@@ -532,7 +532,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests fields that use fixed-length encoding.
    */
-  it('testFixedFields', function() {
+  it('testFixedFields', () => {
     doTestUnsignedField_(
         jspb.BinaryReader.prototype.readFixed32,
         jspb.BinaryWriter.prototype.writeFixed32, 1, Math.pow(2, 32) - 1,
@@ -558,7 +558,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests floating point fields.
    */
-  it('testFloatFields', function() {
+  it('testFloatFields', () => {
     doTestSignedField_(
         jspb.BinaryReader.prototype.readFloat,
         jspb.BinaryWriter.prototype.writeFloat,
@@ -579,7 +579,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests length-delimited string fields.
    */
-  it('testStringFields', function() {
+  it('testStringFields', () => {
     const s1 = 'The quick brown fox jumps over the lazy dog.';
     const s2 = '人人生而自由，在尊嚴和權利上一律平等。';
 
@@ -603,7 +603,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests length-delimited byte fields.
    */
-  it('testByteFields', function() {
+  it('testByteFields', () => {
     const message = [];
     const lowerLimit = 1;
     const upperLimit = 256;
@@ -637,14 +637,14 @@ describe('binaryReaderTest', function() {
   /**
    * Tests nested messages.
    */
-  it('testNesting', function() {
+  it('testNesting', () => {
     const writer = new jspb.BinaryWriter();
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
 
     writer.writeInt32(1, 100);
 
     // Add one message with 3 int fields.
-    writer.writeMessage(2, dummyMessage, function() {
+    writer.writeMessage(2, dummyMessage, () => {
       writer.writeInt32(3, 300);
       writer.writeInt32(4, 400);
       writer.writeInt32(5, 500);
@@ -665,7 +665,7 @@ describe('binaryReaderTest', function() {
 
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(2);
-    reader.readMessage(dummyMessage, function() {
+    reader.readMessage(dummyMessage, () => {
       // Validate embedded message 1.
       reader.nextField();
       expect(reader.getFieldNumber()).toEqual(3);
@@ -684,7 +684,7 @@ describe('binaryReaderTest', function() {
 
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(6);
-    reader.readMessage(dummyMessage, function() {
+    reader.readMessage(dummyMessage, () => {
       // Validate embedded message 2.
 
       expect(reader.nextField()).toEqual(false);
@@ -701,7 +701,7 @@ describe('binaryReaderTest', function() {
    * Tests skipping fields of each type by interleaving them with sentinel
    * values and skipping everything that's not a sentinel.
    */
-  it('testSkipField', function() {
+  it('testSkipField', () => {
     const writer = new jspb.BinaryWriter();
 
     const sentinel = 123456789;
@@ -733,7 +733,7 @@ describe('binaryReaderTest', function() {
     // Write a group with a nested group inside.
     writer.writeInt32(5, sentinel);
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
-    writer.writeGroup(5, dummyMessage, function() {
+    writer.writeGroup(5, dummyMessage, () => {
       // Previously the skipGroup implementation was wrong, which only consume
       // the decoder by nextField. This case is for making the previous
       // implementation failed in skipGroup by an early end group tag.
@@ -747,7 +747,7 @@ describe('binaryReaderTest', function() {
       // varint. The bytes have at least 9 consecutive minus byte, which will
       // fail in this.nextField for previous implementation.
       writer.writeBytes(43, [255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
-      writer.writeGroup(6, dummyMessage, function() {
+      writer.writeGroup(6, dummyMessage, () => {
         writer.writeInt64(84, 42);
         writer.writeInt64(84, 44);
         writer.writeBytes(
@@ -802,7 +802,7 @@ describe('binaryReaderTest', function() {
   /**
    * Tests packed fields.
    */
-  it('testPackedFields', function() {
+  it('testPackedFields', () => {
     const writer = new jspb.BinaryWriter();
 
     const sentinel = 123456789;
@@ -893,7 +893,7 @@ describe('binaryReaderTest', function() {
    * relative to the start of the outermost blob, not the start of their parent
    * blob.
    */
-  it('testNestedBlobs', function() {
+  it('testNestedBlobs', () => {
     // Create a proto consisting of two nested messages, with the inner one
     // containing a blob of bytes.
 
@@ -902,8 +902,8 @@ describe('binaryReaderTest', function() {
     const writer = new jspb.BinaryWriter();
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
 
-    writer.writeMessage(1, dummyMessage, function() {
-      writer.writeMessage(1, dummyMessage, function() {
+    writer.writeMessage(1, dummyMessage, () => {
+      writer.writeMessage(1, dummyMessage, () => {
         writer.writeBytes(1, blob);
       });
     });
@@ -932,14 +932,14 @@ describe('binaryReaderTest', function() {
   /**
    * Tests read callbacks.
    */
-  it('testReadCallbacks', function() {
+  it('testReadCallbacks', () => {
     const writer = new jspb.BinaryWriter();
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});
 
     // Add an int, a submessage, and another int.
     writer.writeInt32(1, 100);
 
-    writer.writeMessage(2, dummyMessage, function() {
+    writer.writeMessage(2, dummyMessage, () => {
       writer.writeInt32(3, 300);
       writer.writeInt32(4, 400);
       writer.writeInt32(5, 500);
@@ -979,7 +979,7 @@ describe('binaryReaderTest', function() {
 
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(2);
-    reader.readMessage(dummyMessage, function() {
+    reader.readMessage(dummyMessage, () => {
       // Decode the embedded message using the registered callback.
       reader.runReadCallback('readCallback');
     });
