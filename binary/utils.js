@@ -38,10 +38,11 @@
 
 goog.provide('jspb.utils');
 
-goog.require('goog.asserts');
 goog.require('goog.crypt');
 goog.require('goog.crypt.base64');
 goog.require('goog.string');
+
+goog.require('jspb.asserts');
 goog.require('jspb.BinaryConstants');
 
 
@@ -76,8 +77,8 @@ jspb.utils.split64High = 0;
 jspb.utils.splitUint64 = function(value) {
   // Extract low 32 bits and high 32 bits as unsigned integers.
   var lowBits = value >>> 0;
-  var highBits = Math.floor((value - lowBits) /
-                            jspb.BinaryConstants.TWO_TO_32) >>> 0;
+  var highBits =
+      Math.floor((value - lowBits) / jspb.BinaryConstants.TWO_TO_32) >>> 0;
 
   jspb.utils.split64Low = lowBits;
   jspb.utils.split64High = highBits;
@@ -96,8 +97,7 @@ jspb.utils.splitInt64 = function(value) {
 
   // Extract low 32 bits and high 32 bits as unsigned integers.
   var lowBits = value >>> 0;
-  var highBits = Math.floor((value - lowBits) /
-                            jspb.BinaryConstants.TWO_TO_32);
+  var highBits = Math.floor((value - lowBits) / jspb.BinaryConstants.TWO_TO_32);
   highBits = highBits >>> 0;
 
   // Perform two's complement conversion if the sign bit was set.
@@ -434,8 +434,7 @@ jspb.utils.joinFloat32 = function(bitsLow, bitsHigh) {
     // Denormal.
     return sign * Math.pow(2, -149) * mant;
   } else {
-    return sign * Math.pow(2, exp - 150) *
-           (mant + Math.pow(2, 23));
+    return sign * Math.pow(2, exp - 150) * (mant + Math.pow(2, 23));
   }
 };
 
@@ -465,7 +464,7 @@ jspb.utils.joinFloat64 = function(bitsLow, bitsHigh) {
     return sign * Math.pow(2, -1074) * mant;
   } else {
     return sign * Math.pow(2, exp - 1075) *
-           (mant + jspb.BinaryConstants.TWO_TO_52);
+        (mant + jspb.BinaryConstants.TWO_TO_52);
   }
 };
 
@@ -494,8 +493,7 @@ jspb.utils.joinHash64 = function(bitsLow, bitsHigh) {
  * @const {!Array<string>}
  */
 jspb.utils.DIGITS = [
-  '0', '1', '2', '3', '4', '5', '6', '7',
-  '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 ];
 
 /** @const @private {number} '0' */
@@ -603,9 +601,8 @@ jspb.utils.hash64ToDecimalString = function(hash, signed) {
   jspb.utils.splitHash64(hash);
   var bitsLow = jspb.utils.split64Low;
   var bitsHigh = jspb.utils.split64High;
-  return signed ?
-      jspb.utils.joinSignedDecimalString(bitsLow, bitsHigh) :
-      jspb.utils.joinUnsignedDecimalString(bitsLow, bitsHigh);
+  return signed ? jspb.utils.joinSignedDecimalString(bitsLow, bitsHigh) :
+                  jspb.utils.joinUnsignedDecimalString(bitsLow, bitsHigh);
 };
 
 
@@ -633,7 +630,7 @@ jspb.utils.hash64ArrayToDecimalStrings = function(hashes, signed) {
  * @return {string}
  */
 jspb.utils.decimalStringToHash64 = function(dec) {
-  goog.asserts.assert(dec.length > 0);
+  jspb.asserts.assert(dec.length > 0);
 
   // Check for minus sign.
   var minus = false;
@@ -736,9 +733,9 @@ jspb.utils.hash64ToHexString = function(hash) {
  */
 jspb.utils.hexStringToHash64 = function(hex) {
   hex = hex.toLowerCase();
-  goog.asserts.assert(hex.length == 18);
-  goog.asserts.assert(hex[0] == '0');
-  goog.asserts.assert(hex[1] == 'x');
+  jspb.asserts.assert(hex.length == 18);
+  jspb.asserts.assert(hex[0] == '0');
+  jspb.asserts.assert(hex[1] == 'x');
 
   var result = '';
   for (var i = 0; i < 8; i++) {
@@ -777,8 +774,7 @@ jspb.utils.hash64ToNumber = function(hash, signed) {
  */
 jspb.utils.numberToHash64 = function(value) {
   jspb.utils.splitInt64(value);
-  return jspb.utils.joinHash64(jspb.utils.split64Low,
-                                  jspb.utils.split64High);
+  return jspb.utils.joinHash64(jspb.utils.split64Low, jspb.utils.split64High);
 };
 
 
@@ -868,8 +864,7 @@ jspb.utils.countVarintFields = function(buffer, start, end, field) {
  * @return {number} The number of fields with a matching tag in the buffer.
  * @private
  */
-jspb.utils.countFixedFields_ =
-    function(buffer, start, end, tag, stride) {
+jspb.utils.countFixedFields_ = function(buffer, start, end, tag, stride) {
   var count = 0;
   var cursor = start;
 
@@ -1026,8 +1021,9 @@ jspb.utils.stringToByteArray = function(str) {
   for (var i = 0; i < str.length; i++) {
     var codepoint = str.charCodeAt(i);
     if (codepoint > 255) {
-      throw new Error('Conversion error: string contains codepoint ' +
-                      'outside of byte range');
+      throw new Error(
+          'Conversion error: string contains codepoint ' +
+          'outside of byte range');
     }
     arr[i] = codepoint;
   }
@@ -1043,21 +1039,21 @@ jspb.utils.stringToByteArray = function(str) {
  */
 jspb.utils.byteSourceToUint8Array = function(data) {
   if (data.constructor === Uint8Array) {
-    return /** @type {!Uint8Array} */(data);
+    return /** @type {!Uint8Array} */ (data);
   }
 
   if (data.constructor === ArrayBuffer) {
-    data = /** @type {!ArrayBuffer} */(data);
-    return /** @type {!Uint8Array} */(new Uint8Array(data));
+    data = /** @type {!ArrayBuffer} */ (data);
+    return /** @type {!Uint8Array} */ (new Uint8Array(data));
   }
 
   if (data.constructor === Array) {
-    data = /** @type {!Array<number>} */(data);
-    return /** @type {!Uint8Array} */(new Uint8Array(data));
+    data = /** @type {!Array<number>} */ (data);
+    return /** @type {!Uint8Array} */ (new Uint8Array(data));
   }
 
   if (data.constructor === String) {
-    data = /** @type {string} */(data);
+    data = /** @type {string} */ (data);
     return goog.crypt.base64.decodeStringToUint8Array(data);
   }
 
@@ -1070,6 +1066,6 @@ jspb.utils.byteSourceToUint8Array = function(data) {
         new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
   }
 
-  goog.asserts.fail('Type not convertible to Uint8Array.');
-  return /** @type {!Uint8Array} */(new Uint8Array(0));
+  jspb.asserts.fail('Type not convertible to Uint8Array.');
+  return /** @type {!Uint8Array} */ (new Uint8Array(0));
 };

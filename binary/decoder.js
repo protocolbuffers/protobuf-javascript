@@ -46,7 +46,7 @@
 
 goog.provide('jspb.BinaryDecoder');
 
-goog.require('goog.asserts');
+goog.require('jspb.asserts');
 goog.require('goog.crypt');
 goog.require('jspb.utils');
 
@@ -145,8 +145,8 @@ jspb.BinaryDecoder.prototype.free = function() {
  * @return {!jspb.BinaryDecoder}
  */
 jspb.BinaryDecoder.prototype.clone = function() {
-  return jspb.BinaryDecoder.alloc(this.bytes_,
-      this.start_, this.end_ - this.start_);
+  return jspb.BinaryDecoder.alloc(
+      this.bytes_, this.start_, this.end_ - this.start_);
 };
 
 
@@ -178,8 +178,7 @@ jspb.BinaryDecoder.prototype.getBuffer = function() {
  * @param {number=} opt_length The optional length of the block to read -
  *     we'll throw an assertion if we go off the end of the block.
  */
-jspb.BinaryDecoder.prototype.setBlock =
-    function(data, opt_start, opt_length) {
+jspb.BinaryDecoder.prototype.setBlock = function(data, opt_start, opt_length) {
   this.bytes_ = jspb.utils.byteSourceToUint8Array(data);
   this.start_ = (opt_start !== undefined) ? opt_start : 0;
   this.end_ = (opt_length !== undefined) ? this.start_ + opt_length :
@@ -236,7 +235,7 @@ jspb.BinaryDecoder.prototype.setCursor = function(cursor) {
  */
 jspb.BinaryDecoder.prototype.advance = function(count) {
   this.cursor_ += count;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
 };
 
 
@@ -263,9 +262,7 @@ jspb.BinaryDecoder.prototype.pastEnd = function() {
  * @return {boolean}
  */
 jspb.BinaryDecoder.prototype.getError = function() {
-  return this.error_ ||
-         (this.cursor_ < 0) ||
-         (this.cursor_ > this.end_);
+  return this.error_ || (this.cursor_ < 0) || (this.cursor_ > this.end_);
 };
 
 
@@ -319,7 +316,7 @@ jspb.BinaryDecoder.prototype.readSplitVarint64 = function(convert) {
   }
 
   // If we did not see the terminator, the encoding was invalid.
-  goog.asserts.fail('Failed to read varint, encoding is invalid.');
+  jspb.asserts.fail('Failed to read varint, encoding is invalid.');
   this.error_ = true;
 };
 
@@ -425,7 +422,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   var x = (temp & 0x7F);
   if (temp < 128) {
     this.cursor_ += 1;
-    goog.asserts.assert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -433,7 +430,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 7;
   if (temp < 128) {
     this.cursor_ += 2;
-    goog.asserts.assert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -441,7 +438,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 14;
   if (temp < 128) {
     this.cursor_ += 3;
-    goog.asserts.assert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -449,7 +446,7 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
   x |= (temp & 0x7F) << 21;
   if (temp < 128) {
     this.cursor_ += 4;
-    goog.asserts.assert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x;
   }
 
@@ -459,23 +456,21 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
     // We're reading the high bits of an unsigned varint. The byte we just read
     // also contains bits 33 through 35, which we're going to discard.
     this.cursor_ += 5;
-    goog.asserts.assert(this.cursor_ <= this.end_);
+    jspb.asserts.assert(this.cursor_ <= this.end_);
     return x >>> 0;
   }
 
   // If we get here, we need to truncate coming bytes. However we need to make
   // sure cursor place is correct.
   this.cursor_ += 5;
-  if (bytes[this.cursor_++] >= 128 &&
-      bytes[this.cursor_++] >= 128 &&
-      bytes[this.cursor_++] >= 128 &&
-      bytes[this.cursor_++] >= 128 &&
+  if (bytes[this.cursor_++] >= 128 && bytes[this.cursor_++] >= 128 &&
+      bytes[this.cursor_++] >= 128 && bytes[this.cursor_++] >= 128 &&
       bytes[this.cursor_++] >= 128) {
     // If we get here, the varint is too long.
-    goog.asserts.assert(false);
+    jspb.asserts.assert(false);
   }
 
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return x;
 };
 
@@ -485,19 +480,21 @@ jspb.BinaryDecoder.prototype.readUnsignedVarint32 = function() {
  *
  * @return {number} The decoded signed 32-bit varint.
  */
-jspb.BinaryDecoder.prototype.readSignedVarint32 = function() {
-  // The `~` operator coerces to int32, and `~~` is the shortest expression of a cast.
-  // This has some edge cases (e.g. NaN becomes 0) but should be okay here.
+jspb.BinaryDecoder.prototype.readSignedVarint32 =
+    function() {
+  // The `~` operator coerces to int32, and `~~` is the shortest expression of a
+  // cast. This has some edge cases (e.g. NaN becomes 0) but should be okay
+  // here.
   return ~~(this.readUnsignedVarint32());
 }
 
 
-/**
- * Reads a 32-bit unsigned variant and returns its value as a string.
- *
- * @return {string} The decoded unsigned 32-bit varint as a string.
- */
-jspb.BinaryDecoder.prototype.readUnsignedVarint32String = function() {
+    /**
+     * Reads a 32-bit unsigned variant and returns its value as a string.
+     *
+     * @return {string} The decoded unsigned 32-bit varint as a string.
+     */
+    jspb.BinaryDecoder.prototype.readUnsignedVarint32String = function() {
   // 32-bit integers fit in JavaScript numbers without loss of precision, so
   // string variants of 32-bit varint readers can simply delegate then convert
   // to string.
@@ -531,7 +528,7 @@ jspb.BinaryDecoder.prototype.readSignedVarint32String = function() {
  */
 jspb.BinaryDecoder.prototype.readZigzagVarint32 = function() {
   var result = this.readUnsignedVarint32();
-  return (result >>> 1) ^ - (result & 1);
+  return (result >>> 1) ^ -(result & 1);
 };
 
 
@@ -641,7 +638,7 @@ jspb.BinaryDecoder.prototype.readZigzagVarint64String = function() {
 jspb.BinaryDecoder.prototype.readUint8 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   this.cursor_ += 1;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return a;
 };
 
@@ -655,7 +652,7 @@ jspb.BinaryDecoder.prototype.readUint16 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   var b = this.bytes_[this.cursor_ + 1];
   this.cursor_ += 2;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 0) | (b << 8);
 };
 
@@ -671,7 +668,7 @@ jspb.BinaryDecoder.prototype.readUint32 = function() {
   var c = this.bytes_[this.cursor_ + 2];
   var d = this.bytes_[this.cursor_ + 3];
   this.cursor_ += 4;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return ((a << 0) | (b << 8) | (c << 16) | (d << 24)) >>> 0;
 };
 
@@ -713,7 +710,7 @@ jspb.BinaryDecoder.prototype.readUint64String = function() {
 jspb.BinaryDecoder.prototype.readInt8 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   this.cursor_ += 1;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 24) >> 24;
 };
 
@@ -727,7 +724,7 @@ jspb.BinaryDecoder.prototype.readInt16 = function() {
   var a = this.bytes_[this.cursor_ + 0];
   var b = this.bytes_[this.cursor_ + 1];
   this.cursor_ += 2;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (((a << 0) | (b << 8)) << 16) >> 16;
 };
 
@@ -743,7 +740,7 @@ jspb.BinaryDecoder.prototype.readInt32 = function() {
   var c = this.bytes_[this.cursor_ + 2];
   var d = this.bytes_[this.cursor_ + 3];
   this.cursor_ += 4;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return (a << 0) | (b << 8) | (c << 16) | (d << 24);
 };
 
@@ -839,27 +836,28 @@ jspb.BinaryDecoder.prototype.readString = function(length) {
   var result = '';
   while (cursor < end) {
     var c = bytes[cursor++];
-    if (c < 128) { // Regular 7-bit ASCII.
+    if (c < 128) {  // Regular 7-bit ASCII.
       codeUnits.push(c);
     } else if (c < 192) {
       // UTF-8 continuation mark. We are out of sync. This
       // might happen if we attempted to read a character
       // with more than four bytes.
       continue;
-    } else if (c < 224) { // UTF-8 with two bytes.
+    } else if (c < 224) {  // UTF-8 with two bytes.
       var c2 = bytes[cursor++];
       codeUnits.push(((c & 31) << 6) | (c2 & 63));
-    } else if (c < 240) { // UTF-8 with three bytes.
+    } else if (c < 240) {  // UTF-8 with three bytes.
       var c2 = bytes[cursor++];
       var c3 = bytes[cursor++];
       codeUnits.push(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-    } else if (c < 248) { // UTF-8 with 4 bytes.
+    } else if (c < 248) {  // UTF-8 with 4 bytes.
       var c2 = bytes[cursor++];
       var c3 = bytes[cursor++];
       var c4 = bytes[cursor++];
       // Characters written on 4 bytes have 21 bits for a codepoint.
       // We can't fit that on 16bit characters, so we use surrogates.
-      var codepoint = ((c & 7) << 18) | ((c2 & 63) << 12) | ((c3 & 63) << 6) | (c4 & 63);
+      var codepoint =
+          ((c & 7) << 18) | ((c2 & 63) << 12) | ((c3 & 63) << 6) | (c4 & 63);
       // Surrogates formula from wikipedia.
       // 1. Subtract 0x10000 from codepoint
       codepoint -= 0x10000;
@@ -902,17 +900,16 @@ jspb.BinaryDecoder.prototype.readStringWithLength = function() {
  *     length was invalid.
  */
 jspb.BinaryDecoder.prototype.readBytes = function(length) {
-  if (length < 0 ||
-      this.cursor_ + length > this.bytes_.length) {
+  if (length < 0 || this.cursor_ + length > this.bytes_.length) {
     this.error_ = true;
-    goog.asserts.fail('Invalid byte length!');
+    jspb.asserts.fail('Invalid byte length!');
     return new Uint8Array(0);
   }
 
   var result = this.bytes_.subarray(this.cursor_, this.cursor_ + length);
 
   this.cursor_ += length;
-  goog.asserts.assert(this.cursor_ <= this.end_);
+  jspb.asserts.assert(this.cursor_ <= this.end_);
   return result;
 };
 

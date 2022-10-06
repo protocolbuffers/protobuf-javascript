@@ -30,8 +30,6 @@
 
 goog.setTestOnly();
 
-goog.require('goog.testing.asserts');
-
 // CommonJS-LoadFromFile: google-protobuf
 goog.require('jspb.debug');
 
@@ -46,61 +44,61 @@ goog.require('proto.jspb.test.TestMapFieldsNoBinary');
 // CommonJS-LoadFromFile: testbinary_pb
 goog.require('proto.jspb.test.TestAllTypes');
 
-describe('debugTest', function() {
-  it('testSimple1', function() {
+describe('debugTest', function () {
+  it('testSimple1', function () {
     if (COMPILED) {
       return;
     }
-    var message = new proto.jspb.test.Simple1();
+    const message = new proto.jspb.test.Simple1();
     message.setAString('foo');
-    assertObjectEquals({
+    expect(jspb.debug.dump(message)).toEqual({
       $name: 'proto.jspb.test.Simple1',
       'aString': 'foo',
       'aRepeatedStringList': []
-    }, jspb.debug.dump(message));
+    });
 
     message.setABoolean(true);
     message.setARepeatedStringList(['1', '2']);
 
-    assertObjectEquals({
+    expect(jspb.debug.dump(message)).toEqual({
       $name: 'proto.jspb.test.Simple1',
       'aString': 'foo',
       'aRepeatedStringList': ['1', '2'],
       'aBoolean': true
-    }, jspb.debug.dump(message));
+    });
 
     message.clearAString();
 
-    assertObjectEquals({
+    expect(jspb.debug.dump(message)).toEqual({
       $name: 'proto.jspb.test.Simple1',
       'aRepeatedStringList': ['1', '2'],
       'aBoolean': true
-    }, jspb.debug.dump(message));
+    });
   });
 
-  it('testBytes', function() {
+  it('testBytes', function () {
     if (COMPILED || typeof Uint8Array == 'undefined') {
       return;
     }
-    var message = new proto.jspb.test.TestAllTypes();
-    var bytes = new Uint8Array(4);
+    const message = new proto.jspb.test.TestAllTypes();
+    const bytes = new Uint8Array(4);
     message.setOptionalBytes(bytes);
-    assertEquals(jspb.debug.dump(message)['optionalBytes'], bytes);
+    expect(bytes).toEqual(jspb.debug.dump(message)['optionalBytes']);
   });
 
-  it('testExtensions', function() {
+  it('testExtensions', function () {
     if (COMPILED) {
       return;
     }
-    var extension = new proto.jspb.test.IsExtension();
+    const extension = new proto.jspb.test.IsExtension();
     extension.setExt1('ext1field');
-    var extendable = new proto.jspb.test.HasExtensions();
+    const extendable = new proto.jspb.test.HasExtensions();
     extendable.setStr1('v1');
     extendable.setStr2('v2');
     extendable.setStr3('v3');
     extendable.setExtension(proto.jspb.test.IsExtension.extField, extension);
 
-    assertObjectEquals({
+    expect(jspb.debug.dump(extendable)).toEqual({
       '$name': 'proto.jspb.test.HasExtensions',
       'str1': 'v1',
       'str2': 'v2',
@@ -112,20 +110,20 @@ describe('debugTest', function() {
         },
         'repeatedSimpleList': []
       }
-    }, jspb.debug.dump(extendable));
+    });
   });
 
-  it('testMapsBasicTypes', function() {
+  it('testMapsBasicTypes', function () {
     if (COMPILED) {
       return;
     }
 
-    var message = new proto.jspb.test.TestMapFieldsNoBinary();
+    const message = new proto.jspb.test.TestMapFieldsNoBinary();
     message.getMapBoolStringMap().set(true, 'bool_string_value1');
     message.getMapBoolStringMap().set(false, 'bool_string_value2');
     message.getMapStringInt32Map().set('key', 111);
 
-    assertObjectEquals({
+    expect(jspb.debug.dump(message)).toEqual({
       '$name': 'proto.jspb.test.TestMapFieldsNoBinary',
       'mapBoolStringMap': {
         true: 'bool_string_value1',
@@ -143,24 +141,24 @@ describe('debugTest', function() {
       'mapStringMsgMap': {},
       'mapStringStringMap': {},
       'mapStringTestmapfieldsMap': {}
-    }, jspb.debug.dump(message));
+    });
   });
 
-  it('testMapsMessageValues', function() {
+  it('testMapsMessageValues', function () {
     if (COMPILED) {
       return;
     }
 
-    var value1 = new proto.jspb.test.MapValueMessageNoBinary();
+    const value1 = new proto.jspb.test.MapValueMessageNoBinary();
     value1.setFoo(1111);
-    var value2 = new proto.jspb.test.MapValueMessageNoBinary();
+    const value2 = new proto.jspb.test.MapValueMessageNoBinary();
     value2.setFoo(2222);
 
-    var message = new proto.jspb.test.TestMapFieldsNoBinary();
+    const message = new proto.jspb.test.TestMapFieldsNoBinary();
     message.getMapStringMsgMap().set('key1', value1);
     message.getMapStringMsgMap().set('key2', value2);
 
-    assertObjectEquals({
+    expect(jspb.debug.dump(message)).toEqual({
       '$name': 'proto.jspb.test.TestMapFieldsNoBinary',
       'mapBoolStringMap': {},
       'mapInt32StringMap': {},
@@ -182,7 +180,7 @@ describe('debugTest', function() {
       },
       'mapStringStringMap': {},
       'mapStringTestmapfieldsMap': {}
-    }, jspb.debug.dump(message));
+    });
   });
 
 });

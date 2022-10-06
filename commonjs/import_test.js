@@ -32,21 +32,18 @@
 
 
 
-var googleProtobuf = require('google-protobuf');
-var asserts = require('closure_asserts_commonjs');
-var global = Function('return this')();
+const googleProtobuf = require('google-protobuf');
+const global = Function('return this')();
 
-// Bring asserts into the global namespace.
-googleProtobuf.object.extend(global, asserts);
 googleProtobuf.exportSymbol('jspb.Message', googleProtobuf.Message, global);
 
 var test7_pb = require('./test7/test7_pb');
 googleProtobuf.exportSymbol('proto.jspb.test.framing.FramingMessage', test7_pb.FramingMessage, global);
 
-describe('Import test suite', function() {
-  it('testImportedMessage', function() {
-    var framing1 = new proto.jspb.test.framing.FramingMessage([]);
-    var framing2 = new proto.jspb.test.framing.FramingMessage([]);
-    assertObjectEquals(framing1.toObject(), framing2.toObject());
+describe('Import test suite', () => {
+  it('testImportedMessage', () => {
+    const framing1 = new proto.jspb.test.framing.FramingMessage([]);
+    const framing2 = new proto.jspb.test.framing.FramingMessage([]);
+    expect(framing1.toObject()).toEqual(framing2.toObject());
   });
 });

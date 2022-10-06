@@ -27,6 +27,7 @@ pkg_files(
         "package.json",
         "README.md",
         "LICENSE.md",
+        "LICENSE-asserts.md",
     ],
     strip_prefix = strip_prefix.from_root(""),
 )

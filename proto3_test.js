@@ -29,7 +29,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 goog.require('goog.crypt.base64');
-goog.require('goog.testing.asserts');
 // CommonJS-LoadFromFile: protos/testbinary_pb proto.jspb.test
 goog.require('proto.jspb.test.ForeignMessage');
 // CommonJS-LoadFromFile: protos/proto3_test_pb proto.jspb.test
@@ -43,9 +42,9 @@ goog.require('proto.google.protobuf.Timestamp');
 goog.require('proto.google.protobuf.Struct');
 goog.require('jspb.Message');
 
-var BYTES = new Uint8Array([1, 2, 8, 9]);
-var BYTES_B64 = goog.crypt.base64.encodeByteArray(BYTES);
 
+const BYTES = new Uint8Array([1, 2, 8, 9]);
+const BYTES_B64 = goog.crypt.base64.encodeByteArray(BYTES);
 
 /**
  * Helper: compare a bytes field to an expected value
@@ -60,7 +59,7 @@ function bytesCompare(arr, expected) {
   if (arr.length != expected.length) {
     return false;
   }
-  for (var i = 0; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     if (arr[i] != expected[i]) {
       return false;
     }
@@ -69,162 +68,161 @@ function bytesCompare(arr, expected) {
 }
 
 
-describe('proto3Test', function() {
+describe('proto3Test', () => {
   /**
    * Test default values don't affect equality test.
    */
-  it('testEqualsProto3', function() {
-    var msg1 = new proto.jspb.test.TestProto3();
-    var msg2 = new proto.jspb.test.TestProto3();
+  it('testEqualsProto3', () => {
+    const msg1 = new proto.jspb.test.TestProto3();
+    const msg2 = new proto.jspb.test.TestProto3();
     msg2.setSingularString('');
 
-    assertTrue(jspb.Message.equals(msg1, msg2));
+    expect(jspb.Message.equals(msg1, msg2)).toBeTrue();
   });
 
 
   /**
    * Test setting when a field has default semantics.
    */
-  it('testSetProto3ToValueAndBackToDefault', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testSetProto3ToValueAndBackToDefault', () => {
+    const msg = new proto.jspb.test.TestProto3();
 
     // Setting should work normally.
     msg.setSingularString('optionalString');
-    assertEquals(msg.getSingularString(), 'optionalString');
+    expect(msg.getSingularString()).toEqual('optionalString');
 
     // Clearing should work too ...
     msg.setSingularString('');
-    assertEquals(msg.getSingularString(), '');
+    expect(msg.getSingularString()).toEqual('');
 
     // ... and shouldn't affect the equality with a brand new message.
-    assertTrue(jspb.Message.equals(msg, new proto.jspb.test.TestProto3()));
+    expect(jspb.Message.equals(msg, new proto.jspb.test.TestProto3()))
+        .toBeTrue();
   });
 
   /**
    * Test defaults for proto3 message fields.
    */
-  it('testProto3FieldDefaults', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testProto3FieldDefaults', () => {
+    const msg = new proto.jspb.test.TestProto3();
 
-    assertEquals(msg.getSingularInt32(), 0);
-    assertEquals(msg.getSingularInt64(), 0);
-    assertEquals(msg.getSingularUint32(), 0);
-    assertEquals(msg.getSingularUint64(), 0);
-    assertEquals(msg.getSingularSint32(), 0);
-    assertEquals(msg.getSingularSint64(), 0);
-    assertEquals(msg.getSingularFixed32(), 0);
-    assertEquals(msg.getSingularFixed64(), 0);
-    assertEquals(msg.getSingularSfixed32(), 0);
-    assertEquals(msg.getSingularSfixed64(), 0);
-    assertEquals(msg.getSingularFloat(), 0);
-    assertEquals(msg.getSingularDouble(), 0);
-    assertEquals(msg.getSingularString(), '');
+    expect(msg.getSingularInt32()).toEqual(0);
+    expect(msg.getSingularInt64()).toEqual(0);
+    expect(msg.getSingularUint32()).toEqual(0);
+    expect(msg.getSingularUint64()).toEqual(0);
+    expect(msg.getSingularSint32()).toEqual(0);
+    expect(msg.getSingularSint64()).toEqual(0);
+    expect(msg.getSingularFixed32()).toEqual(0);
+    expect(msg.getSingularFixed64()).toEqual(0);
+    expect(msg.getSingularSfixed32()).toEqual(0);
+    expect(msg.getSingularSfixed64()).toEqual(0);
+    expect(msg.getSingularFloat()).toEqual(0);
+    expect(msg.getSingularDouble()).toEqual(0);
+    expect(msg.getSingularString()).toEqual('');
 
     // TODO(b/26173701): when we change bytes fields default getter to return
-    // Uint8Array, we'll want to switch this assertion to match the u8 case.
-    assertEquals(typeof msg.getSingularBytes(), 'string');
-    assertEquals(msg.getSingularBytes_asU8() instanceof Uint8Array, true);
-    assertEquals(typeof msg.getSingularBytes_asB64(), 'string');
-    assertEquals(msg.getSingularBytes().length, 0);
-    assertEquals(msg.getSingularBytes_asU8().length, 0);
-    assertEquals(msg.getSingularBytes_asB64(), '');
+    expect(typeof msg.getSingularBytes()).toEqual('string');
+    expect(msg.getSingularBytes_asU8() instanceof Uint8Array).toBeTrue();
+    expect(typeof msg.getSingularBytes_asB64()).toEqual('string');
+    expect(msg.getSingularBytes().length).toEqual(0);
+    expect(msg.getSingularBytes_asU8().length).toEqual(0);
+    expect(msg.getSingularBytes_asB64()).toEqual('');
 
-    assertEquals(
-        msg.getSingularForeignEnum(), proto.jspb.test.Proto3Enum.PROTO3_FOO);
-    assertEquals(msg.getSingularForeignMessage(), undefined);
-    assertEquals(msg.getSingularForeignMessage(), undefined);
+    expect(msg.getSingularForeignEnum())
+        .toEqual(proto.jspb.test.Proto3Enum.PROTO3_FOO);
+    expect(msg.getSingularForeignMessage()).toBeUndefined();
+    expect(msg.getSingularForeignMessage()).toBeUndefined();
 
-    assertEquals(msg.getRepeatedInt32List().length, 0);
-    assertEquals(msg.getRepeatedInt64List().length, 0);
-    assertEquals(msg.getRepeatedUint32List().length, 0);
-    assertEquals(msg.getRepeatedUint64List().length, 0);
-    assertEquals(msg.getRepeatedSint32List().length, 0);
-    assertEquals(msg.getRepeatedSint64List().length, 0);
-    assertEquals(msg.getRepeatedFixed32List().length, 0);
-    assertEquals(msg.getRepeatedFixed64List().length, 0);
-    assertEquals(msg.getRepeatedSfixed32List().length, 0);
-    assertEquals(msg.getRepeatedSfixed64List().length, 0);
-    assertEquals(msg.getRepeatedFloatList().length, 0);
-    assertEquals(msg.getRepeatedDoubleList().length, 0);
-    assertEquals(msg.getRepeatedStringList().length, 0);
-    assertEquals(msg.getRepeatedBytesList().length, 0);
-    assertEquals(msg.getRepeatedForeignEnumList().length, 0);
-    assertEquals(msg.getRepeatedForeignMessageList().length, 0);
+    expect(msg.getRepeatedInt32List().length).toEqual(0);
+    expect(msg.getRepeatedInt64List().length).toEqual(0);
+    expect(msg.getRepeatedUint32List().length).toEqual(0);
+    expect(msg.getRepeatedUint64List().length).toEqual(0);
+    expect(msg.getRepeatedSint32List().length).toEqual(0);
+    expect(msg.getRepeatedSint64List().length).toEqual(0);
+    expect(msg.getRepeatedFixed32List().length).toEqual(0);
+    expect(msg.getRepeatedFixed64List().length).toEqual(0);
+    expect(msg.getRepeatedSfixed32List().length).toEqual(0);
+    expect(msg.getRepeatedSfixed64List().length).toEqual(0);
+    expect(msg.getRepeatedFloatList().length).toEqual(0);
+    expect(msg.getRepeatedDoubleList().length).toEqual(0);
+    expect(msg.getRepeatedStringList().length).toEqual(0);
+    expect(msg.getRepeatedBytesList().length).toEqual(0);
+    expect(msg.getRepeatedForeignEnumList().length).toEqual(0);
+    expect(msg.getRepeatedForeignMessageList().length).toEqual(0);
   });
 
   /**
    * Test presence for proto3 optional fields.
    */
-  it('testProto3Optional', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testProto3Optional', () => {
+    const msg = new proto.jspb.test.TestProto3();
 
-    assertEquals(msg.getOptionalInt32(), 0);
-    assertEquals(msg.getOptionalInt64(), 0);
-    assertEquals(msg.getOptionalUint32(), 0);
-    assertEquals(msg.getOptionalUint64(), 0);
-    assertEquals(msg.getOptionalSint32(), 0);
-    assertEquals(msg.getOptionalSint64(), 0);
-    assertEquals(msg.getOptionalFixed32(), 0);
-    assertEquals(msg.getOptionalFixed64(), 0);
-    assertEquals(msg.getOptionalSfixed32(), 0);
-    assertEquals(msg.getOptionalSfixed64(), 0);
-    assertEquals(msg.getOptionalFloat(), 0);
-    assertEquals(msg.getOptionalDouble(), 0);
-    assertEquals(msg.getOptionalString(), '');
+    expect(msg.getOptionalInt32()).toEqual(0);
+    expect(msg.getOptionalInt64()).toEqual(0);
+    expect(msg.getOptionalUint32()).toEqual(0);
+    expect(msg.getOptionalUint64()).toEqual(0);
+    expect(msg.getOptionalSint32()).toEqual(0);
+    expect(msg.getOptionalSint64()).toEqual(0);
+    expect(msg.getOptionalFixed32()).toEqual(0);
+    expect(msg.getOptionalFixed64()).toEqual(0);
+    expect(msg.getOptionalSfixed32()).toEqual(0);
+    expect(msg.getOptionalSfixed64()).toEqual(0);
+    expect(msg.getOptionalFloat()).toEqual(0);
+    expect(msg.getOptionalDouble()).toEqual(0);
+    expect(msg.getOptionalString()).toEqual('');
 
     // TODO(b/26173701): when we change bytes fields default getter to return
-    // Uint8Array, we'll want to switch this assertion to match the u8 case.
-    assertEquals(typeof msg.getOptionalBytes(), 'string');
-    assertEquals(msg.getOptionalBytes_asU8() instanceof Uint8Array, true);
-    assertEquals(typeof msg.getOptionalBytes_asB64(), 'string');
-    assertEquals(msg.getOptionalBytes().length, 0);
-    assertEquals(msg.getOptionalBytes_asU8().length, 0);
-    assertEquals(msg.getOptionalBytes_asB64(), '');
+    expect(typeof msg.getOptionalBytes()).toEqual('string');
+    expect(msg.getOptionalBytes_asU8() instanceof Uint8Array).toBeTrue();
+    expect(typeof msg.getOptionalBytes_asB64()).toEqual('string');
+    expect(msg.getOptionalBytes().length).toEqual(0);
+    expect(msg.getOptionalBytes_asU8().length).toEqual(0);
+    expect(msg.getOptionalBytes_asB64()).toEqual('');
 
-    assertEquals(
-        msg.getOptionalForeignEnum(), proto.jspb.test.Proto3Enum.PROTO3_FOO);
-    assertEquals(msg.getOptionalForeignMessage(), undefined);
-    assertEquals(msg.getOptionalForeignMessage(), undefined);
+    expect(msg.getOptionalForeignEnum())
+        .toEqual(proto.jspb.test.Proto3Enum.PROTO3_FOO);
+    expect(msg.getOptionalForeignMessage()).toBeUndefined();
+    expect(msg.getOptionalForeignMessage()).toBeUndefined();
 
     // Serializing an empty proto yields the empty string.
-    assertEquals(msg.serializeBinary().length, 0);
+    expect(msg.serializeBinary().length).toEqual(0);
 
     // Values start as unset, but can be explicitly set even to default values
     // like 0.
-    assertFalse(msg.hasOptionalInt32());
+    expect(msg.hasOptionalInt32()).toBeFalse();
     msg.setOptionalInt32(0);
-    assertTrue(msg.hasOptionalInt32());
+    expect(msg.hasOptionalInt32()).toBeTrue();
 
-    assertFalse(msg.hasOptionalInt64());
+    expect(msg.hasOptionalInt64()).toBeFalse();
     msg.setOptionalInt64(0);
-    assertTrue(msg.hasOptionalInt64());
+    expect(msg.hasOptionalInt64()).toBeTrue();
 
-    assertFalse(msg.hasOptionalString());
+    expect(msg.hasOptionalString()).toBeFalse();
     msg.setOptionalString('');
-    assertTrue(msg.hasOptionalString());
+    expect(msg.hasOptionalString()).toBeTrue();
 
     // Now the proto will have a non-zero size, even though its values are 0.
-    var serialized = msg.serializeBinary();
-    assertNotEquals(serialized.length, 0);
+    const serialized = msg.serializeBinary();
+    expect(serialized.length).not.toEqual(0);
 
-    var msg2 = proto.jspb.test.TestProto3.deserializeBinary(serialized);
-    assertTrue(msg2.hasOptionalInt32());
-    assertTrue(msg2.hasOptionalInt64());
-    assertTrue(msg2.hasOptionalString());
+    const msg2 = proto.jspb.test.TestProto3.deserializeBinary(serialized);
+    expect(msg2.hasOptionalInt32()).toBeTrue();
+    expect(msg2.hasOptionalInt64()).toBeTrue();
+    expect(msg2.hasOptionalString()).toBeTrue();
 
     // We can clear fields to go back to empty.
     msg2.clearOptionalInt32();
-    assertFalse(msg2.hasOptionalInt32());
+    expect(msg2.hasOptionalInt32()).toBeFalse();
 
     msg2.clearOptionalString();
-    assertFalse(msg2.hasOptionalString());
+    expect(msg2.hasOptionalString()).toBeFalse();
   });
 
   /**
    * Test that all fields can be set ,and read via a serialization roundtrip.
    */
-  it('testProto3FieldSetGet', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testProto3FieldSetGet', () => {
+    let msg = new proto.jspb.test.TestProto3();
 
     msg.setSingularInt32(-42);
     msg.setSingularInt64(-0x7fffffff00000000);
@@ -241,7 +239,7 @@ describe('proto3Test', function() {
     msg.setSingularBool(true);
     msg.setSingularString('hello world');
     msg.setSingularBytes(BYTES);
-    var submsg = new proto.jspb.test.ForeignMessage();
+    let submsg = new proto.jspb.test.ForeignMessage();
     submsg.setC(16);
     msg.setSingularForeignMessage(submsg);
     msg.setSingularForeignEnum(proto.jspb.test.Proto3Enum.PROTO3_BAR);
@@ -268,128 +266,127 @@ describe('proto3Test', function() {
 
     msg.setOneofString('asdf');
 
-    var serialized = msg.serializeBinary();
+    const serialized = msg.serializeBinary();
     msg = proto.jspb.test.TestProto3.deserializeBinary(serialized);
 
-    assertEquals(msg.getSingularInt32(), -42);
-    assertEquals(msg.getSingularInt64(), -0x7fffffff00000000);
-    assertEquals(msg.getSingularUint32(), 0x80000000);
-    assertEquals(msg.getSingularUint64(), 0xf000000000000000);
-    assertEquals(msg.getSingularSint32(), -100);
-    assertEquals(msg.getSingularSint64(), -0x8000000000000000);
-    assertEquals(msg.getSingularFixed32(), 1234);
-    assertEquals(msg.getSingularFixed64(), 0x1234567800000000);
-    assertEquals(msg.getSingularSfixed32(), -1234);
-    assertEquals(msg.getSingularSfixed64(), -0x1234567800000000);
-    assertEquals(msg.getSingularFloat(), 1.5);
-    assertEquals(msg.getSingularDouble(), -1.5);
-    assertEquals(msg.getSingularBool(), true);
-    assertEquals(msg.getSingularString(), 'hello world');
-    assertEquals(true, bytesCompare(msg.getSingularBytes(), BYTES));
-    assertEquals(msg.getSingularForeignMessage().getC(), 16);
-    assertEquals(
-        msg.getSingularForeignEnum(), proto.jspb.test.Proto3Enum.PROTO3_BAR);
+    expect(msg.getSingularInt32()).toEqual(-42);
+    expect(msg.getSingularInt64()).toEqual(-0x7fffffff00000000);
+    expect(msg.getSingularUint32()).toEqual(0x80000000);
+    expect(msg.getSingularUint64()).toEqual(0xf000000000000000);
+    expect(msg.getSingularSint32()).toEqual(-100);
+    expect(msg.getSingularSint64()).toEqual(-0x8000000000000000);
+    expect(msg.getSingularFixed32()).toEqual(1234);
+    expect(msg.getSingularFixed64()).toEqual(0x1234567800000000);
+    expect(msg.getSingularSfixed32()).toEqual(-1234);
+    expect(msg.getSingularSfixed64()).toEqual(-0x1234567800000000);
+    expect(msg.getSingularFloat()).toEqual(1.5);
+    expect(msg.getSingularDouble()).toEqual(-1.5);
+    expect(msg.getSingularBool()).toBeTrue();
+    expect(msg.getSingularString()).toEqual('hello world');
+    expect(bytesCompare(msg.getSingularBytes(), BYTES)).toEqual(true);
+    expect(msg.getSingularForeignMessage().getC()).toEqual(16);
+    expect(msg.getSingularForeignEnum())
+        .toEqual(proto.jspb.test.Proto3Enum.PROTO3_BAR);
 
-    assertElementsEquals(msg.getRepeatedInt32List(), [-42]);
-    assertElementsEquals(msg.getRepeatedInt64List(), [-0x7fffffff00000000]);
-    assertElementsEquals(msg.getRepeatedUint32List(), [0x80000000]);
-    assertElementsEquals(msg.getRepeatedUint64List(), [0xf000000000000000]);
-    assertElementsEquals(msg.getRepeatedSint32List(), [-100]);
-    assertElementsEquals(msg.getRepeatedSint64List(), [-0x8000000000000000]);
-    assertElementsEquals(msg.getRepeatedFixed32List(), [1234]);
-    assertElementsEquals(msg.getRepeatedFixed64List(), [0x1234567800000000]);
-    assertElementsEquals(msg.getRepeatedSfixed32List(), [-1234]);
-    assertElementsEquals(msg.getRepeatedSfixed64List(), [-0x1234567800000000]);
-    assertElementsEquals(msg.getRepeatedFloatList(), [1.5]);
-    assertElementsEquals(msg.getRepeatedDoubleList(), [-1.5]);
-    assertElementsEquals(msg.getRepeatedBoolList(), [true]);
-    assertElementsEquals(msg.getRepeatedStringList(), ['hello world']);
-    assertEquals(msg.getRepeatedBytesList().length, 1);
-    assertEquals(true, bytesCompare(msg.getRepeatedBytesList()[0], BYTES));
-    assertEquals(msg.getRepeatedForeignMessageList().length, 1);
-    assertEquals(msg.getRepeatedForeignMessageList()[0].getC(), 1000);
-    assertElementsEquals(
-        msg.getRepeatedForeignEnumList(),
-        [proto.jspb.test.Proto3Enum.PROTO3_BAR]);
+    expect(msg.getRepeatedInt32List()).toEqual([-42]);
+    expect(msg.getRepeatedInt64List()).toEqual([-0x7fffffff00000000]);
+    expect(msg.getRepeatedUint32List()).toEqual([0x80000000]);
+    expect(msg.getRepeatedUint64List()).toEqual([0xf000000000000000]);
+    expect(msg.getRepeatedSint32List()).toEqual([-100]);
+    expect(msg.getRepeatedSint64List()).toEqual([-0x8000000000000000]);
+    expect(msg.getRepeatedFixed32List()).toEqual([1234]);
+    expect(msg.getRepeatedFixed64List()).toEqual([0x1234567800000000]);
+    expect(msg.getRepeatedSfixed32List()).toEqual([-1234]);
+    expect(msg.getRepeatedSfixed64List()).toEqual([-0x1234567800000000]);
+    expect(msg.getRepeatedFloatList()).toEqual([1.5]);
+    expect(msg.getRepeatedDoubleList()).toEqual([-1.5]);
+    expect(msg.getRepeatedBoolList()).toEqual([true]);
+    expect(msg.getRepeatedStringList()).toEqual(['hello world']);
+    expect(msg.getRepeatedBytesList().length).toEqual(1);
+    expect(true).toEqual(bytesCompare(msg.getRepeatedBytesList()[0], BYTES));
+    expect(msg.getRepeatedForeignMessageList().length).toEqual(1);
+    expect(msg.getRepeatedForeignMessageList()[0].getC()).toEqual(1000);
+    expect(msg.getRepeatedForeignEnumList()).toEqual([
+      proto.jspb.test.Proto3Enum.PROTO3_BAR
+    ]);
 
-    assertEquals(msg.getOneofString(), 'asdf');
+    expect(msg.getOneofString()).toEqual('asdf');
   });
 
 
   /**
    * Test that oneofs continue to have a notion of field presence.
    */
-  it('testOneofs', function() {
+  it('testOneofs', () => {
     // Default instance.
-    var msg = new proto.jspb.test.TestProto3();
-    assertEquals(msg.getOneofUint32(), 0);
-    assertEquals(msg.getOneofForeignMessage(), undefined);
-    assertEquals(msg.getOneofString(), '');
-    assertEquals(msg.getOneofBytes(), '');
+    const msg = new proto.jspb.test.TestProto3();
+    expect(msg.getOneofUint32()).toEqual(0);
+    expect(msg.getOneofForeignMessage()).toBeUndefined();
+    expect(msg.getOneofString()).toEqual('');
+    expect(msg.getOneofBytes()).toEqual('');
 
-    assertFalse(msg.hasOneofUint32());
-    assertFalse(msg.hasOneofForeignMessage());
-    assertFalse(msg.hasOneofString());
-    assertFalse(msg.hasOneofBytes());
+    expect(msg.hasOneofUint32()).toBeFalse();
+    expect(msg.hasOneofForeignMessage()).toBeFalse();
+    expect(msg.hasOneofString()).toBeFalse();
+    expect(msg.hasOneofBytes()).toBeFalse();
 
     // Integer field.
     msg.setOneofUint32(42);
-    assertEquals(msg.getOneofUint32(), 42);
-    assertEquals(msg.getOneofForeignMessage(), undefined);
-    assertEquals(msg.getOneofString(), '');
-    assertEquals(msg.getOneofBytes(), '');
+    expect(msg.getOneofUint32()).toEqual(42);
+    expect(msg.getOneofForeignMessage()).toBeUndefined();
+    expect(msg.getOneofString()).toEqual('');
+    expect(msg.getOneofBytes()).toEqual('');
 
-    assertTrue(msg.hasOneofUint32());
-    assertFalse(msg.hasOneofForeignMessage());
-    assertFalse(msg.hasOneofString());
-    assertFalse(msg.hasOneofBytes());
+    expect(msg.hasOneofUint32()).toBeTrue();
+    expect(msg.hasOneofForeignMessage()).toBeFalse();
+    expect(msg.hasOneofString()).toBeFalse();
+    expect(msg.hasOneofBytes()).toBeFalse();
 
     // Sub-message field.
-    var submsg = new proto.jspb.test.ForeignMessage();
+    const submsg = new proto.jspb.test.ForeignMessage();
     msg.setOneofForeignMessage(submsg);
-    assertEquals(msg.getOneofUint32(), 0);
-    assertEquals(msg.getOneofForeignMessage(), submsg);
-    assertEquals(msg.getOneofString(), '');
-    assertEquals(msg.getOneofBytes(), '');
+    expect(msg.getOneofUint32()).toEqual(0);
+    expect(submsg).toEqual(msg.getOneofForeignMessage());
+    expect(msg.getOneofString()).toEqual('');
+    expect(msg.getOneofBytes()).toEqual('');
 
-    assertFalse(msg.hasOneofUint32());
-    assertTrue(msg.hasOneofForeignMessage());
-    assertFalse(msg.hasOneofString());
-    assertFalse(msg.hasOneofBytes());
+    expect(msg.hasOneofUint32()).toBeFalse();
+    expect(msg.hasOneofForeignMessage()).toBeTrue();
+    expect(msg.hasOneofString()).toBeFalse();
+    expect(msg.hasOneofBytes()).toBeFalse();
 
     // String field.
     msg.setOneofString('hello');
-    assertEquals(msg.getOneofUint32(), 0);
-    assertEquals(msg.getOneofForeignMessage(), undefined);
-    assertEquals(msg.getOneofString(), 'hello');
-    assertEquals(msg.getOneofBytes(), '');
+    expect(msg.getOneofUint32()).toEqual(0);
+    expect(msg.getOneofForeignMessage()).toBeUndefined();
+    expect(msg.getOneofString()).toEqual('hello');
+    expect(msg.getOneofBytes()).toEqual('');
 
-    assertFalse(msg.hasOneofUint32());
-    assertFalse(msg.hasOneofForeignMessage());
-    assertTrue(msg.hasOneofString());
-    assertFalse(msg.hasOneofBytes());
+    expect(msg.hasOneofUint32()).toBeFalse();
+    expect(msg.hasOneofForeignMessage()).toBeFalse();
+    expect(msg.hasOneofString()).toBeTrue();
+    expect(msg.hasOneofBytes()).toBeFalse();
 
     // Bytes field.
     msg.setOneofBytes(goog.crypt.base64.encodeString('\u00FF\u00FF'));
-    assertEquals(msg.getOneofUint32(), 0);
-    assertEquals(msg.getOneofForeignMessage(), undefined);
-    assertEquals(msg.getOneofString(), '');
-    assertEquals(
-        msg.getOneofBytes_asB64(),
-        goog.crypt.base64.encodeString('\u00FF\u00FF'));
+    expect(msg.getOneofUint32()).toEqual(0);
+    expect(msg.getOneofForeignMessage()).toBeUndefined();
+    expect(msg.getOneofString()).toEqual('');
+    expect(msg.getOneofBytes_asB64())
+        .toEqual(goog.crypt.base64.encodeString('\u00FF\u00FF'));
 
-    assertFalse(msg.hasOneofUint32());
-    assertFalse(msg.hasOneofForeignMessage());
-    assertFalse(msg.hasOneofString());
-    assertTrue(msg.hasOneofBytes());
+    expect(msg.hasOneofUint32()).toBeFalse();
+    expect(msg.hasOneofForeignMessage()).toBeFalse();
+    expect(msg.hasOneofString()).toBeFalse();
+    expect(msg.hasOneofBytes()).toBeTrue();
   });
 
 
   /**
    * Test that "default"-valued primitive fields are not emitted on the wire.
    */
-  it('testNoSerializeDefaults', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testNoSerializeDefaults', () => {
+    const msg = new proto.jspb.test.TestProto3();
 
     // Set each primitive to a non-default value, then back to its default, to
     // ensure that the serialization is actually checking the value and not just
@@ -412,49 +409,49 @@ describe('proto3Test', function() {
     msg.clearOneofUint32();
 
 
-    var serialized = msg.serializeBinary();
-    assertEquals(0, serialized.length);
+    const serialized = msg.serializeBinary();
+    expect(serialized.length).toEqual(0);
   });
 
   /**
    * Test that base64 string and Uint8Array are interchangeable in bytes fields.
    */
-  it('testBytesFieldsInterop', function() {
-    var msg = new proto.jspb.test.TestProto3();
+  it('testBytesFieldsInterop', () => {
+    let msg = new proto.jspb.test.TestProto3();
     // Set as a base64 string and check all the getters work.
     msg.setSingularBytes(BYTES_B64);
-    assertTrue(bytesCompare(msg.getSingularBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes(), BYTES));
+    expect(bytesCompare(msg.getSingularBytes_asU8(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes_asB64(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes(), BYTES)).toBeTrue();
 
     // Test binary serialize round trip doesn't break it.
     msg = proto.jspb.test.TestProto3.deserializeBinary(msg.serializeBinary());
-    assertTrue(bytesCompare(msg.getSingularBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes(), BYTES));
+    expect(bytesCompare(msg.getSingularBytes_asU8(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes_asB64(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes(), BYTES)).toBeTrue();
 
     msg = new proto.jspb.test.TestProto3();
     // Set as a Uint8Array and check all the getters work.
     msg.setSingularBytes(BYTES);
-    assertTrue(bytesCompare(msg.getSingularBytes_asU8(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes_asB64(), BYTES));
-    assertTrue(bytesCompare(msg.getSingularBytes(), BYTES));
+    expect(bytesCompare(msg.getSingularBytes_asU8(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes_asB64(), BYTES)).toBeTrue();
+    expect(bytesCompare(msg.getSingularBytes(), BYTES)).toBeTrue();
   });
 
-  it('testTimestampWellKnownType', function() {
-    var msg = new proto.google.protobuf.Timestamp();
+  it('testTimestampWellKnownType', () => {
+    const msg = new proto.google.protobuf.Timestamp();
     msg.fromDate(new Date(123456789));
-    assertEquals(123456, msg.getSeconds());
-    assertEquals(789000000, msg.getNanos());
-    var date = msg.toDate();
-    assertEquals(123456789, date.getTime());
-    var anotherMsg = proto.google.protobuf.Timestamp.fromDate(date);
-    assertEquals(msg.getSeconds(), anotherMsg.getSeconds());
-    assertEquals(msg.getNanos(), anotherMsg.getNanos());
+    expect(msg.getSeconds()).toEqual(123456);
+    expect(msg.getNanos()).toEqual(789000000);
+    const date = msg.toDate();
+    expect(date.getTime()).toEqual(123456789);
+    const anotherMsg = proto.google.protobuf.Timestamp.fromDate(date);
+    expect(anotherMsg.getSeconds()).toEqual(msg.getSeconds());
+    expect(anotherMsg.getNanos()).toEqual(msg.getNanos());
   });
 
-  it('testStructWellKnownType', function() {
-    var jsObj = {
+  it('testStructWellKnownType', () => {
+    const jsObj = {
       abc: 'def',
       number: 12345.678,
       nullKey: null,
@@ -464,15 +461,15 @@ describe('proto3Test', function() {
       complicatedKey: [{xyz: {abc: [3, 4, null, false]}}, 'zzz']
     };
 
-    var struct = proto.google.protobuf.Struct.fromJavaScript(jsObj);
-    var jsObj2 = struct.toJavaScript();
+    const struct = proto.google.protobuf.Struct.fromJavaScript(jsObj);
+    const jsObj2 = struct.toJavaScript();
 
-    assertEquals('def', jsObj2.abc);
-    assertEquals(12345.678, jsObj2.number);
-    assertEquals(null, jsObj2.nullKey);
-    assertEquals(true, jsObj2.boolKey);
-    assertEquals('abc', jsObj2.listKey[4]);
-    assertEquals('bar', jsObj2.structKey.foo);
-    assertEquals(4, jsObj2.complicatedKey[0].xyz.abc[1]);
+    expect('def').toEqual(jsObj2.abc);
+    expect(12345.678).toEqual(jsObj2.number);
+    expect(null).toEqual(jsObj2.nullKey);
+    expect(true).toEqual(jsObj2.boolKey);
+    expect('abc').toEqual(jsObj2.listKey[4]);
+    expect('bar').toEqual(jsObj2.structKey.foo);
+    expect(4).toEqual(jsObj2.complicatedKey[0].xyz.abc[1]);
   });
 });

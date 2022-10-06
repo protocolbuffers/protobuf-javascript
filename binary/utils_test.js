@@ -48,7 +48,7 @@ goog.require('jspb.utils');
  * @return {number}
  */
 function truncate(x) {
-  var temp = new Float32Array(1);
+  const temp = new Float32Array(1);
   temp[0] = x;
   return temp[0];
 }
@@ -62,25 +62,20 @@ function truncate(x) {
  * @return {string} The encoded hash string, 8 bits per character.
  */
 function toHashString(bitsLow, bitsHigh) {
-  return String.fromCharCode((bitsLow >>> 0) & 0xFF,
-                             (bitsLow >>> 8) & 0xFF,
-                             (bitsLow >>> 16) & 0xFF,
-                             (bitsLow >>> 24) & 0xFF,
-                             (bitsHigh >>> 0) & 0xFF,
-                             (bitsHigh >>> 8) & 0xFF,
-                             (bitsHigh >>> 16) & 0xFF,
-                             (bitsHigh >>> 24) & 0xFF);
+  return String.fromCharCode(
+      (bitsLow >>> 0) & 0xFF, (bitsLow >>> 8) & 0xFF, (bitsLow >>> 16) & 0xFF,
+      (bitsLow >>> 24) & 0xFF, (bitsHigh >>> 0) & 0xFF, (bitsHigh >>> 8) & 0xFF,
+      (bitsHigh >>> 16) & 0xFF, (bitsHigh >>> 24) & 0xFF);
 }
 
 
-describe('binaryUtilsTest', function() {
+describe('binaryUtilsTest', () => {
   /**
    * Tests lossless binary-to-decimal conversion.
    */
-  it('testDecimalConversion', function() {
+  it('testDecimalConversion', () => {
     // Check some magic numbers.
-    var result =
-        jspb.utils.joinUnsignedDecimalString(0x89e80001, 0x8ac72304);
+    let result = jspb.utils.joinUnsignedDecimalString(0x89e80001, 0x8ac72304);
     expect(result).toEqual('10000000000000000001');
 
     result = jspb.utils.joinUnsignedDecimalString(0xacd05f15, 0x1b69b4b);
@@ -100,15 +95,15 @@ describe('binaryUtilsTest', function() {
     expect(result).toEqual('18446744073709551615');
 
     // Check each bit of the low dword.
-    for (var i = 0; i < 32; i++) {
-      var low = (1 << i) >>> 0;
+    for (let i = 0; i < 32; i++) {
+      const low = (1 << i) >>> 0;
       result = jspb.utils.joinUnsignedDecimalString(low, 0);
       expect(result).toEqual('' + Math.pow(2, i));
     }
 
     // Check the first 20 bits of the high dword.
-    for (var i = 0; i < 20; i++) {
-      var high = (1 << i) >>> 0;
+    for (let i = 0; i < 20; i++) {
+      const high = (1 << i) >>> 0;
       result = jspb.utils.joinUnsignedDecimalString(0, high);
       expect(result).toEqual('' + Math.pow(2, 32 + i));
     }
@@ -158,9 +153,9 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hash strings to decimal strings should also be lossless.
    */
-  it('testHashToDecimalConversion', function() {
-    var result;
-    var convert = jspb.utils.hash64ToDecimalString;
+  it('testHashToDecimalConversion', () => {
+    let result;
+    const convert = jspb.utils.hash64ToDecimalString;
 
     result = convert(toHashString(0x00000000, 0x00000000), false);
     expect(result).toEqual('0');
@@ -187,10 +182,13 @@ describe('binaryUtilsTest', function() {
     expect(result).toEqual('-123456789123456789');
 
     // And converting arrays of hashes should work the same way.
-    result = jspb.utils.hash64ArrayToDecimalStrings([
-      toHashString(0xFFFFFFFF, 0xFFFFFFFF),
-      toHashString(0x00000000, 0x80000000),
-      toHashString(0xacd05f15, 0x01b69b4b)], false);
+    result = jspb.utils.hash64ArrayToDecimalStrings(
+        [
+          toHashString(0xFFFFFFFF, 0xFFFFFFFF),
+          toHashString(0x00000000, 0x80000000),
+          toHashString(0xacd05f15, 0x01b69b4b)
+        ],
+        false);
     expect(result.length).toEqual(3);
     expect(result[0]).toEqual('18446744073709551615');
     expect(result[1]).toEqual('9223372036854775808');
@@ -200,9 +198,9 @@ describe('binaryUtilsTest', function() {
   /*
    * Going from decimal strings to hash strings should be lossless.
    */
-  it('testDecimalToHashConversion', function() {
-    var result;
-    var convert = jspb.utils.decimalStringToHash64;
+  it('testDecimalToHashConversion', () => {
+    let result;
+    const convert = jspb.utils.decimalStringToHash64;
 
     result = convert('0');
     expect(result).toEqual(goog.crypt.byteArrayToString(
@@ -236,9 +234,9 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hash strings to hex strings should be lossless.
    */
-  it('testHashToHexConversion', function() {
-    var result;
-    var convert = jspb.utils.hash64ToHexString;
+  it('testHashToHexConversion', () => {
+    let result;
+    const convert = jspb.utils.hash64ToHexString;
 
     result = convert(toHashString(0x00000000, 0x00000000));
     expect(result).toEqual('0x0000000000000000');
@@ -254,9 +252,9 @@ describe('binaryUtilsTest', function() {
   /**
    * Going from hex strings to hash strings should be lossless.
    */
-  it('testHexToHashConversion', function() {
-    var result;
-    var convert = jspb.utils.hexStringToHash64;
+  it('testHexToHashConversion', () => {
+    let result;
+    const convert = jspb.utils.hexStringToHash64;
 
     result = convert('0x0000000000000000');
     expect(result).toEqual(goog.crypt.byteArrayToString(
@@ -282,9 +280,9 @@ describe('binaryUtilsTest', function() {
    * Going from numbers to hash strings should be lossless for up to 53 bits of
    * precision.
    */
-  it('testNumberToHashConversion', function() {
-    var result;
-    var convert = jspb.utils.numberToHash64;
+  it('testNumberToHashConversion', () => {
+    let result;
+    const convert = jspb.utils.numberToHash64;
 
     result = convert(0x0000000000000);
     expect(jspb.utils.hash64ToHexString(result)).toEqual('0x0000000000000000');
@@ -313,13 +311,13 @@ describe('binaryUtilsTest', function() {
    * Sanity check the behavior of Javascript's strings when doing funny things
    * with unicode characters.
    */
-  it('sanityCheckUnicodeStrings', function() {
-    var strings = new Array(65536);
+  it('sanityCheckUnicodeStrings', () => {
+    const strings = new Array(65536);
 
     // All possible unsigned 16-bit values should be storable in a string, they
     // shouldn't do weird things with the length of the string, and they should
     // come back out of the string unchanged.
-    for (var i = 0; i < 65536; i++) {
+    for (let i = 0; i < 65536; i++) {
       strings[i] = 'a' + String.fromCharCode(i) + 'a';
       expect(strings[i].length).toEqual(3);
       expect(strings[i].charCodeAt(1)).toEqual(i);
@@ -327,7 +325,7 @@ describe('binaryUtilsTest', function() {
 
     // Each unicode character should compare equal to itself and not equal to a
     // different unicode character.
-    for (var i = 0; i < 65536; i++) {
+    for (let i = 0; i < 65536; i++) {
       expect(strings[i] == strings[i]).toEqual(true);
       expect(strings[i] == strings[(i + 1) % 65536]).toEqual(false);
     }
@@ -337,12 +335,12 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests conversion from 32-bit floating point numbers to split64 numbers.
    */
-  it('testFloat32ToSplit64', function() {
-    var f32_eps = jspb.BinaryConstants.FLOAT32_EPS;
-    var f32_min = jspb.BinaryConstants.FLOAT32_MIN;
-    var f32_max = jspb.BinaryConstants.FLOAT32_MAX;
-    var f32_max_safe_int = jspb.utils.joinFloat32(0x4b7fffff, 0);
-    var f32_pi = Math.fround(Math.PI);
+  it('testFloat32ToSplit64', () => {
+    const f32_eps = jspb.BinaryConstants.FLOAT32_EPS;
+    const f32_min = jspb.BinaryConstants.FLOAT32_MIN;
+    const f32_max = jspb.BinaryConstants.FLOAT32_MAX;
+    const f32_max_safe_int = jspb.utils.joinFloat32(0x4b7fffff, 0);
+    const f32_pi = Math.fround(Math.PI);
 
     // NaN.
     jspb.utils.splitFloat32(NaN);
@@ -397,7 +395,7 @@ describe('binaryUtilsTest', function() {
     test(Math.sin(30 * Math.PI / 180), 0x3f000000);  // sin(30 degrees)
 
     // Various positive values.
-    var cursor = f32_eps * 10;
+    let cursor = f32_eps * 10;
     while (cursor != Infinity) {
       test(cursor);
       cursor *= 1.1;
@@ -415,10 +413,10 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests conversion from 64-bit floating point numbers to split64 numbers.
    */
-  it('testFloat64ToSplit64', function() {
-    var f64_eps = jspb.BinaryConstants.FLOAT64_EPS;
-    var f64_min = jspb.BinaryConstants.FLOAT64_MIN;
-    var f64_max = jspb.BinaryConstants.FLOAT64_MAX;
+  it('testFloat64ToSplit64', () => {
+    const f64_eps = jspb.BinaryConstants.FLOAT64_EPS;
+    const f64_min = jspb.BinaryConstants.FLOAT64_MIN;
+    const f64_max = jspb.BinaryConstants.FLOAT64_MAX;
 
     // NaN.
     jspb.utils.splitFloat64(NaN);
@@ -434,11 +432,11 @@ describe('binaryUtilsTest', function() {
     function test(x, opt_highBits, opt_lowBits) {
       jspb.utils.splitFloat64(x);
       if (opt_highBits !== undefined) {
-        var split64High = jspb.utils.split64High;
+        const split64High = jspb.utils.split64High;
         expect(opt_highBits.toString(16)).toEqual(split64High.toString(16));
       }
       if (opt_lowBits !== undefined) {
-        var split64Low = jspb.utils.split64Low;
+        const split64Low = jspb.utils.split64Low;
         expect(opt_lowBits.toString(16)).toEqual(split64Low.toString(16));
       }
       expect(
@@ -483,7 +481,7 @@ describe('binaryUtilsTest', function() {
     test(jspb.BinaryConstants.FLOAT32_MIN, 0x38100000, 0x00000000);
 
     // Various positive values.
-    var cursor = f64_eps * 10;
+    let cursor = f64_eps * 10;
     while (cursor != Infinity) {
       test(cursor);
       cursor *= 1.1;
@@ -500,7 +498,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests zigzag conversions.
    */
-  it('can encode and decode zigzag 64', function() {
+  it('can encode and decode zigzag 64', () => {
     function stringToHiLoPair(str) {
       jspb.utils.splitDecimalString(str);
       return {
@@ -513,7 +511,7 @@ describe('binaryUtilsTest', function() {
     }
     // Test cases directly from the protobuf dev guide.
     // https://engdoc.corp.google.com/eng/howto/protocolbuffers/developerguide/encoding.shtml?cl=head#types
-    var testCases = [
+    const testCases = [
       {original: stringToHiLoPair('0'), zigzag: stringToHiLoPair('0')},
       {original: stringToHiLoPair('-1'), zigzag: stringToHiLoPair('1')},
       {original: stringToHiLoPair('1'), zigzag: stringToHiLoPair('2')},
@@ -548,16 +546,16 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting packed varints.
    */
-  it('testCountVarints', function() {
-    var values = [];
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+  it('testCountVarints', () => {
+    const values = [];
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       values.push(Math.floor(i));
     }
 
-    var writer = new jspb.BinaryWriter();
+    const writer = new jspb.BinaryWriter();
     writer.writePackedUint64(1, values);
 
-    var buffer = new Uint8Array(writer.getResultBuffer());
+    const buffer = new Uint8Array(writer.getResultBuffer());
 
     // We should have two more varints than we started with - one for the field
     // tag, one for the packed length.
@@ -569,24 +567,24 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching varint fields.
    */
-  it('testCountVarintFields', function() {
-    var writer = new jspb.BinaryWriter();
+  it('testCountVarintFields', () => {
+    let writer = new jspb.BinaryWriter();
 
-    var count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    let count = 0;
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeUint64(1, Math.floor(i));
       count++;
     }
     writer.writeString(2, 'terminator');
 
-    var buffer = new Uint8Array(writer.getResultBuffer());
+    let buffer = new Uint8Array(writer.getResultBuffer());
     expect(jspb.utils.countVarintFields(buffer, 0, buffer.length, 1))
         .toEqual(count);
 
     writer = new jspb.BinaryWriter();
 
     count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeUint64(123456789, Math.floor(i));
       count++;
     }
@@ -601,24 +599,24 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching fixed32 fields.
    */
-  it('testCountFixed32Fields', function() {
-    var writer = new jspb.BinaryWriter();
+  it('testCountFixed32Fields', () => {
+    let writer = new jspb.BinaryWriter();
 
-    var count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    let count = 0;
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeFixed32(1, Math.floor(i));
       count++;
     }
     writer.writeString(2, 'terminator');
 
-    var buffer = new Uint8Array(writer.getResultBuffer());
+    let buffer = new Uint8Array(writer.getResultBuffer());
     expect(jspb.utils.countFixed32Fields(buffer, 0, buffer.length, 1))
         .toEqual(count);
 
     writer = new jspb.BinaryWriter();
 
     count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeFixed32(123456789, Math.floor(i));
       count++;
     }
@@ -633,24 +631,24 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching fixed64 fields.
    */
-  it('testCountFixed64Fields', function() {
-    var writer = new jspb.BinaryWriter();
+  it('testCountFixed64Fields', () => {
+    let writer = new jspb.BinaryWriter();
 
-    var count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    let count = 0;
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeDouble(1, i);
       count++;
     }
     writer.writeString(2, 'terminator');
 
-    var buffer = new Uint8Array(writer.getResultBuffer());
+    let buffer = new Uint8Array(writer.getResultBuffer());
     expect(jspb.utils.countFixed64Fields(buffer, 0, buffer.length, 1))
         .toEqual(count);
 
     writer = new jspb.BinaryWriter();
 
     count = 0;
-    for (var i = 1; i < 1000000000; i *= 1.1) {
+    for (let i = 1; i < 1000000000; i *= 1.1) {
       writer.writeDouble(123456789, i);
       count++;
     }
@@ -665,24 +663,24 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests counting matching delimited fields.
    */
-  it('testCountDelimitedFields', function() {
-    var writer = new jspb.BinaryWriter();
+  it('testCountDelimitedFields', () => {
+    let writer = new jspb.BinaryWriter();
 
-    var count = 0;
-    for (var i = 1; i < 1000; i *= 1.1) {
+    let count = 0;
+    for (let i = 1; i < 1000; i *= 1.1) {
       writer.writeBytes(1, [Math.floor(i)]);
       count++;
     }
     writer.writeString(2, 'terminator');
 
-    var buffer = new Uint8Array(writer.getResultBuffer());
+    let buffer = new Uint8Array(writer.getResultBuffer());
     expect(jspb.utils.countDelimitedFields(buffer, 0, buffer.length, 1))
         .toEqual(count);
 
     writer = new jspb.BinaryWriter();
 
     count = 0;
-    for (var i = 1; i < 1000; i *= 1.1) {
+    for (let i = 1; i < 1000; i *= 1.1) {
       writer.writeBytes(123456789, [Math.floor(i)]);
       count++;
     }
@@ -697,7 +695,7 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests byte format for debug strings.
    */
-  it('testDebugBytesToTextFormat', function() {
+  it('testDebugBytesToTextFormat', () => {
     expect(jspb.utils.debugBytesToTextFormat(null)).toEqual('""');
     expect(jspb.utils.debugBytesToTextFormat([
       0, 16, 255
@@ -708,22 +706,22 @@ describe('binaryUtilsTest', function() {
   /**
    * Tests converting byte blob sources into byte blobs.
    */
-  it('testByteSourceToUint8Array', function() {
-    var convert = jspb.utils.byteSourceToUint8Array;
+  it('testByteSourceToUint8Array', () => {
+    const convert = jspb.utils.byteSourceToUint8Array;
 
-    var sourceData = [];
-    for (var i = 0; i < 256; i++) {
+    const sourceData = [];
+    for (let i = 0; i < 256; i++) {
       sourceData.push(i);
     }
 
-    var sourceBytes = new Uint8Array(sourceData);
-    var sourceBuffer = sourceBytes.buffer;
-    var sourceBase64 = goog.crypt.base64.encodeByteArray(sourceData);
+    const sourceBytes = new Uint8Array(sourceData);
+    const sourceBuffer = sourceBytes.buffer;
+    const sourceBase64 = goog.crypt.base64.encodeByteArray(sourceData);
 
     function check(result) {
       expect(result.constructor).toEqual(Uint8Array);
       expect(result.length).toEqual(sourceData.length);
-      for (var i = 0; i < result.length; i++) {
+      for (let i = 0; i < result.length; i++) {
         expect(result[i]).toEqual(sourceData[i]);
       }
     }

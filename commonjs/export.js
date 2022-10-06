@@ -22,7 +22,7 @@ if (typeof exports === 'object') {
   exports['BinaryWriter'] = jspb.BinaryWriter;
   exports['ExtensionFieldInfo'] = jspb.ExtensionFieldInfo;
   exports['ExtensionFieldBinaryInfo'] = jspb.ExtensionFieldBinaryInfo;
-  
+
   // These are used by generated code but should not be used directly by clients.
   exports['exportSymbol'] = goog.exportSymbol;
   exports['inherits'] = goog.inherits;

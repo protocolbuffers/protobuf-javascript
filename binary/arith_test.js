@@ -45,8 +45,8 @@ describe('binaryArithTest', function() {
    * Tests comparison operations.
    */
   it('testCompare', function() {
-    var a = new jspb.arith.UInt64(1234, 5678);
-    var b = new jspb.arith.UInt64(1234, 5678);
+    const a = new jspb.arith.UInt64(1234, 5678);
+    const b = new jspb.arith.UInt64(1234, 5678);
     expect(a.cmp(b)).toEqual(0);
     expect(b.cmp(a)).toEqual(0);
     b.lo -= 1;
@@ -78,10 +78,10 @@ describe('binaryArithTest', function() {
    * Tests shifts.
    */
   it('testShifts', function() {
-    var a = new jspb.arith.UInt64(1, 0);
+    let a = new jspb.arith.UInt64(1, 0);
     expect(a.lo).toEqual(1);
     expect(a.hi).toEqual(0);
-    var orig = a;
+    const orig = a;
     a = a.leftShift();
     expect(orig.lo).toEqual(1);  // original unmodified.
     expect(orig.hi).toEqual(0);
@@ -90,7 +90,7 @@ describe('binaryArithTest', function() {
     a = a.leftShift();
     expect(a.lo).toEqual(4);
     expect(a.hi).toEqual(0);
-    for (var i = 0; i < 29; i++) {
+    for (let i = 0; i < 29; i++) {
       a = a.leftShift();
     }
     expect(a.lo).toEqual(0x80000000);
@@ -115,12 +115,14 @@ describe('binaryArithTest', function() {
    * Tests additions.
    */
   it('testAdd', function() {
-    var a = new jspb.arith.UInt64(/* lo = */ 0x89abcdef,
-                                         /* hi = */ 0x01234567);
-    var b = new jspb.arith.UInt64(/* lo = */ 0xff52ab91,
-                                         /* hi = */ 0x92fa2123);
+    const a = new jspb.arith.UInt64(
+        /* lo = */ 0x89abcdef,
+        /* hi = */ 0x01234567);
+    const b = new jspb.arith.UInt64(
+        /* lo = */ 0xff52ab91,
+        /* hi = */ 0x92fa2123);
     // Addition with carry.
-    var c = a.add(b);
+    let c = a.add(b);
     expect(a.lo).toEqual(0x89abcdef);  // originals unmodified.
     expect(a.hi).toEqual(0x01234567);
     expect(b.lo).toEqual(0xff52ab91);
@@ -143,32 +145,20 @@ describe('binaryArithTest', function() {
    * Test subtractions.
    */
   it('testSub', function() {
-    var kLength = 10;
-    var hiValues = [0x1682ef32,
-                    0x583902f7,
-                    0xb62f5955,
-                    0x6ea99bbf,
-                    0x25a39c20,
-                    0x0700a08b,
-                    0x00f7304d,
-                    0x91a5b5af,
-                    0x89077fd2,
-                    0xe09e347c];
-    var loValues = [0xe1538b18,
-                    0xbeacd556,
-                    0x74100758,
-                    0x96e3cb26,
-                    0x56c37c3f,
-                    0xe00b3f7d,
-                    0x859f25d7,
-                    0xc2ee614a,
-                    0xe1d21cd7,
-                    0x30aae6a4];
-    for (var i = 0; i < kLength; i++) {
-      for (var j = 0; j < kLength; j++) {
-        var a = new jspb.arith.UInt64(loValues[i], hiValues[j]);
-        var b = new jspb.arith.UInt64(loValues[j], hiValues[i]);
-        var c = a.add(b).sub(b);
+    const kLength = 10;
+    const hiValues = [
+      0x1682ef32, 0x583902f7, 0xb62f5955, 0x6ea99bbf, 0x25a39c20, 0x0700a08b,
+      0x00f7304d, 0x91a5b5af, 0x89077fd2, 0xe09e347c
+    ];
+    const loValues = [
+      0xe1538b18, 0xbeacd556, 0x74100758, 0x96e3cb26, 0x56c37c3f, 0xe00b3f7d,
+      0x859f25d7, 0xc2ee614a, 0xe1d21cd7, 0x30aae6a4
+    ];
+    for (let i = 0; i < kLength; i++) {
+      for (let j = 0; j < kLength; j++) {
+        const a = new jspb.arith.UInt64(loValues[i], hiValues[j]);
+        const b = new jspb.arith.UInt64(loValues[j], hiValues[i]);
+        const c = a.add(b).sub(b);
         expect(c.hi).toEqual(a.hi);
         expect(c.lo).toEqual(a.lo);
       }
@@ -180,7 +170,7 @@ describe('binaryArithTest', function() {
    * Tests 32-by-32 multiplication.
    */
   it('testMul32x32', function() {
-    var testData = [
+    const testData = [
       // a        b          low(a*b)   high(a*b)
       [0xc0abe2f8, 0x1607898a, 0x5de711b0, 0x109471b8],
       [0x915eb3cb, 0x4fb66d0e, 0xbd0d441a, 0x2d43d0bc],
@@ -194,12 +184,12 @@ describe('binaryArithTest', function() {
       [0x0dd0bfa9, 0x916e27b1, 0x6e2542d9, 0x07d92e65]
     ];
 
-    for (var i = 0; i < testData.length; i++) {
-      var a = testData[i][0] >>> 0;
-      var b = testData[i][1] >>> 0;
-      var cLow = testData[i][2] >>> 0;
-      var cHigh = testData[i][3] >>> 0;
-      var c = jspb.arith.UInt64.mul32x32(a, b);
+    for (let i = 0; i < testData.length; i++) {
+      const a = testData[i][0] >>> 0;
+      const b = testData[i][1] >>> 0;
+      const cLow = testData[i][2] >>> 0;
+      const cHigh = testData[i][3] >>> 0;
+      const c = jspb.arith.UInt64.mul32x32(a, b);
       expect(c.lo).toEqual(cLow);
       expect(c.hi).toEqual(cHigh);
     }
@@ -213,7 +203,7 @@ describe('binaryArithTest', function() {
     // 64x32 bits produces 96 bits of product. The multiplication function under
     // test truncates the top 32 bits, so we compare against a 64-bit expected
     // product.
-    var testData = [
+    const testData = [
       // low(a)   high(a)               low(a*b)   high(a*b)
       [0xec10955b, 0x360eb168, 0x4b7f3f5b, 0xbfcb7c59, 0x9517da5f],
       [0x42b000fc, 0x9d101642, 0x6fa1ab72, 0x2584c438, 0x6a9e6d2b],
@@ -227,9 +217,9 @@ describe('binaryArithTest', function() {
       [0xe4f2ce21, 0x2e74b7bd, 0xd801b38b, 0xbc17feeb, 0xc6c44e0f]
     ];
 
-    for (var i = 0; i < testData.length; i++) {
-      var a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      var prod = a.mul(testData[i][2]);
+    for (let i = 0; i < testData.length; i++) {
+      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
+      const prod = a.mul(testData[i][2]);
       expect(prod.lo).toEqual(testData[i][3]);
       expect(prod.hi).toEqual(testData[i][4]);
     }
@@ -241,7 +231,7 @@ describe('binaryArithTest', function() {
    */
   it('testDiv', function() {
     // Compute a/b, yielding quot = a/b and rem = a%b.
-    var testData = [
+    const testData = [
       // --- divisors in (0, 2^32-1) to test full divisor range
       // low(a)   high(a)    b          low(quot)  high(quot) rem
       [0x712443f1, 0xe85cefcc, 0xc1a7050b, 0x332c79ad, 0x00000001, 0x92ffa882],
@@ -268,11 +258,11 @@ describe('binaryArithTest', function() {
       [0x7179a74c, 0x46083fff, 0x0000253c, 0x4d39ba6e, 0x0001e17f, 0x00000f84]
     ];
 
-    for (var i = 0; i < testData.length; i++) {
-      var a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      var result = a.div(testData[i][2]);
-      var quotient = result[0];
-      var remainder = result[1];
+    for (let i = 0; i < testData.length; i++) {
+      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
+      const result = a.div(testData[i][2]);
+      const quotient = result[0];
+      const remainder = result[1];
       expect(quotient.lo).toEqual(testData[i][3]);
       expect(quotient.hi).toEqual(testData[i][4]);
       expect(remainder.lo).toEqual(testData[i][5]);
@@ -284,32 +274,32 @@ describe('binaryArithTest', function() {
    * Tests .toString() and .fromString().
    */
   it('testStrings', function() {
-    var testData = [
-        [0x5e84c935, 0xcae33d0e, '14619595947299359029'],
-        [0x62b3b8b8, 0x93480544, '10612738313170434232'],
-        [0x319bfb13, 0xc01c4172, '13843011313344445203'],
-        [0x5b8a65fb, 0xa5885b31, '11927883880638080507'],
-        [0x6bdb80f1, 0xb0d1b16b, '12741159895737008369'],
-        [0x4b82b442, 0x2e0d8c97, '3318463081876730946'],
-        [0x780d5208, 0x7d76752c, '9040542135845999112'],
-        [0x2e46800f, 0x0993778d, '690026616168284175'],
-        [0xf00a7e32, 0xcd8e3931, '14811839111111540274'],
-        [0x1baeccd6, 0x923048c4, '10533999535534820566'],
-        [0x03669d29, 0xbff3ab72, '13831587386756603177'],
-        [0x2526073e, 0x01affc81, '121593346566522686'],
-        [0xc24244e0, 0xd7f40d0e, '15561076969511732448'],
-        [0xc56a341e, 0xa68b66a7, '12000798502816461854'],
-        [0x8738d64d, 0xbfe78604, '13828168534871037517'],
-        [0x5baff03b, 0xd7572aea, '15516918227177304123'],
-        [0x4a843d8a, 0x864e132b, '9677693725920476554'],
-        [0x25b4e94d, 0x22b54dc6, '2500990681505655117'],
-        [0x6bbe664b, 0x55a5cc0e, '6171563226690381387'],
-        [0xee916c81, 0xb00aabb3, '12685140089732426881']
+    const testData = [
+      [0x5e84c935, 0xcae33d0e, '14619595947299359029'],
+      [0x62b3b8b8, 0x93480544, '10612738313170434232'],
+      [0x319bfb13, 0xc01c4172, '13843011313344445203'],
+      [0x5b8a65fb, 0xa5885b31, '11927883880638080507'],
+      [0x6bdb80f1, 0xb0d1b16b, '12741159895737008369'],
+      [0x4b82b442, 0x2e0d8c97, '3318463081876730946'],
+      [0x780d5208, 0x7d76752c, '9040542135845999112'],
+      [0x2e46800f, 0x0993778d, '690026616168284175'],
+      [0xf00a7e32, 0xcd8e3931, '14811839111111540274'],
+      [0x1baeccd6, 0x923048c4, '10533999535534820566'],
+      [0x03669d29, 0xbff3ab72, '13831587386756603177'],
+      [0x2526073e, 0x01affc81, '121593346566522686'],
+      [0xc24244e0, 0xd7f40d0e, '15561076969511732448'],
+      [0xc56a341e, 0xa68b66a7, '12000798502816461854'],
+      [0x8738d64d, 0xbfe78604, '13828168534871037517'],
+      [0x5baff03b, 0xd7572aea, '15516918227177304123'],
+      [0x4a843d8a, 0x864e132b, '9677693725920476554'],
+      [0x25b4e94d, 0x22b54dc6, '2500990681505655117'],
+      [0x6bbe664b, 0x55a5cc0e, '6171563226690381387'],
+      [0xee916c81, 0xb00aabb3, '12685140089732426881']
     ];
 
-    for (var i = 0; i < testData.length; i++) {
-      var a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      var roundtrip = jspb.arith.UInt64.fromString(a.toString());
+    for (let i = 0; i < testData.length; i++) {
+      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
+      const roundtrip = jspb.arith.UInt64.fromString(a.toString());
       expect(roundtrip.lo).toEqual(a.lo);
       expect(roundtrip.hi).toEqual(a.hi);
       expect(a.toString()).toEqual(testData[i][2]);
@@ -322,32 +312,18 @@ describe('binaryArithTest', function() {
    * the explicit overrides: .toString() and .fromString().
    */
   it('testSignedInt64', function() {
-    var testStrings = [
-        '-7847499644178593666',
-        '3771946501229139523',
-        '2872856549054995060',
-        '-5780049594274350904',
-        '3383785956695105201',
-        '2973055184857072610',
-        '-3879428459215627206',
-        '4589812431064156631',
-        '8484075557333689940',
-        '1075325817098092407',
-        '-4346697501012292314',
-        '2488620459718316637',
-        '6112655187423520672',
-        '-3655278273928612104',
-        '3439154019435803196',
-        '1004112478843763757',
-        '-6587790776614368413',
-        '664320065099714586',
-        '4760412909973292912',
-        '-7911903989602274672'
+    const testStrings = [
+      '-7847499644178593666', '3771946501229139523',  '2872856549054995060',
+      '-5780049594274350904', '3383785956695105201',  '2973055184857072610',
+      '-3879428459215627206', '4589812431064156631',  '8484075557333689940',
+      '1075325817098092407',  '-4346697501012292314', '2488620459718316637',
+      '6112655187423520672',  '-3655278273928612104', '3439154019435803196',
+      '1004112478843763757',  '-6587790776614368413', '664320065099714586',
+      '4760412909973292912',  '-7911903989602274672'
     ];
 
-    for (var i = 0; i < testStrings.length; i++) {
-      var roundtrip =
-          jspb.arith.Int64.fromString(testStrings[i]).toString();
+    for (let i = 0; i < testStrings.length; i++) {
+      const roundtrip = jspb.arith.Int64.fromString(testStrings[i]).toString();
       expect(roundtrip).toEqual(testStrings[i]);
     }
   });

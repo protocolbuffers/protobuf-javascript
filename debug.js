@@ -35,8 +35,9 @@
 goog.provide('jspb.debug');
 
 goog.require('goog.array');
-goog.require('goog.asserts');
 goog.require('goog.object');
+
+goog.require('jspb.asserts');
 goog.require('jspb.Map');
 goog.require('jspb.Message');
 
@@ -55,11 +56,11 @@ jspb.debug.dump = function(message) {
   if (!goog.DEBUG) {
     return null;
   }
-  goog.asserts.assert(message instanceof jspb.Message,
+  jspb.asserts.assertInstanceof(message, jspb.Message,
       'jspb.Message instance expected');
   /** @type {Object} */
   var object = message;
-  goog.asserts.assert(object['getExtension'],
+  jspb.asserts.assert(object['getExtension'],
       'Only unobfuscated and unoptimized compilation modes supported.');
   return /** @type {Object} */ (jspb.debug.dump_(message));
 };
@@ -88,7 +89,7 @@ jspb.debug.dump_ = function(thing) {
   }
 
   if (type == 'array') {
-    goog.asserts.assertArray(thing);
+    jspb.asserts.assertArray(thing);
     return goog.array.map(thing, jspb.debug.dump_);
   }
 
@@ -101,7 +102,7 @@ jspb.debug.dump_ = function(thing) {
     return mapObject;
   }
 
-  goog.asserts.assert(message instanceof jspb.Message,
+  jspb.asserts.assertInstanceof(message, jspb.Message,
       'Only messages expected: ' + thing);
   var ctor = message.constructor;
   var messageName = ctor.name || ctor.displayName;

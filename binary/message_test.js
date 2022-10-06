@@ -32,29 +32,27 @@
 
 goog.setTestOnly();
 
-goog.require('goog.testing.asserts');
-
 // CommonJS-LoadFromFile: test_pb proto.jspb.test
 goog.require('proto.jspb.test.Deeply.Nested.Message');
 
 // CommonJS-LoadFromFile: test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ForeignNestedFieldMessage');
 
-describe('Message test suite', function() {
+describe('Message test suite', () => {
   // Verify that we can successfully use a field referring to a nested message
   // from a different .proto file.
-  it('testForeignNestedMessage', function() {
-    var msg = new proto.jspb.test.ForeignNestedFieldMessage();
-    var nested = new proto.jspb.test.Deeply.Nested.Message();
+  it('testForeignNestedMessage', () => {
+    const msg = new proto.jspb.test.ForeignNestedFieldMessage();
+    const nested = new proto.jspb.test.Deeply.Nested.Message();
     nested.setCount(5);
     msg.setDeeplyNestedMessage(nested);
-    assertEquals(5, msg.getDeeplyNestedMessage().getCount());
+    expect(msg.getDeeplyNestedMessage().getCount()).toEqual(5);
 
     // After a serialization-deserialization round trip we should get back the
     // same data we started with.
-    var serialized = msg.serializeBinary();
-    var deserialized =
+    const serialized = msg.serializeBinary();
+    const deserialized =
         proto.jspb.test.ForeignNestedFieldMessage.deserializeBinary(serialized);
-    assertEquals(5, deserialized.getDeeplyNestedMessage().getCount());
+    expect(deserialized.getDeeplyNestedMessage().getCount()).toEqual(5);
   });
 });
