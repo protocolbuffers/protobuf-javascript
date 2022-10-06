@@ -133,7 +133,8 @@ jspb.asserts.fail = function(opt_message, ...args) {
 jspb.asserts.assertInstanceof = function(value, type, opt_message, ...args) {
   if (!(value instanceof type)) {
     jspb.assert.doAssertFailure(
-        'Expected instanceof %s but got %s.', [getType(type), getType(value)],
+        'Expected instanceof %s but got %s.',
+        [jspb.asserts.getType(type), jspb.asseerts.getType(value)],
         opt_message, args);
   }
   return value;
@@ -144,8 +145,9 @@ jspb.asserts.assertInstanceof = function(value, type, opt_message, ...args) {
  * string cannot be found, 'unknown type name' will be returned.
  * @param {*} value A constructor, object, or primitive.
  * @return {string} The best display name for the value, or 'unknown type name'.
+ * @private
  */
-function getType(value) {
+jspb.asserts.getType = function(value) {
   if (value instanceof Function) {
     return value.displayName || value.name || 'unknown type name';
   } else if (value instanceof Object) {
