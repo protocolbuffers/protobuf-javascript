@@ -12,29 +12,6 @@
 goog.provide('jspb.asserts');
 
 /**
- * Does simple python-style string substitution.
- * subs("foo%s hot%s", "bar", "dog") becomes "foobar hotdog".
- * @param {string} pattern The string containing the pattern.
- * @param {!Array<*>} subs The items to substitute into the pattern.
- * @return {string} A copy of `str` in which each occurrence of
- *     `%s` has been replaced an argument from `var_args`.
- */
-function subs(pattern, subs) {
-  const splitParts = pattern.split('%s');
-  let returnString = '';
-
-  // Replace up to the last split part. We are inserting in the
-  // positions between split parts.
-  const subLast = splitParts.length - 1;
-  for (let i = 0; i < subLast; i++) {
-    // keep unsupplied as '%s'
-    const sub = (i < subs.length) ? subs[i] : '%s';
-    returnString += splitParts[i] + sub;
-  }
-  return returnString + splitParts[subLast];
-}
-
-/**
  * Throws an exception with the given message and "Assertion failed" prefixed
  * onto it.
  * @param {string} defaultMessage The message to use if givenMessage is empty.
@@ -43,7 +20,7 @@ function subs(pattern, subs) {
  * @param {!Array<*>} givenArgs The substitution arguments for givenMessage.
  * @throws {Error} When the value is not a number.
  */
-function doAssertFailure(defaultMessage, defaultArgs, givenMessage, givenArgs) {
+jspb.asserts.doAssertFailure = function(defaultMessage, defaultArgs, givenMessage, givenArgs) {
   let message = 'Assertion failed';
   let args;
   if (givenMessage) {
@@ -72,7 +49,7 @@ function doAssertFailure(defaultMessage, defaultArgs, givenMessage, givenArgs) {
 
 jspb.asserts.assert = function(condition, opt_message, ...args) {
   if (!condition) {
-    doAssertFailure('', null, opt_message, args);
+    jspb.asserts.doAssertFailure('', null, opt_message, args);
   }
   return condition;
 };
@@ -88,7 +65,7 @@ jspb.asserts.assert = function(condition, opt_message, ...args) {
  */
 jspb.asserts.assertString = function(value, opt_message, ...args) {
   if (typeof value !== 'string') {
-    doAssertFailure(
+    jspb.asserts.doAssertFailure(
         'Expected string but got %s: %s.', [goog.typeOf(value), value],
         opt_message, args);
   }
@@ -106,7 +83,7 @@ jspb.asserts.assertString = function(value, opt_message, ...args) {
  */
 jspb.asserts.assertArray = function(value, opt_message, ...args) {
   if (!Array.isArray(value)) {
-    doAssertFailure(
+    jspb.asserts.doAssertFailure(
         'Expected array but got %s: %s.', [goog.typeOf(value), value],
         opt_message, args);
   }
@@ -155,7 +132,7 @@ jspb.asserts.fail = function(opt_message, ...args) {
  */
 jspb.asserts.assertInstanceof = function(value, type, opt_message, ...args) {
   if (!(value instanceof type)) {
-    doAssertFailure(
+    jspb.assert.doAssertFailure(
         'Expected instanceof %s but got %s.', [getType(type), getType(value)],
         opt_message, args);
   }
