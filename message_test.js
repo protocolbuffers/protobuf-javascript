@@ -126,37 +126,37 @@ goog.require('proto.jspb.test.MessageWithLargeFieldNumbers');
 
 goog.require('proto.jspb.test.simple1');
 
-describe('Message test suite', function() {
+describe('Message test suite', () => {
   const stubs = new goog.testing.PropertyReplacer();
 
-  beforeEach(function() {
+  beforeEach(() => {
     stubs.set(jspb.Message, 'SERIALIZE_EMPTY_TRAILING_FIELDS', false);
   });
 
-  afterEach(function() {
+  afterEach(() => {
     stubs.reset();
   });
 
-  it('testEmptyProto', function() {
+  it('testEmptyProto', () => {
     const empty1 = new proto.jspb.test.Empty([]);
     const empty2 = new proto.jspb.test.Empty([]);
     expect(empty1.toObject()).toEqual({});
     expect(empty1).toEqual(empty2);
   });
 
-  it('testTopLevelEnum', function() {
+  it('testTopLevelEnum', () => {
     const response = new proto.jspb.test.EnumContainer([]);
     response.setOuterEnum(proto.jspb.test.OuterEnum.FOO);
     expect(response.getOuterEnum()).toEqual(proto.jspb.test.OuterEnum.FOO);
   });
 
-  it('testByteStrings', function() {
+  it('testByteStrings', () => {
     const data = new proto.jspb.test.DefaultValues([]);
     data.setBytesField('some_bytes');
     expect(data.getBytesField()).toEqual('some_bytes');
   });
 
-  it('testComplexConversion', function() {
+  it('testComplexConversion', () => {
     const data1 = ['a', , , [, 11], [[, 22], [, 33]], , ['s1', 's2'], , 1];
     const foo = new proto.jspb.test.Complex(data1);
     let result = foo.toObject();
@@ -186,7 +186,7 @@ describe('Message test suite', function() {
     });
   });
 
-  it('testMissingFields', function() {
+  it('testMissingFields', () => {
     const foo = new proto.jspb.test.Complex([
       undefined, undefined, undefined, [], undefined, undefined, undefined,
       undefined
@@ -203,14 +203,14 @@ describe('Message test suite', function() {
     });
   });
 
-  it('testNestedComplexMessage', function() {
+  it('testNestedComplexMessage', () => {
     // Instantiate the message and set a unique field, just to ensure that we
     // are not getting jspb.test.Complex instead.
     const msg = new proto.jspb.test.OuterMessage.Complex();
     msg.setInnerComplexField(5);
   });
 
-  it('testSpecialCases', function() {
+  it('testSpecialCases', () => {
     // Note: Some property names are reserved in JavaScript.
     // These names are converted to the Js property named pb_<reserved_name>.
     const special = new proto.jspb.test.SpecialCases(
@@ -224,7 +224,7 @@ describe('Message test suite', function() {
     });
   });
 
-  it('testDefaultValues', function() {
+  it('testDefaultValues', () => {
     const defaultString = 'default<>\'"abc';
     let response = new proto.jspb.test.DefaultValues();
 
@@ -318,7 +318,7 @@ describe('Message test suite', function() {
     expect(response.hasEnumField()).toEqual(false);
   });
 
-  it('testEqualsSimple', function() {
+  it('testEqualsSimple', () => {
     const s1 = new proto.jspb.test.Simple1(['hi']);
     expect(jspb.Message.equals(s1, new proto.jspb.test.Simple1(['hi'])))
         .toEqual(true);
@@ -339,7 +339,7 @@ describe('Message test suite', function() {
     expect(jspb.Message.equals(s1, s2)).toEqual(false);
   });
 
-  it('testEquals_softComparison', function() {
+  it('testEquals_softComparison', () => {
     const s1 = new proto.jspb.test.Simple1(['hi', [], null]);
     expect(jspb.Message.equals(s1, new proto.jspb.test.Simple1(['hi', []])))
         .toBeTrue();
@@ -349,7 +349,7 @@ describe('Message test suite', function() {
         .toBeTrue();
   });
 
-  it('testEqualsComplex', function() {
+  it('testEqualsComplex', () => {
     const data1 = ['a', , , [, 11], [[, 22], [, 33]], , ['s1', 's2'], , 1];
     const data2 = ['a', , , [, 11], [[, 22], [, 34]], , ['s1', 's2'], , 1];
     const data3 = ['a', , , [, 11], [[, 22]], , ['s1', 's2'], , 1];
@@ -366,7 +366,7 @@ describe('Message test suite', function() {
     expect(jspb.Message.equals(c1a, s1)).toBeFalse();
   });
 
-  it('testEqualsExtensionsConstructed', function() {
+  it('testEqualsExtensionsConstructed', () => {
     expect(jspb.Message.equals(
                new proto.jspb.test.HasExtensions([]),
                new proto.jspb.test.HasExtensions([{}])))
@@ -403,7 +403,7 @@ describe('Message test suite', function() {
         .toBeTrue();
   });
 
-  it('testEqualsExtensionsUnconstructed', function() {
+  it('testEqualsExtensionsUnconstructed', () => {
     expect(jspb.Message.compareFields([], [{}])).toBeTrue();
     expect(jspb.Message.compareFields([, , , {}], [])).toBeTrue();
     expect(jspb.Message.compareFields([, , , {}], [, , {}])).toBeTrue();
@@ -430,13 +430,13 @@ describe('Message test suite', function() {
     ])).toBeTrue();
   });
 
-  it('testInitializeMessageWithLastFieldNull', function() {
+  it('testInitializeMessageWithLastFieldNull', () => {
     // This tests for regression to bug http://b/117298778
     const msg = new proto.jspb.test.TestLastFieldBeforePivot([null]);
     expect(msg.getLastFieldBeforePivot()).not.toBeUndefined();
   });
 
-  it('testEqualsNonFinite', function() {
+  it('testEqualsNonFinite', () => {
     expect(jspb.Message.compareFields(NaN, NaN)).toEqual(true);
     expect(jspb.Message.compareFields(NaN, 'NaN')).toEqual(true);
     expect(jspb.Message.compareFields('NaN', NaN)).toEqual(true);
@@ -448,7 +448,7 @@ describe('Message test suite', function() {
     expect(jspb.Message.compareFields(NaN, undefined)).toEqual(false);
   });
 
-  it('testToMap', function() {
+  it('testToMap', () => {
     const p1 = new proto.jspb.test.Simple1(['k', ['v']]);
     const p2 = new proto.jspb.test.Simple1(['k1', ['v1', 'v2']]);
     const soymap = jspb.Message.toMap(
@@ -462,7 +462,7 @@ describe('Message test suite', function() {
     expect(protomap['k'].getARepeatedStringList()).toEqual(['v']);
   });
 
-  it('testClone', function() {
+  it('testClone', () => {
     const supportsUint8Array =
         !goog.userAgent.IE || goog.userAgent.isVersionOrHigher('10');
     const original = new proto.jspb.test.TestClone();
@@ -508,7 +508,7 @@ describe('Message test suite', function() {
     ]);
   });
 
-  it('testCopyInto', function() {
+  it('testCopyInto', () => {
     const supportsUint8Array =
         !goog.userAgent.IE || goog.userAgent.isVersionOrHigher('10');
     const original = new proto.jspb.test.TestClone();
@@ -560,7 +560,7 @@ describe('Message test suite', function() {
                          .getExt());
   });
 
-  it('testCopyInto_notSameType', function() {
+  it('testCopyInto_notSameType', () => {
     const a = new proto.jspb.test.TestClone();
     const b = new proto.jspb.test.Simple1(['str', ['s1', 's2']]);
 
@@ -568,7 +568,7 @@ describe('Message test suite', function() {
         .toThrowError(Error, /should have the same type/);
   });
 
-  it('testExtensions', function() {
+  it('testExtensions', () => {
     const extension1 = new proto.jspb.test.IsExtension(['ext1field']);
     const extension2 = new proto.jspb.test.Simple1(['str', ['s1', 's2']]);
     const extendable = new proto.jspb.test.HasExtensions(['v1', 'v2', 'v3']);
@@ -611,7 +611,7 @@ describe('Message test suite', function() {
     expect(proto.jspb.test.HasExtensions['ignoredFloating']).toBeUndefined();
   });
 
-  it('testFloatingExtensions', function() {
+  it('testFloatingExtensions', () => {
     // From an autogenerated container.
     let extendable = new proto.jspb.test.HasExtensions(['v1', 'v2', 'v3']);
     let extension = new proto.jspb.test.Simple1(['foo', ['s1', 's2']]);
@@ -632,7 +632,7 @@ describe('Message test suite', function() {
     expect(proto.jspb.exttest.beta.floatingStrField).not.toBeUndefined();
   });
 
-  it('testNestedExtensions', function() {
+  it('testNestedExtensions', () => {
     const extendable =
         new proto.jspb.exttest.nested.TestNestedExtensionsMessage();
     const extension =
@@ -645,7 +645,7 @@ describe('Message test suite', function() {
         .toEqual(extension);
   });
 
-  it('testToObject_extendedObject', function() {
+  it('testToObject_extendedObject', () => {
     const extension1 = new proto.jspb.test.IsExtension(['ext1field']);
     const extension2 = new proto.jspb.test.Simple1(['str', ['s1', 's2'], true]);
     const extendable = new proto.jspb.test.HasExtensions(['v1', 'v2', 'v3']);
@@ -711,38 +711,38 @@ describe('Message test suite', function() {
     });
   });
 
-  it('testInitialization_emptyArray', function() {
+  it('testInitialization_emptyArray', () => {
     const msg = new proto.jspb.test.HasExtensions([]);
     expect(msg.toArray()).toEqual([]);
   });
 
-  it('testInitialization_justExtensionObject', function() {
+  it('testInitialization_justExtensionObject', () => {
     const msg = new proto.jspb.test.Empty([{1: 'hi'}]);
     // The extensionObject is not moved from its original location.
     expect(msg.toArray()).toEqual([{1: 'hi'}])
   });
 
-  it('testInitialization_incompleteList', function() {
+  it('testInitialization_incompleteList', () => {
     const msg = new proto.jspb.test.Empty([1, {4: 'hi'}]);
     // The extensionObject is not moved from its original location.
     expect(msg.toArray()).toEqual([1, {4: 'hi'}]);
   });
 
-  it('testInitialization_forwardCompatible', function() {
+  it('testInitialization_forwardCompatible', () => {
     const msg = new proto.jspb.test.Empty([1, 2, 3, {1: 'hi'}]);
 
     expect(msg.toArray()).toEqual([1, 2, 3, {1: 'hi'}]);
   });
 
   it('testExtendedMessageEnsureObject',
-     /** @suppress {visibility} */ function() {
+     /** @suppress {visibility} */ () => {
        const data =
            new proto.jspb.test.HasExtensions(['str1', {'a_key': 'an_object'}]);
 
        expect(jspb.Message.getField(data, ['a_key'])).toEqual('an_object');
      });
 
-  it('testToObject_hasExtensionField', function() {
+  it('testToObject_hasExtensionField', () => {
     const data =
         new proto.jspb.test.HasExtensions(['str1', {100: ['ext1'], 102: ''}]);
     const obj = data.toObject();
@@ -751,7 +751,7 @@ describe('Message test suite', function() {
     expect(obj.str).toEqual('');
   });
 
-  it('testGetExtension', function() {
+  it('testGetExtension', () => {
     const data = new proto.jspb.test.HasExtensions(['str1', {100: ['ext1']}]);
     expect(data.getStr1()).toEqual('str1');
     const extension = data.getExtension(proto.jspb.test.IsExtension.extField);
@@ -759,7 +759,7 @@ describe('Message test suite', function() {
     expect(extension.getExt1()).toEqual('ext1');
   });
 
-  it('testSetExtension', function() {
+  it('testSetExtension', () => {
     const data = new proto.jspb.test.HasExtensions();
     const extensionMessage = new proto.jspb.test.IsExtension(['is_extension']);
     data.setExtension(proto.jspb.test.IsExtension.extField, extensionMessage);
@@ -773,7 +773,7 @@ describe('Message test suite', function() {
    * Note that group is long deprecated, we only support it because JsPb has
    * a goal of being able to generate JS classes for all proto descriptors.
    */
-  it('testGroups', function() {
+  it('testGroups', () => {
     const group = new proto.jspb.test.TestGroup();
     const someGroup = new proto.jspb.test.TestGroup.RepeatedGroup();
     someGroup.setId('g1');
@@ -797,13 +797,13 @@ describe('Message test suite', function() {
     expect(group1.getGroup()).toEqual(someGroup);
   });
 
-  it('testNonExtensionFieldsAfterExtensionRange', function() {
+  it('testNonExtensionFieldsAfterExtensionRange', () => {
     const data = [{'1': 'a_string'}];
     const message = new proto.jspb.test.Complex(data);
     expect(message.getARepeatedStringList()).toEqual([])
   });
 
-  it('testReservedGetterNames', function() {
+  it('testReservedGetterNames', () => {
     const message = new proto.jspb.test.TestReservedNames();
     message.setExtension$(11);
     message.setExtension(proto.jspb.test.TestReservedNamesExtension.foo, 12);
@@ -813,7 +813,7 @@ describe('Message test suite', function() {
     expect(message.toObject()).toEqual({extension: 11, foo: 12});
   });
 
-  it('testInitializeMessageWithUnsetOneof', function() {
+  it('testInitializeMessageWithUnsetOneof', () => {
     const message = new proto.jspb.test.TestMessageWithOneof([]);
     expect(message.getPartialOneofCase())
         .toEqual(proto.jspb.test.TestMessageWithOneof.PartialOneofCase
@@ -824,7 +824,7 @@ describe('Message test suite', function() {
                      .RECURSIVE_ONEOF_NOT_SET);
   });
 
-  it('testUnsetsOneofCaseWhenFieldIsCleared', function() {
+  it('testUnsetsOneofCaseWhenFieldIsCleared', () => {
     const message = new proto.jspb.test.TestMessageWithOneof;
     expect(message.getPartialOneofCase())
         .toEqual(proto.jspb.test.TestMessageWithOneof.PartialOneofCase
@@ -841,7 +841,7 @@ describe('Message test suite', function() {
                      .PARTIAL_ONEOF_NOT_SET);
   });
 
-  it('testFloatingPointFieldsSupportNan', function() {
+  it('testFloatingPointFieldsSupportNan', () => {
     const message = new proto.jspb.test.FloatingPointFields([
       'NaN', 'NaN', ['NaN', 'NaN'], 'NaN', 'NaN', 'NaN', ['NaN', 'NaN'], 'NaN'
     ]);
@@ -857,7 +857,7 @@ describe('Message test suite', function() {
     expect(message.getDefaultDoubleField()).toBeNaN();
   });
 
-  it('testFloatingPointsAreConvertedFromStringInput', function() {
+  it('testFloatingPointsAreConvertedFromStringInput', () => {
     const message = new proto.jspb.test.FloatingPointFields([
       Infinity, 'Infinity', ['Infinity', Infinity], 'Infinity', 'Infinity',
       'Infinity', ['Infinity', Infinity], 'Infinity'
@@ -874,7 +874,7 @@ describe('Message test suite', function() {
     expect(message.getDefaultDoubleField()).toBePositiveInfinity();
   });
 
-  it('testBooleansAreConvertedFromNumberInput', function() {
+  it('testBooleansAreConvertedFromNumberInput', () => {
     let message = new proto.jspb.test.BooleanFields([1, 1, [true, 1]]);
     expect(message.getOptionalBooleanField()).toBeTrue();
     expect(message.getRequiredBooleanField()).toBeTrue();
@@ -889,7 +889,7 @@ describe('Message test suite', function() {
     expect(message.getRepeatedBooleanFieldList()[1]).toBeFalse();
   });
 
-  it('testExtensionReverseOrder', function() {
+  it('testExtensionReverseOrder', () => {
     const message2 =
         new proto.jspb.exttest.reverse.TestExtensionReverseOrderMessage2;
 
@@ -911,7 +911,7 @@ describe('Message test suite', function() {
     expect(message2.getExtension(proto.jspb.exttest.reverse.c)).toEqual(23333);
   });
 
-  it('testCircularDepsBaseOnMessageField', function() {
+  it('testCircularDepsBaseOnMessageField', () => {
     const nestMessage1 = new proto.jspb.circulartest.MessageField1;
     const nestMessage2 = new proto.jspb.circulartest.MessageField2;
     const message1 = new proto.jspb.circulartest.MessageField1;
@@ -928,7 +928,7 @@ describe('Message test suite', function() {
   });
 
 
-  it('testCircularDepsBaseOnRepeatedMessageField', function() {
+  it('testCircularDepsBaseOnRepeatedMessageField', () => {
     const nestMessage1 = new proto.jspb.circulartest.RepeatedMessageField1;
     const nestMessage2 = new proto.jspb.circulartest.RepeatedMessageField2;
     const message1 = new proto.jspb.circulartest.RepeatedMessageField1;
@@ -944,7 +944,7 @@ describe('Message test suite', function() {
     expect(message2.getBList()[0].getA()).toEqual(1);
   });
 
-  it('testCircularDepsBaseOnMapField', function() {
+  it('testCircularDepsBaseOnMapField', () => {
     const nestMessage1 = new proto.jspb.circulartest.MapField1;
     const nestMessage2 = new proto.jspb.circulartest.MapField2;
     const message1 = new proto.jspb.circulartest.MapField1;
@@ -960,7 +960,7 @@ describe('Message test suite', function() {
     expect(message2.getBMap().get(1).getA()).toEqual(1);
   });
 
-  it('testCircularDepsBaseOnNestedMessage', function() {
+  it('testCircularDepsBaseOnNestedMessage', () => {
     const nestMessage1 =
         new proto.jspb.circulartest.NestedMessage1.NestedNestedMessage;
     const nestMessage2 = new proto.jspb.circulartest.NestedMessage2;
@@ -977,7 +977,7 @@ describe('Message test suite', function() {
     expect(message2.getB().getA()).toEqual(1);
   });
 
-  it('testCircularDepsBaseOnNestedEnum', function() {
+  it('testCircularDepsBaseOnNestedEnum', () => {
     const nestMessage2 = new proto.jspb.circulartest.NestedEnum2;
     const message1 = new proto.jspb.circulartest.NestedEnum1;
     const message2 = new proto.jspb.circulartest.NestedEnum2;
@@ -992,7 +992,7 @@ describe('Message test suite', function() {
         .toEqual(proto.jspb.circulartest.NestedEnum1.NestedNestedEnum.VALUE_1);
   });
 
-  it('testCircularDepsBaseOnExtensionContainingType', function() {
+  it('testCircularDepsBaseOnExtensionContainingType', () => {
     const nestMessage2 = new proto.jspb.circulartest.ExtensionContainingType2;
     const message1 = new proto.jspb.circulartest.ExtensionContainingType1;
 
@@ -1008,7 +1008,7 @@ describe('Message test suite', function() {
         .toEqual(1);
   });
 
-  it('testCircularDepsBaseOnExtensionField', function() {
+  it('testCircularDepsBaseOnExtensionField', () => {
     const nestMessage2 = new proto.jspb.circulartest.ExtensionField2;
     const message1 = new proto.jspb.circulartest.ExtensionField1;
     const message3 = new proto.jspb.circulartest.ExtensionField3;
@@ -1024,7 +1024,7 @@ describe('Message test suite', function() {
         .toEqual(2);
   });
 
-  it('testSameMessageNameOuputs', function() {
+  it('testSameMessageNameOuputs', () => {
     const package1Message = new proto.jspb.filenametest.package1.TestMessage;
     const package2Message = new proto.jspb.filenametest.package2.TestMessage;
 
@@ -1040,7 +1040,7 @@ describe('Message test suite', function() {
   });
 
 
-  it('testMessageWithLargeFieldNumbers', function() {
+  it('testMessageWithLargeFieldNumbers', () => {
     const message = new proto.jspb.test.MessageWithLargeFieldNumbers;
 
     message.setAString('string');

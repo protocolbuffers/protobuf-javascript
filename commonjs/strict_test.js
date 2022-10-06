@@ -38,25 +38,25 @@ const global = Function('return this')();
 const test9_pb = require('./protos/test9_pb');
 const test10_pb = require('./protos/test10_pb');
 
-describe('Strict test suite', function() {
-  it('testImportedMessage', function() {
+describe('Strict test suite', () => {
+  it('testImportedMessage', () => {
     const simple1 = new test9_pb.jspb.exttest.strict.nine.Simple9()
     const simple2 = new test9_pb.jspb.exttest.strict.nine.Simple9()
     expect(simple1.toObject()).toEqual(simple2.toObject());
   });
 
-  it('testGlobalScopePollution', function() {
+  it('testGlobalScopePollution', () => {
     expect(global.jspb.exttest).toBeUndefined();
   });
 
-  describe('with imports', function() {
-    it('testImportedMessage', function() {
+  describe('with imports', () => {
+    it('testImportedMessage', () => {
       const simple1 = new test10_pb.jspb.exttest.strict.ten.Simple10()
       const simple2 = new test10_pb.jspb.exttest.strict.ten.Simple10()
       expect(simple1.toObject()).toEqual(simple2.toObject());
     });
 
-    it('testGlobalScopePollution', function() {
+    it('testGlobalScopePollution', () => {
       expect(global.jspb.exttest).toBeUndefined();
     });
   });

@@ -396,12 +396,12 @@ function checkExtensions(msg) {
 }
 
 
-describe('protoBinaryTest', function() {
+describe('protoBinaryTest', () => {
   /**
    * Tests a basic serialization-deserializaton round-trip with all supported
    * field types (on the TestAllTypes message type).
    */
-  it('testRoundTrip', function() {
+  it('testRoundTrip', () => {
     const msg = new proto.jspb.test.TestAllTypes();
     fillAllFields(msg);
     const encoded = msg.serializeBinary();
@@ -412,7 +412,7 @@ describe('protoBinaryTest', function() {
   /**
    * Test that base64 string and Uint8Array are interchangeable in bytes fields.
    */
-  it('testBytesFieldsGettersInterop', function() {
+  it('testBytesFieldsGettersInterop', () => {
     let msg = new proto.jspb.test.TestAllTypes();
     // Set from a base64 string and check all the getters work.
     msg.setOptionalBytes(BYTES_B64);
@@ -437,7 +437,7 @@ describe('protoBinaryTest', function() {
   /**
    * Test that bytes setters will receive result of any of the getters.
    */
-  it('testBytesFieldsSettersInterop', function() {
+  it('testBytesFieldsSettersInterop', () => {
     const msg = new proto.jspb.test.TestAllTypes();
     msg.setOptionalBytes(BYTES);
     expect(bytesCompare(msg.getOptionalBytes(), BYTES)).toBeTrue();
@@ -453,7 +453,7 @@ describe('protoBinaryTest', function() {
   /**
    * Test that bytes setters will receive result of any of the getters.
    */
-  it('testRepeatedBytesGetters', function() {
+  it('testRepeatedBytesGetters', () => {
     const msg = new proto.jspb.test.TestAllTypes();
 
     function assertGetters() {
@@ -575,7 +575,7 @@ describe('protoBinaryTest', function() {
   /**
    * Tests extension serialization and deserialization.
    */
-  it('testExtensions', function() {
+  it('testExtensions', () => {
     const msg = new proto.jspb.test.TestExtendable();
     fillExtensions(msg);
     const encoded = msg.serializeBinary();
@@ -586,7 +586,7 @@ describe('protoBinaryTest', function() {
   /**
    * Tests that unknown extensions don't cause deserialization failure.
    */
-  it('testUnknownExtension', function() {
+  it('testUnknownExtension', () => {
     const msg = new proto.jspb.test.TestExtendable();
     fillExtensions(msg);
     const writer = new jspb.BinaryWriter();
@@ -597,7 +597,7 @@ describe('protoBinaryTest', function() {
     checkExtensions(decoded);
   });
 
-  it('testAnyWellKnownType', function() {
+  it('testAnyWellKnownType', () => {
     const any = new proto.google.protobuf.Any();
     const msg = new proto.jspb.test.TestAllTypes();
 

@@ -40,8 +40,8 @@ googleProtobuf.exportSymbol('jspb.Message', googleProtobuf.Message, global);
 var test7_pb = require('./test7/test7_pb');
 googleProtobuf.exportSymbol('proto.jspb.test.framing.FramingMessage', test7_pb.FramingMessage, global);
 
-describe('Import test suite', function() {
-  it('testImportedMessage', function() {
+describe('Import test suite', () => {
+  it('testImportedMessage', () => {
     const framing1 = new proto.jspb.test.framing.FramingMessage([]);
     const framing2 = new proto.jspb.test.framing.FramingMessage([]);
     expect(framing1.toObject()).toEqual(framing2.toObject());
