@@ -4,8 +4,13 @@
   "description": "Protocol Buffers for JavaScript",
   "main": "google-protobuf.js",
   "files": [
-    "google",
-    "LICENSE-asserts.md"
+    "google/protobuf/*_pb.js",
+    "google/protobuf/compiler/*_pb.js",
+    "google-protobuf.js",
+    "LICENSE.md",
+    "LICENSE-asserts.md",
+    "package.json",
+    "README.md"
   ],
   "dependencies": {},
   "devDependencies": {
