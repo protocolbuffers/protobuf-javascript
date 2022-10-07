@@ -132,9 +132,9 @@ jspb.asserts.fail = function(opt_message, ...args) {
  */
 jspb.asserts.assertInstanceof = function(value, type, opt_message, ...args) {
   if (!(value instanceof type)) {
-    jspb.assert.doAssertFailure(
+    jspb.asserts.doAssertFailure(
         'Expected instanceof %s but got %s.',
-        [jspb.asserts.getType(type), jspb.asseerts.getType(value)],
+        [jspb.asserts.getType(type), jspb.asserts.getType(value)],
         opt_message, args);
   }
   return value;

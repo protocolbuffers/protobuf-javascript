@@ -4,7 +4,8 @@
   "description": "Protocol Buffers for JavaScript",
   "main": "google-protobuf.js",
   "files": [
-    "google"
+    "google",
+    "LICENSE-asserts.md"
   ],
   "dependencies": {},
   "devDependencies": {
@@ -24,5 +25,5 @@
     "url": "https://github.com/protocolbuffers/protobuf-javascript"
   },
   "author": "Google Protocol Buffers Team",
-  "license": "BSD-3-Clause"
+  "license": "(BSD-3-Clause AND Apache-2.0)"
 }
