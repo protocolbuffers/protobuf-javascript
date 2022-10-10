@@ -117,12 +117,9 @@ function genproto_group3_commonjs_strict(cb) {
 }
 
 
-function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
-  let compilationLevel = 'ADVANCED';
-  if (keepSymbols === true) {
-    compilationLevel = 'SIMPLE';
-  }
-
+function getClosureCompilerCommand(exportsFile, outputFile) {
+  // Use the default optimization level: SIMPLE_OPTIMIZATIONS:
+  // https://developers.google.com/closure/compiler/docs/compilation_levels#simple_optimizations
   const closureLib = 'node_modules/google-closure-library';
   return [
     'node_modules/.bin/google-closure-compiler',
@@ -139,12 +136,12 @@ function getClosureCompilerCommand(exportsFile, outputFile, keepSymbols) {
     '--js=binary/utils.js',
     '--js=binary/writer.js',
     `--js=${exportsFile}`,
-    `--compilation_level="${compilationLevel}"`,
     '--generate_exports',
     '--export_local_property_definitions',
     `--entry_point=${exportsFile}`, `> ${outputFile}`
   ].join(' ');
 }
+
 
 function gen_google_protobuf_js(cb) {
   exec(
@@ -157,8 +154,7 @@ function commonjs_testdeps(cb) {
                 'mkdir -p commonjs_out/test_node_modules && ' +
                   getClosureCompilerCommand(
                       'commonjs/export_testdeps.js',
-                      'commonjs_out/test_node_modules/testdeps_commonjs.js',
-                      true),
+                      'commonjs_out/test_node_modules/testdeps_commonjs.js'),
                 make_exec_logging_callback(cb));
 }
 
