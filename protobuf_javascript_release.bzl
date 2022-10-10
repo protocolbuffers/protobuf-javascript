@@ -3,7 +3,7 @@
 load("@rules_pkg//:providers.bzl", "PackageVariablesInfo")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-_PROTOBUF_JAVASCRIPT_VERSION = "3.21.1"
+_PROTOBUF_JAVASCRIPT_VERSION = "3.21.2"
 
 
 def _package_naming_impl(ctx):
@@ -45,7 +45,7 @@ package_naming = rule(
         # Necessary data dependency for find_cpp_toolchain.
         "_cc_toolchain":
             attr.label(
-                default=Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+                default=Label("@bazel_tools//tools/cpp:current_cc_toolchain"),),
     },
     toolchains=["@bazel_tools//tools/cpp:toolchain_type"],
     incompatible_use_toolchain_transition=True,
