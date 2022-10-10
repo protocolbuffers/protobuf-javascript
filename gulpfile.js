@@ -118,6 +118,8 @@ function genproto_group3_commonjs_strict(cb) {
 
 
 function getClosureCompilerCommand(exportsFile, outputFile) {
+  // Use the default optimization level: SIMPLE_OPTIMIZATIONS:
+  // https://developers.google.com/closure/compiler/docs/compilation_levels#simple_optimizations
   const closureLib = 'node_modules/google-closure-library';
   return [
     'node_modules/.bin/google-closure-compiler',
