@@ -8,6 +8,8 @@
 goog.provide('jspb.Export');
 
 goog.require('goog.object');
+
+goog.require('jspb.debug');
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
 goog.require('jspb.ExtensionFieldBinaryInfo');
@@ -15,9 +17,12 @@ goog.require('jspb.ExtensionFieldInfo');
 goog.require('jspb.Message');
 goog.require('jspb.Map');
 
+
 if (typeof exports === 'object') {
+  exports['debug'] = jspb.debug;
   exports['Map'] = jspb.Map;
   exports['Message'] = jspb.Message;
+
   exports['BinaryReader'] = jspb.BinaryReader;
   exports['BinaryWriter'] = jspb.BinaryWriter;
   exports['ExtensionFieldInfo'] = jspb.ExtensionFieldInfo;

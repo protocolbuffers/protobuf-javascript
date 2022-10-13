@@ -49,16 +49,19 @@ goog.provide('jspb.arith.UInt64');
  * @param {number} lo The low 32 bits.
  * @param {number} hi The high 32 bits.
  * @constructor
+ * @export
  */
 jspb.arith.UInt64 = function(lo, hi) {
   /**
    * The low 32 bits.
-   * @public {number}
+   * @type {number}
+   * @export
    */
   this.lo = lo;
   /**
    * The high 32 bits.
-   * @public {number}
+   * @type {number}
+   * @export
    */
   this.hi = hi;
 };
@@ -69,6 +72,7 @@ jspb.arith.UInt64 = function(lo, hi) {
  * less, +1 if the first is greater, or 0 if both are equal.
  * @param {!jspb.arith.UInt64} other
  * @return {number}
+ * @export
  */
 jspb.arith.UInt64.prototype.cmp = function(other) {
   if (this.hi < other.hi || (this.hi == other.hi && this.lo < other.lo)) {
@@ -84,6 +88,7 @@ jspb.arith.UInt64.prototype.cmp = function(other) {
 /**
  * Right-shift this number by one bit.
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.rightShift = function() {
   var hi = this.hi >>> 1;
@@ -95,6 +100,7 @@ jspb.arith.UInt64.prototype.rightShift = function() {
 /**
  * Left-shift this number by one bit.
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.leftShift = function() {
   var lo = this.lo << 1;
@@ -106,6 +112,7 @@ jspb.arith.UInt64.prototype.leftShift = function() {
 /**
  * Test the MSB.
  * @return {boolean}
+ * @export
  */
 jspb.arith.UInt64.prototype.msb = function() {
   return !!(this.hi & 0x80000000);
@@ -115,6 +122,7 @@ jspb.arith.UInt64.prototype.msb = function() {
 /**
  * Test the LSB.
  * @return {boolean}
+ * @export
  */
 jspb.arith.UInt64.prototype.lsb = function() {
   return !!(this.lo & 1);
@@ -124,6 +132,7 @@ jspb.arith.UInt64.prototype.lsb = function() {
 /**
  * Test whether this number is zero.
  * @return {boolean}
+ * @export
  */
 jspb.arith.UInt64.prototype.zero = function() {
   return this.lo == 0 && this.hi == 0;
@@ -134,6 +143,7 @@ jspb.arith.UInt64.prototype.zero = function() {
  * Add two 64-bit numbers to produce a 64-bit number.
  * @param {!jspb.arith.UInt64} other
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.add = function(other) {
   var lo = ((this.lo + other.lo) & 0xffffffff) >>> 0;
@@ -148,6 +158,7 @@ jspb.arith.UInt64.prototype.add = function(other) {
  * Subtract two 64-bit numbers to produce a 64-bit number.
  * @param {!jspb.arith.UInt64} other
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.sub = function(other) {
   var lo = ((this.lo - other.lo) & 0xffffffff) >>> 0;
@@ -163,6 +174,7 @@ jspb.arith.UInt64.prototype.sub = function(other) {
  * @param {number} a The first integer:  must be in [0, 2^32-1).
  * @param {number} b The second integer: must be in [0, 2^32-1).
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.mul32x32 = function(a, b) {
   // Directly multiplying two 32-bit numbers may produce up to 64 bits of
@@ -204,6 +216,7 @@ jspb.arith.UInt64.mul32x32 = function(a, b) {
  * truncate the top 32 bits.
  * @param {number} a The multiplier.
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.mul = function(a) {
   // Produce two parts: at bits 0-63, and 32-95.
@@ -223,6 +236,7 @@ jspb.arith.UInt64.prototype.mul = function(a) {
  * @param {number} _divisor
  * @return {Array<jspb.arith.UInt64>} array of [quotient, remainder],
  * unless divisor is 0, in which case an empty array is returned.
+ * @export
  */
 jspb.arith.UInt64.prototype.div = function(_divisor) {
   if (_divisor == 0) {
@@ -264,6 +278,7 @@ jspb.arith.UInt64.prototype.div = function(_divisor) {
  * Convert a 64-bit number to a string.
  * @return {string}
  * @override
+ * @export
  */
 jspb.arith.UInt64.prototype.toString = function() {
   var result = '';
@@ -285,6 +300,7 @@ jspb.arith.UInt64.prototype.toString = function() {
  * Parse a string into a 64-bit number. Returns `null` on a parse error.
  * @param {string} s
  * @return {?jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.fromString = function(s) {
   var result = new jspb.arith.UInt64(0, 0);
@@ -305,6 +321,7 @@ jspb.arith.UInt64.fromString = function(s) {
 /**
  * Make a copy of the uint64.
  * @return {!jspb.arith.UInt64}
+ * @export
  */
 jspb.arith.UInt64.prototype.clone = function() {
   return new jspb.arith.UInt64(this.lo, this.hi);
@@ -324,16 +341,19 @@ jspb.arith.UInt64.prototype.clone = function() {
  * @param {number} lo The low 32 bits.
  * @param {number} hi The high 32 bits.
  * @constructor
+ * @export
  */
 jspb.arith.Int64 = function(lo, hi) {
   /**
    * The low 32 bits.
-   * @public {number}
+   * @type {number}
+   * @export
    */
   this.lo = lo;
   /**
    * The high 32 bits.
-   * @public {number}
+   * @type {number}
+   * @export
    */
   this.hi = hi;
 };
@@ -343,6 +363,7 @@ jspb.arith.Int64 = function(lo, hi) {
  * Add two 64-bit numbers to produce a 64-bit number.
  * @param {!jspb.arith.Int64} other
  * @return {!jspb.arith.Int64}
+ * @export
  */
 jspb.arith.Int64.prototype.add = function(other) {
   var lo = ((this.lo + other.lo) & 0xffffffff) >>> 0;
@@ -357,6 +378,7 @@ jspb.arith.Int64.prototype.add = function(other) {
  * Subtract two 64-bit numbers to produce a 64-bit number.
  * @param {!jspb.arith.Int64} other
  * @return {!jspb.arith.Int64}
+ * @export
  */
 jspb.arith.Int64.prototype.sub = function(other) {
   var lo = ((this.lo - other.lo) & 0xffffffff) >>> 0;
@@ -370,6 +392,7 @@ jspb.arith.Int64.prototype.sub = function(other) {
 /**
  * Make a copy of the int64.
  * @return {!jspb.arith.Int64}
+ * @export
  */
 jspb.arith.Int64.prototype.clone = function() {
   return new jspb.arith.Int64(this.lo, this.hi);
@@ -380,6 +403,7 @@ jspb.arith.Int64.prototype.clone = function() {
  * Convert a 64-bit number to a string.
  * @return {string}
  * @override
+ * @export
  */
 jspb.arith.Int64.prototype.toString = function() {
   // If the number is negative, find its twos-complement inverse.
@@ -396,6 +420,7 @@ jspb.arith.Int64.prototype.toString = function() {
  * Parse a string into a 64-bit number. Returns `null` on a parse error.
  * @param {string} s
  * @return {?jspb.arith.Int64}
+ * @export
  */
 jspb.arith.Int64.fromString = function(s) {
   var hasNegative = (s.length > 0 && s[0] == '-');

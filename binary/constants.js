@@ -63,12 +63,14 @@ goog.forwardDeclare('jsprotolib.BinaryExtension');
 /**
  * Base interface class for all const messages.
  * @interface
+ * @export
  */
 jspb.ConstBinaryMessage = function() {};
 
 /**
  * Generate a debug string for this proto that is in proto2 text format.
  * @return {string} The debug string.
+ * @export
  */
 jspb.ConstBinaryMessage.prototype.toDebugString;
 
@@ -86,6 +88,7 @@ jspb.ConstBinaryMessage.prototype.toDebugStringInternal;
  * doing so on a widely-used interface defeats dead-code elimination.
  * @interface
  * @extends {jspb.ConstBinaryMessage}
+ * @export
  */
 jspb.BinaryMessage = function() {};
 
@@ -94,6 +97,7 @@ jspb.BinaryMessage = function() {};
  * The types convertible to Uint8Arrays. Strings are assumed to be
  * base64-encoded.
  * @typedef {ArrayBuffer|Uint8Array|Array<number>|string}
+ * @export
  */
 jspb.ByteSource;
 
@@ -101,6 +105,7 @@ jspb.ByteSource;
 /**
  * A scalar field in jspb can be a boolean, number, or string.
  * @typedef {boolean|number|string}
+ * @export
  */
 jspb.ScalarFieldType;
 
@@ -111,6 +116,7 @@ jspb.ScalarFieldType;
              !Array<!Uint8Array>|
              !Array<!jspb.ConstBinaryMessage>|
              !Array<!jspb.BinaryMessage>}
+* @export
  */
 jspb.RepeatedFieldType;
 
@@ -124,6 +130,7 @@ jspb.RepeatedFieldType;
              !jspb.ConstBinaryMessage|
              !jspb.BinaryMessage|
              !jsprotolib.BinaryExtension}
+ * @export
  */
 jspb.AnyFieldType;
 
@@ -131,6 +138,7 @@ jspb.AnyFieldType;
 /**
  * A builder function creates an instance of a message object.
  * @typedef {function():!jspb.BinaryMessage}
+ * @export
  */
 jspb.BuilderFunction;
 
@@ -138,6 +146,7 @@ jspb.BuilderFunction;
 /**
  * A cloner function creates a deep copy of a message object.
  * @typedef {function(jspb.ConstBinaryMessage):jspb.BinaryMessage}
+ * @export
  */
 jspb.ClonerFunction;
 
@@ -145,6 +154,7 @@ jspb.ClonerFunction;
 /**
  * A recycler function destroys an instance of a message object.
  * @typedef {function(!jspb.BinaryMessage):void}
+ * @export
  */
 jspb.RecyclerFunction;
 
@@ -152,6 +162,7 @@ jspb.RecyclerFunction;
 /**
  * A reader function initializes a message using data from a BinaryReader.
  * @typedef {function(!jspb.BinaryMessage, !jspb.BinaryReader):void}
+ * @export
  */
 jspb.ReaderFunction;
 
@@ -160,6 +171,7 @@ jspb.ReaderFunction;
  * A writer function serializes a message to a BinaryWriter.
  * @typedef {function((!jspb.Message|!jspb.ConstBinaryMessage),
  *                    !jspb.BinaryWriter):void}
+ * @export
  */
 jspb.WriterFunction;
 
@@ -169,6 +181,7 @@ jspb.WriterFunction;
  * message and returns either the pruned message or null if the entire message
  * was pruned away.
  * @typedef {function(?jspb.BinaryMessage):?jspb.BinaryMessage}
+ * @export
  */
 jspb.PrunerFunction;
 
@@ -177,6 +190,7 @@ jspb.PrunerFunction;
  * A comparer function returns true if two protos are equal.
  * @typedef {function(?jspb.ConstBinaryMessage,
  *                     ?jspb.ConstBinaryMessage):boolean}
+ * @export
  */
 jspb.ComparerFunction;
 
@@ -184,6 +198,7 @@ jspb.ComparerFunction;
 /**
  * Field type codes, taken from proto2/public/wire_format_lite.h.
  * @enum {number}
+ * @export
  */
 jspb.BinaryConstants.FieldType = {
   INVALID: -1,
@@ -216,6 +231,7 @@ jspb.BinaryConstants.FieldType = {
 /**
  * Wire-format type codes, taken from proto2/public/wire_format_lite.h.
  * @enum {number}
+ * @export
  */
 jspb.BinaryConstants.WireType = {
   INVALID: -1,
@@ -232,6 +248,7 @@ jspb.BinaryConstants.WireType = {
  * Translates field type to wire type.
  * @param {jspb.BinaryConstants.FieldType} fieldType
  * @return {jspb.BinaryConstants.WireType}
+ * @export
  */
 jspb.BinaryConstants.FieldTypeToWireType = function(fieldType) {
   var fieldTypes = jspb.BinaryConstants.FieldType;
@@ -275,6 +292,7 @@ jspb.BinaryConstants.FieldTypeToWireType = function(fieldType) {
 /**
  * Flag to indicate a missing field.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.INVALID_FIELD_NUMBER = -1;
 
@@ -282,6 +300,7 @@ jspb.BinaryConstants.INVALID_FIELD_NUMBER = -1;
 /**
  * The smallest denormal float32 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT32_EPS = 1.401298464324817e-45;
 
@@ -289,6 +308,7 @@ jspb.BinaryConstants.FLOAT32_EPS = 1.401298464324817e-45;
 /**
  * The smallest normal float64 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT32_MIN = 1.1754943508222875e-38;
 
@@ -296,6 +316,7 @@ jspb.BinaryConstants.FLOAT32_MIN = 1.1754943508222875e-38;
 /**
  * The largest finite float32 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT32_MAX = 3.4028234663852886e+38;
 
@@ -303,6 +324,7 @@ jspb.BinaryConstants.FLOAT32_MAX = 3.4028234663852886e+38;
 /**
  * The smallest denormal float64 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT64_EPS = 5e-324;
 
@@ -310,6 +332,7 @@ jspb.BinaryConstants.FLOAT64_EPS = 5e-324;
 /**
  * The smallest normal float64 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT64_MIN = 2.2250738585072014e-308;
 
@@ -317,6 +340,7 @@ jspb.BinaryConstants.FLOAT64_MIN = 2.2250738585072014e-308;
 /**
  * The largest finite float64 value.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.FLOAT64_MAX = 1.7976931348623157e+308;
 
@@ -324,6 +348,7 @@ jspb.BinaryConstants.FLOAT64_MAX = 1.7976931348623157e+308;
 /**
  * Convenience constant equal to 2^20.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_20 = 1048576;
 
@@ -331,6 +356,7 @@ jspb.BinaryConstants.TWO_TO_20 = 1048576;
 /**
  * Convenience constant equal to 2^23.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_23 = 8388608;
 
@@ -338,6 +364,7 @@ jspb.BinaryConstants.TWO_TO_23 = 8388608;
 /**
  * Convenience constant equal to 2^31.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_31 = 2147483648;
 
@@ -345,6 +372,7 @@ jspb.BinaryConstants.TWO_TO_31 = 2147483648;
 /**
  * Convenience constant equal to 2^32.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_32 = 4294967296;
 
@@ -352,6 +380,7 @@ jspb.BinaryConstants.TWO_TO_32 = 4294967296;
 /**
  * Convenience constant equal to 2^52.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_52 = 4503599627370496;
 
@@ -359,6 +388,7 @@ jspb.BinaryConstants.TWO_TO_52 = 4503599627370496;
 /**
  * Convenience constant equal to 2^63.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_63 = 9223372036854775808;
 
@@ -366,6 +396,7 @@ jspb.BinaryConstants.TWO_TO_63 = 9223372036854775808;
 /**
  * Convenience constant equal to 2^64.
  * @const {number}
+ * @export
  */
 jspb.BinaryConstants.TWO_TO_64 = 18446744073709551616;
 
@@ -373,5 +404,6 @@ jspb.BinaryConstants.TWO_TO_64 = 18446744073709551616;
 /**
  * Eight-character string of zeros, used as the default 64-bit hash value.
  * @const {string}
+ * @export
  */
 jspb.BinaryConstants.ZERO_HASH = '\0\0\0\0\0\0\0\0';
