@@ -10,6 +10,9 @@ const plugin =   '--plugin=protoc-gen-js=bazel-bin/generator/protoc-gen-js';
 const protoc = [(process.env.PROTOC || 'protoc'), plugin].join(' ');
 const protocInc = process.env.PROTOC_INC || '../src';
 
+// See https://github.com/google/closure-compiler/wiki/Flags-and-Options
+let compilationLevel = 'SIMPLE';
+
 const wellKnownTypes = [
   'google/protobuf/any.proto',
   'google/protobuf/api.proto',
@@ -62,6 +65,16 @@ function make_exec_logging_callback(cb) {
     console.error(stderr);
     cb(err);
   }
+}
+
+function enableAdvancedOptimizations(cb) {
+  compilationLevel = 'ADVANCED';
+  cb();
+}
+
+function enableSimpleOptimizations(cb) {
+  compilationLevel = 'SIMPLE';
+  cb();
 }
 
 function genproto_well_known_types_closure(cb) {
@@ -118,14 +131,13 @@ function genproto_group3_commonjs_strict(cb) {
 
 
 function getClosureCompilerCommand(exportsFile, outputFile) {
-  // Use the default optimization level: SIMPLE_OPTIMIZATIONS:
-  // https://developers.google.com/closure/compiler/docs/compilation_levels#simple_optimizations
   const closureLib = 'node_modules/google-closure-library';
   return [
     'node_modules/.bin/google-closure-compiler',
     `--js=${closureLib}/closure/goog/**.js`,
     `--js=${closureLib}/third_party/closure/goog/**.js`,
     '--js=asserts.js',
+    '--js=debug.js',
     '--js=map.js',
     '--js=message.js',
     '--js=binary/arith.js',
@@ -137,6 +149,7 @@ function getClosureCompilerCommand(exportsFile, outputFile) {
     '--js=binary/writer.js',
     `--js=${exportsFile}`,
     '--generate_exports',
+    `--compilation_level=${compilationLevel}`,
     '--export_local_property_definitions',
     `--entry_point=${exportsFile}`, `> ${outputFile}`
   ].join(' ');
@@ -196,34 +209,64 @@ function test_commonjs(cb) {
        make_exec_logging_callback(cb));
 }
 
+function remove_gen_files(cb) {
+  exec('rm -rf commonjs_out google-protobuf.js deps.js',
+       make_exec_logging_callback(cb));
+}
+
 exports.build_protoc_plugin = function (cb) {
   exec('bazel build generator:protoc-gen-js',
        make_exec_logging_callback(cb));
 }
 
-exports.dist = series(exports.build_protoc_plugin,
-                      genproto_wellknowntypes,
-                      gen_google_protobuf_js);
+const dist = series(exports.build_protoc_plugin,
+                    genproto_wellknowntypes,
+                    gen_google_protobuf_js);
 
-exports.make_commonjs_out = series(
-    exports.dist,
+exports.dist = series(enableAdvancedOptimizations, dist);
+
+exports.build_commonjs = series(
+    dist,
     genproto_well_known_types_commonjs,
     genproto_group1_commonjs, genproto_group2_commonjs,
     genproto_commonjs_wellknowntypes,
     commonjs_testdeps, genproto_group3_commonjs_strict,
     commonjs_out);
 
-exports.deps = series(exports.build_protoc_plugin,
-                      genproto_well_known_types_closure,
-                      genproto_group1_closure,
-                      genproto_group2_closure,
-                      closure_make_deps);
+exports.build_closure = series(exports.build_protoc_plugin,
+                               genproto_well_known_types_closure,
+                               genproto_group1_closure,
+                               genproto_group2_closure,
+                               closure_make_deps);
 
-exports.test_closure = series(exports.deps,
-                              test_closure);
+const test_closure_series = series(
+    exports.build_closure,
+    test_closure);
 
-exports.test_commonjs = series(exports.make_commonjs_out,
-                               test_commonjs);
+exports.test_closure = series(enableSimpleOptimizations,
+                              test_closure_series);
 
-exports.test = series(exports.test_closure,
-                      exports.test_commonjs);
+exports.test_closure_opt = series(enableAdvancedOptimizations,
+                                  test_closure_series);
+
+
+const test_commonjs_series = series(
+    exports.build_commonjs,
+    test_commonjs);
+
+
+exports.test_commonjs = series(enableSimpleOptimizations,
+                               test_commonjs_series);
+exports.test_commonjs_opt = series(enableAdvancedOptimizations,
+                                   test_commonjs_series);
+
+const test_series = series(test_closure_series,
+                           test_commonjs_series);
+
+exports.test = series(enableSimpleOptimizations,
+                      test_series);
+
+exports.test_opt = series(enableAdvancedOptimizations,
+                          test_series);
+
+exports.clean = series(remove_gen_files);

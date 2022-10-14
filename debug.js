@@ -51,6 +51,7 @@ goog.require('jspb.Message');
  * not available for code size reasons.
  * @param {jspb.Message} message A jspb.Message.
  * @return {Object}
+ * @export
  */
 jspb.debug.dump = function(message) {
   if (!goog.DEBUG) {

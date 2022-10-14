@@ -345,7 +345,7 @@ describe('binaryUtilsTest', () => {
     // NaN.
     jspb.utils.splitFloat32(NaN);
     expect(isNaN(jspb.utils.joinFloat32(
-               jspb.utils.split64Low, jspb.utils.split64High)))
+        jspb.utils.getSplit64Low(), jspb.utils.getSplit64High())))
         .toEqual(true);
 
     /**
@@ -355,11 +355,11 @@ describe('binaryUtilsTest', () => {
     function test(x, opt_bits) {
       jspb.utils.splitFloat32(x);
       if (opt_bits !== undefined) {
-        if (opt_bits != jspb.utils.split64Low) throw 'fail!';
+        if (opt_bits != jspb.utils.getSplit64Low()) throw 'fail!';
       }
       expect(truncate(x))
           .toEqual(jspb.utils.joinFloat32(
-              jspb.utils.split64Low, jspb.utils.split64High));
+              jspb.utils.getSplit64Low(), jspb.utils.getSplit64High()));
     }
 
     // Positive and negative infinity.
@@ -432,15 +432,15 @@ describe('binaryUtilsTest', () => {
     function test(x, opt_highBits, opt_lowBits) {
       jspb.utils.splitFloat64(x);
       if (opt_highBits !== undefined) {
-        const split64High = jspb.utils.split64High;
+        const split64High = jspb.utils.getSplit64High();
         expect(opt_highBits.toString(16)).toEqual(split64High.toString(16));
       }
       if (opt_lowBits !== undefined) {
-        const split64Low = jspb.utils.split64Low;
+        const split64Low = jspb.utils.getSplit64Low();
         expect(opt_lowBits.toString(16)).toEqual(split64Low.toString(16));
       }
       expect(
-          jspb.utils.joinFloat64(jspb.utils.split64Low, jspb.utils.split64High))
+          jspb.utils.joinFloat64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High()))
           .toEqual(x);
     }
 
@@ -502,8 +502,8 @@ describe('binaryUtilsTest', () => {
     function stringToHiLoPair(str) {
       jspb.utils.splitDecimalString(str);
       return {
-        lo: jspb.utils.split64Low >>> 0,
-        hi: jspb.utils.split64High >>> 0
+        lo: jspb.utils.getSplit64Low() >>> 0,
+        hi: jspb.utils.getSplit64High() >>> 0
       };
     }
     function makeHiLoPair(lo, hi) {

@@ -63,7 +63,7 @@ describe('binaryReaderTest', () => {
     const buffer = writer.getResultBuffer();
 
     // Empty the instance caches.
-    jspb.BinaryReader.instanceCache_ = [];
+    jspb.BinaryReader.clearInstanceCache();
 
     // Allocating and then freeing three decoders should leave us with three in
     // the cache.
@@ -75,46 +75,46 @@ describe('binaryReaderTest', () => {
     decoder2.free();
     decoder3.free();
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(3);
-    expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(3);
+    expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(0);
 
     // Allocating and then freeing a reader should remove one decoder from its
     // cache, but it should stay stuck to the reader afterwards since we can't
     // have a reader without a decoder.
     jspb.BinaryReader.alloc().free();
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(2);
-    expect(jspb.BinaryReader.instanceCache_.length).toEqual(1);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(2);
+    expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(1);
 
     // Allocating a reader should remove a reader from the cache.
     const reader = jspb.BinaryReader.alloc(buffer);
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(2);
-    expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(2);
+    expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(0);
 
     // Processing the message reuses the current reader.
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(1);
     reader.readMessage(dummyMessage, () => {
-        expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+        expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(0);
       });
 
     reader.nextField();
     expect(reader.getFieldNumber()).toEqual(2);
     reader.readMessage(dummyMessage, () => {
-        expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+        expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(0);
       });
 
     expect(reader.nextField()).toEqual(false);
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(2);
-    expect(jspb.BinaryReader.instanceCache_.length).toEqual(0);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(2);
+    expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(0);
 
     // Freeing the reader should put it back into the cache.
     reader.free();
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(2);
-    expect(jspb.BinaryReader.instanceCache_.length).toEqual(1);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(2);
+    expect(jspb.BinaryReader.getInstanceCacheLength()).toEqual(1);
   });
 
 
@@ -897,7 +897,7 @@ describe('binaryReaderTest', () => {
     // Create a proto consisting of two nested messages, with the inner one
     // containing a blob of bytes.
 
-    const fieldTag = (1 << 3) | jspb.BinaryConstants.WireType.DELIMITED;
+    const fieldTag = (1 << 3) | /* jspb.BinaryConstants.WireType.DELIMITED = */ 2;
     const blob = [1, 2, 3, 4, 5];
     const writer = new jspb.BinaryWriter();
     const dummyMessage = /** @type {!jspb.BinaryMessage} */ ({});

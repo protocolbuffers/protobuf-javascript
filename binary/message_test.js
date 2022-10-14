@@ -32,10 +32,10 @@
 
 goog.setTestOnly();
 
-// CommonJS-LoadFromFile: test_pb proto.jspb.test
+// CommonJS-LoadFromFile: ../protos/test_pb proto.jspb.test
 goog.require('proto.jspb.test.Deeply.Nested.Message');
 
-// CommonJS-LoadFromFile: test2_pb proto.jspb.test
+// CommonJS-LoadFromFile: ../protos/test2_pb proto.jspb.test
 goog.require('proto.jspb.test.ForeignNestedFieldMessage');
 
 describe('Message test suite', () => {

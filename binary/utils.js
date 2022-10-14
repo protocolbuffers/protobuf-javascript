@@ -57,6 +57,7 @@ goog.require('jspb.BinaryConstants');
  * If the original value was a double, this temporary value will contain the
  * low 32 bits of the binary representation of that double, etcetera.
  * @type {number}
+ * @private
  */
 jspb.utils.split64Low = 0;
 
@@ -65,14 +66,33 @@ jspb.utils.split64Low = 0;
  * And correspondingly, this temporary variable will contain the high 32 bits
  * of whatever value was split.
  * @type {number}
+ * @private
  */
 jspb.utils.split64High = 0;
+
+
+/**
+ * @return {number}
+ * @export
+ */
+jspb.utils.getSplit64Low = function() {
+  return jspb.utils.split64Low;
+}
+
+/**
+ * @return {number}
+ * @export
+ */
+jspb.utils.getSplit64High = function() {
+  return jspb.utils.split64High;
+}
 
 
 /**
  * Splits an unsigned Javascript integer into two 32-bit halves and stores it
  * in the temp values above.
  * @param {number} value The number to split.
+ * @export
  */
 jspb.utils.splitUint64 = function(value) {
   // Extract low 32 bits and high 32 bits as unsigned integers.
@@ -89,6 +109,7 @@ jspb.utils.splitUint64 = function(value) {
  * Splits a signed Javascript integer into two 32-bit halves and stores it in
  * the temp values above.
  * @param {number} value The number to split.
+ * @export
  */
 jspb.utils.splitInt64 = function(value) {
   // Convert to sign-magnitude representation.
@@ -121,6 +142,7 @@ jspb.utils.splitInt64 = function(value) {
  * Converts a signed Javascript integer into zigzag format, splits it into two
  * 32-bit halves, and stores it in the temp values above.
  * @param {number} value The number to split.
+ * @export
  */
 jspb.utils.splitZigzag64 = function(value) {
   // Convert to sign-magnitude and scale by 2 before we split the value.
@@ -156,6 +178,7 @@ jspb.utils.splitZigzag64 = function(value) {
  * Converts a floating-point number into 32-bit IEEE representation and stores
  * it in the temp values above.
  * @param {number} value
+ * @export
  */
 jspb.utils.splitFloat32 = function(value) {
   var sign = (value < 0) ? 1 : 0;
@@ -217,6 +240,7 @@ jspb.utils.splitFloat32 = function(value) {
  * Converts a floating-point number into 64-bit IEEE representation and stores
  * it in the temp values above.
  * @param {number} value
+ * @export
  */
 jspb.utils.splitFloat64 = function(value) {
   var sign = (value < 0) ? 1 : 0;
@@ -294,6 +318,7 @@ jspb.utils.splitFloat64 = function(value) {
  * Converts an 8-character hash string into two 32-bit numbers and stores them
  * in the temp values above.
  * @param {string} hash
+ * @export
  */
 jspb.utils.splitHash64 = function(hash) {
   var a = hash.charCodeAt(0);
@@ -316,6 +341,7 @@ jspb.utils.splitHash64 = function(hash) {
  * @param {number} bitsLow
  * @param {number} bitsHigh
  * @return {number}
+ * @export
  */
 jspb.utils.joinUint64 = function(bitsLow, bitsHigh) {
   return bitsHigh * jspb.BinaryConstants.TWO_TO_32 + (bitsLow >>> 0);
@@ -328,6 +354,7 @@ jspb.utils.joinUint64 = function(bitsLow, bitsHigh) {
  * @param {number} bitsLow
  * @param {number} bitsHigh
  * @return {number}
+ * @export
  */
 jspb.utils.joinInt64 = function(bitsLow, bitsHigh) {
   // If the high bit is set, do a manual two's complement conversion.
@@ -354,6 +381,7 @@ jspb.utils.joinInt64 = function(bitsLow, bitsHigh) {
  *     the result value, takes parameters (lowBits, highBits).
  * @return {T}
  * @template T
+ * @export
  */
 jspb.utils.toZigzag64 = function(bitsLow, bitsHigh, convert) {
   // See
@@ -378,6 +406,7 @@ jspb.utils.toZigzag64 = function(bitsLow, bitsHigh, convert) {
  * @param {number} bitsLow
  * @param {number} bitsHigh
  * @return {number}
+ * @export
  */
 jspb.utils.joinZigzag64 = function(bitsLow, bitsHigh) {
   return jspb.utils.fromZigzag64(bitsLow, bitsHigh, jspb.utils.joinInt64);
@@ -394,6 +423,7 @@ jspb.utils.joinZigzag64 = function(bitsLow, bitsHigh) {
  *     the result value, takes parameters (lowBits, highBits).
  * @return {T}
  * @template T
+ * @export
  */
 jspb.utils.fromZigzag64 = function(bitsLow, bitsHigh, convert) {
   // 64 bit math is:
@@ -416,6 +446,7 @@ jspb.utils.fromZigzag64 = function(bitsLow, bitsHigh, convert) {
  * @param {number} bitsLow The low 32 bits of the binary number;
  * @param {number} bitsHigh The high 32 bits of the binary number.
  * @return {number}
+ * @export
  */
 jspb.utils.joinFloat32 = function(bitsLow, bitsHigh) {
   var sign = ((bitsLow >> 31) * 2 + 1);
@@ -445,6 +476,7 @@ jspb.utils.joinFloat32 = function(bitsLow, bitsHigh) {
  * @param {number} bitsLow The low 32 bits of the binary number;
  * @param {number} bitsHigh The high 32 bits of the binary number.
  * @return {number}
+ * @export
  */
 jspb.utils.joinFloat64 = function(bitsLow, bitsHigh) {
   var sign = ((bitsHigh >> 31) * 2 + 1);
@@ -474,6 +506,7 @@ jspb.utils.joinFloat64 = function(bitsLow, bitsHigh) {
  * @param {number} bitsLow
  * @param {number} bitsHigh
  * @return {string}
+ * @export
  */
 jspb.utils.joinHash64 = function(bitsLow, bitsHigh) {
   var a = (bitsLow >>> 0) & 0xFF;
@@ -491,6 +524,7 @@ jspb.utils.joinHash64 = function(bitsLow, bitsHigh) {
 /**
  * Individual digits for number->string conversion.
  * @const {!Array<string>}
+ * @export
  */
 jspb.utils.DIGITS = [
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
@@ -508,6 +542,7 @@ jspb.utils.A_CHAR_CODE_ = 97;
  * @param {number} bitsLow The low 32 bits of the binary number;
  * @param {number} bitsHigh The high 32 bits of the binary number.
  * @return {string} The binary number represented as a string.
+ * @export
  */
 jspb.utils.joinUnsignedDecimalString = function(bitsLow, bitsHigh) {
   // Skip the expensive conversion if the number is small enough to use the
@@ -573,6 +608,7 @@ jspb.utils.joinUnsignedDecimalString = function(bitsLow, bitsHigh) {
  * @param {number} bitsLow The low 32 bits of the binary number;
  * @param {number} bitsHigh The high 32 bits of the binary number.
  * @return {string} The binary number represented as a string.
+ * @export
  */
 jspb.utils.joinSignedDecimalString = function(bitsLow, bitsHigh) {
   // If we're treating the input as a signed value and the high bit is set, do
@@ -596,6 +632,7 @@ jspb.utils.joinSignedDecimalString = function(bitsLow, bitsHigh) {
  * @param {boolean} signed True if we should treat the hash string as encoding
  *     a signed integer.
  * @return {string}
+ * @export
  */
 jspb.utils.hash64ToDecimalString = function(hash, signed) {
   jspb.utils.splitHash64(hash);
@@ -613,6 +650,7 @@ jspb.utils.hash64ToDecimalString = function(hash, signed) {
  * @param {boolean} signed True if we should treat the hash string as encoding
  *     a signed integer.
  * @return {!Array<string>}
+ * @export
  */
 jspb.utils.hash64ArrayToDecimalStrings = function(hashes, signed) {
   var result = new Array(hashes.length);
@@ -628,6 +666,7 @@ jspb.utils.hash64ArrayToDecimalStrings = function(hashes, signed) {
  * representation.
  * @param {string} dec
  * @return {string}
+ * @export
  */
 jspb.utils.decimalStringToHash64 = function(dec) {
   jspb.asserts.assert(dec.length > 0);
@@ -677,6 +716,7 @@ jspb.utils.decimalStringToHash64 = function(dec) {
  * Converts a signed or unsigned decimal string into two 32-bit halves, and
  * stores them in the temp variables listed above.
  * @param {string} value The decimal string to convert.
+ * @export
  */
 jspb.utils.splitDecimalString = function(value) {
   jspb.utils.splitHash64(jspb.utils.decimalStringToHash64(value));
@@ -709,6 +749,7 @@ jspb.utils.fromHexCharCode_ = function(hexCharCode) {
  * Converts an 8-character hash string into its hexadecimal representation.
  * @param {string} hash
  * @return {string}
+ * @export
  */
 jspb.utils.hash64ToHexString = function(hash) {
   var temp = new Array(18);
@@ -730,6 +771,7 @@ jspb.utils.hash64ToHexString = function(hash) {
  * Converts a '0x<16 digits>' hex string into its hash string representation.
  * @param {string} hex
  * @return {string}
+ * @export
  */
 jspb.utils.hexStringToHash64 = function(hex) {
   hex = hex.toLowerCase();
@@ -756,6 +798,7 @@ jspb.utils.hexStringToHash64 = function(hex) {
  * @param {boolean} signed True if the has should be interpreted as a signed
  *     number.
  * @return {number}
+ * @export
  */
 jspb.utils.hash64ToNumber = function(hash, signed) {
   jspb.utils.splitHash64(hash);
@@ -771,6 +814,7 @@ jspb.utils.hash64ToNumber = function(hash, signed) {
  * precision if the value is non-integral or greater than 2^64.
  * @param {number} value The integer to convert.
  * @return {string}
+ * @export
  */
 jspb.utils.numberToHash64 = function(value) {
   jspb.utils.splitInt64(value);
@@ -784,6 +828,7 @@ jspb.utils.numberToHash64 = function(value) {
  * @param {number} start The starting point in the buffer to scan.
  * @param {number} end The end point in the buffer to scan.
  * @return {number} The number of varints in the buffer.
+ * @export
  */
 jspb.utils.countVarints = function(buffer, start, end) {
   // Count how many high bits of each byte were set in the buffer.
@@ -807,6 +852,7 @@ jspb.utils.countVarints = function(buffer, start, end) {
  * @param {number} end The end point in the buffer to scan.
  * @param {number} field The field number to count.
  * @return {number} The number of matching fields in the buffer.
+ * @export
  */
 jspb.utils.countVarintFields = function(buffer, start, end, field) {
   var count = 0;
@@ -909,6 +955,7 @@ jspb.utils.countFixedFields_ = function(buffer, start, end, tag, stride) {
  * @param {number} end The end point in the buffer to scan.
  * @param {number} field The field number to count.
  * @return {number} The number of matching fields in the buffer.
+ * @export
  */
 jspb.utils.countFixed32Fields = function(buffer, start, end, field) {
   var tag = field * 8 + jspb.BinaryConstants.WireType.FIXED32;
@@ -924,6 +971,7 @@ jspb.utils.countFixed32Fields = function(buffer, start, end, field) {
  * @param {number} end The end point in the buffer to scan.
  * @param {number} field The field number to count
  * @return {number} The number of matching fields in the buffer.
+ * @export
  */
 jspb.utils.countFixed64Fields = function(buffer, start, end, field) {
   var tag = field * 8 + jspb.BinaryConstants.WireType.FIXED64;
@@ -939,6 +987,7 @@ jspb.utils.countFixed64Fields = function(buffer, start, end, field) {
  * @param {number} end The end point in the buffer to scan.
  * @param {number} field The field number to count.
  * @return {number} The number of matching fields in the buffer.
+ * @export
  */
 jspb.utils.countDelimitedFields = function(buffer, start, end, field) {
   var count = 0;
@@ -980,6 +1029,7 @@ jspb.utils.countDelimitedFields = function(buffer, start, end, field) {
  * [1, 31] serializes to '"\x01\x1f"'.
  * @param {jspb.ByteSource} byteSource The bytes to serialize.
  * @return {string} Stringified bytes for text format.
+ * @export
  */
 jspb.utils.debugBytesToTextFormat = function(byteSource) {
   var s = '"';
@@ -999,6 +1049,7 @@ jspb.utils.debugBytesToTextFormat = function(byteSource) {
  * String-ify a scalar for text format. Should be optimized away in non-debug.
  * @param {string|number|boolean} scalar The scalar to stringify.
  * @return {string} Stringified scalar for text format.
+ * @export
  */
 jspb.utils.debugScalarToTextFormat = function(scalar) {
   if (typeof scalar === 'string') {
@@ -1015,6 +1066,7 @@ jspb.utils.debugScalarToTextFormat = function(scalar) {
  * exception.
  * @param {string} str
  * @return {!Uint8Array}
+ * @export
  */
 jspb.utils.stringToByteArray = function(str) {
   var arr = new Uint8Array(str.length);
@@ -1036,6 +1088,7 @@ jspb.utils.stringToByteArray = function(str) {
  * @param {!jspb.ByteSource} data
  * @return {!Uint8Array}
  * @suppress {invalidCasts}
+ * @export
  */
 jspb.utils.byteSourceToUint8Array = function(data) {
   if (data.constructor === Uint8Array) {

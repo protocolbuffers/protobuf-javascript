@@ -168,9 +168,9 @@ describe('binaryWriterTest', () => {
     writer.writeBytes(1, new Uint8Array([127]));
     expect('CgF/').toEqual(writer.getResultBase64String());
     expect('CgF/').toEqual(
-        writer.getResultBase64String(goog.crypt.base64.Alphabet.DEFAULT));
+        writer.getResultBase64String(/* goog.crypt.base64.Alphabet.DEFAULT = */ 0));
     expect('CgF_').toEqual(writer.getResultBase64String(
-        goog.crypt.base64.Alphabet.WEBSAFE_NO_PADDING));
+        /* goog.crypt.base64.Alphabet.WEBSAFE_NO_PADDING = */ 4));
   });
 
   it('writes split 64 fields', () => {
@@ -259,11 +259,11 @@ describe('binaryWriterTest', () => {
     ];
     function decimalToLowBits(v) {
       jspb.utils.splitDecimalString(v);
-      return jspb.utils.split64Low >>> 0;
+      return jspb.utils.getSplit64Low() >>> 0;
     }
     function decimalToHighBits(v) {
       jspb.utils.splitDecimalString(v);
-      return jspb.utils.split64High >>> 0;
+      return jspb.utils.getSplit64High() >>> 0;
     }
 
     const writer = new jspb.BinaryWriter();
@@ -272,7 +272,7 @@ describe('binaryWriterTest', () => {
       writer.writeSintHash64(1, jspb.utils.decimalStringToHash64(c.original));
       jspb.utils.splitDecimalString(c.original);
       writer.writeSplitZigzagVarint64(
-          1, jspb.utils.split64Low, jspb.utils.split64High);
+          1, jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
     });
 
     writer.writeRepeatedSint64String(2, testCases.map(function(c) {

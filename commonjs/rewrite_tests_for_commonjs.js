@@ -68,7 +68,7 @@ console.log("var googleProtobuf = require('google-protobuf');");
 console.log("var testdeps = require('testdeps_commonjs');");
 console.log("global.COMPILED = testdeps.COMPILED;");
 console.log("global.goog = testdeps.goog;");
-console.log("global.jspb = googleProtobuf;");
+console.log("global.jspb = googleProtobuf.jspb;");
 console.log("");
 
 lineReader.on('line', function(line) {

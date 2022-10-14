@@ -49,6 +49,7 @@ goog.require('jspb.utils');
  *
  * @constructor
  * @struct
+ * @export
  */
 jspb.BinaryEncoder = function() {
   /** @private {!Array<number>} */
@@ -58,6 +59,7 @@ jspb.BinaryEncoder = function() {
 
 /**
  * @return {number}
+ * @export
  */
 jspb.BinaryEncoder.prototype.length = function() {
   return this.buffer_.length;
@@ -66,6 +68,7 @@ jspb.BinaryEncoder.prototype.length = function() {
 
 /**
  * @return {!Array<number>}
+ * @export
  */
 jspb.BinaryEncoder.prototype.end = function() {
   var buffer = this.buffer_;
@@ -79,6 +82,7 @@ jspb.BinaryEncoder.prototype.end = function() {
  * varint representation and stores it in the buffer.
  * @param {number} lowBits The low 32 bits of the int.
  * @param {number} highBits The high 32 bits of the int.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeSplitVarint64 = function(lowBits, highBits) {
   jspb.asserts.assert(lowBits == Math.floor(lowBits));
@@ -104,6 +108,7 @@ jspb.BinaryEncoder.prototype.writeSplitVarint64 = function(lowBits, highBits) {
  * fixed representation and stores it in the buffer.
  * @param {number} lowBits The low 32 bits of the int.
  * @param {number} highBits The high 32 bits of the int.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeSplitFixed64 = function(lowBits, highBits) {
   jspb.asserts.assert(lowBits == Math.floor(lowBits));
@@ -121,6 +126,7 @@ jspb.BinaryEncoder.prototype.writeSplitFixed64 = function(lowBits, highBits) {
  * Encodes a 32-bit unsigned integer into its wire-format varint representation
  * and stores it in the buffer.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUnsignedVarint32 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -140,6 +146,7 @@ jspb.BinaryEncoder.prototype.writeUnsignedVarint32 = function(value) {
  * Encodes a 32-bit signed integer into its wire-format varint representation
  * and stores it in the buffer.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeSignedVarint32 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -170,13 +177,14 @@ jspb.BinaryEncoder.prototype.writeSignedVarint32 = function(value) {
  * and stores it in the buffer. Integers that are not representable in 64 bits
  * will be truncated.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUnsignedVarint64 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
   jspb.asserts.assert(
       (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_64));
   jspb.utils.splitInt64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -185,6 +193,7 @@ jspb.BinaryEncoder.prototype.writeUnsignedVarint64 = function(value) {
  * and stores it in the buffer. Integers that are not representable in 64 bits
  * will be truncated.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeSignedVarint64 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -192,7 +201,7 @@ jspb.BinaryEncoder.prototype.writeSignedVarint64 = function(value) {
       (value >= -jspb.BinaryConstants.TWO_TO_63) &&
       (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitInt64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -200,6 +209,7 @@ jspb.BinaryEncoder.prototype.writeSignedVarint64 = function(value) {
  * Encodes a JavaScript integer into its wire-format, zigzag-encoded varint
  * representation and stores it in the buffer.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarint32 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -215,6 +225,7 @@ jspb.BinaryEncoder.prototype.writeZigzagVarint32 = function(value) {
  * representation and stores it in the buffer. Integers not representable in 64
  * bits will be truncated.
  * @param {number} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarint64 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -222,7 +233,7 @@ jspb.BinaryEncoder.prototype.writeZigzagVarint64 = function(value) {
       (value >= -jspb.BinaryConstants.TWO_TO_63) &&
       (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitZigzag64(value);
-  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -231,6 +242,7 @@ jspb.BinaryEncoder.prototype.writeZigzagVarint64 = function(value) {
  * varint representation and stores it in the buffer. Integers not representable
  * in 64 bits will be truncated.
  * @param {string} value The integer to convert.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarint64String = function(value) {
   this.writeZigzagVarintHash64(jspb.utils.decimalStringToHash64(value));
@@ -241,12 +253,13 @@ jspb.BinaryEncoder.prototype.writeZigzagVarint64String = function(value) {
  * Writes a 64-bit hash string (8 characters @ 8 bits of data each) to the
  * buffer as a zigzag varint.
  * @param {string} hash The hash to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeZigzagVarintHash64 = function(hash) {
   var self = this;
   jspb.utils.splitHash64(hash);
   jspb.utils.toZigzag64(
-      jspb.utils.split64Low, jspb.utils.split64High, function(lo, hi) {
+      jspb.utils.getSplit64Low(), jspb.utils.getSplit64High(), function(lo, hi) {
         self.writeSplitVarint64(lo >>> 0, hi >>> 0);
       });
 };
@@ -256,6 +269,7 @@ jspb.BinaryEncoder.prototype.writeZigzagVarintHash64 = function(hash) {
  * Writes an 8-bit unsigned integer to the buffer. Numbers outside the range
  * [0,2^8) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUint8 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -268,6 +282,7 @@ jspb.BinaryEncoder.prototype.writeUint8 = function(value) {
  * Writes a 16-bit unsigned integer to the buffer. Numbers outside the
  * range [0,2^16) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUint16 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -281,6 +296,7 @@ jspb.BinaryEncoder.prototype.writeUint16 = function(value) {
  * Writes a 32-bit unsigned integer to the buffer. Numbers outside the
  * range [0,2^32) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUint32 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -297,14 +313,15 @@ jspb.BinaryEncoder.prototype.writeUint32 = function(value) {
  * Writes a 64-bit unsigned integer to the buffer. Numbers outside the
  * range [0,2^64) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeUint64 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
   jspb.asserts.assert(
       (value >= 0) && (value < jspb.BinaryConstants.TWO_TO_64));
   jspb.utils.splitUint64(value);
-  this.writeUint32(jspb.utils.split64Low);
-  this.writeUint32(jspb.utils.split64High);
+  this.writeUint32(jspb.utils.getSplit64Low());
+  this.writeUint32(jspb.utils.getSplit64High());
 };
 
 
@@ -312,6 +329,7 @@ jspb.BinaryEncoder.prototype.writeUint64 = function(value) {
  * Writes an 8-bit integer to the buffer. Numbers outside the range
  * [-2^7,2^7) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeInt8 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -324,6 +342,7 @@ jspb.BinaryEncoder.prototype.writeInt8 = function(value) {
  * Writes a 16-bit integer to the buffer. Numbers outside the range
  * [-2^15,2^15) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeInt16 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -337,6 +356,7 @@ jspb.BinaryEncoder.prototype.writeInt16 = function(value) {
  * Writes a 32-bit integer to the buffer. Numbers outside the range
  * [-2^31,2^31) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeInt32 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -354,6 +374,7 @@ jspb.BinaryEncoder.prototype.writeInt32 = function(value) {
  * Writes a 64-bit integer to the buffer. Numbers outside the range
  * [-2^63,2^63) will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeInt64 = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -361,7 +382,7 @@ jspb.BinaryEncoder.prototype.writeInt64 = function(value) {
       (value >= -jspb.BinaryConstants.TWO_TO_63) &&
       (value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitInt64(value);
-  this.writeSplitFixed64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitFixed64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -369,6 +390,7 @@ jspb.BinaryEncoder.prototype.writeInt64 = function(value) {
  * Writes a 64-bit integer decimal strings to the buffer. Numbers outside the
  * range [-2^63,2^63) will be truncated.
  * @param {string} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeInt64String = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -376,7 +398,7 @@ jspb.BinaryEncoder.prototype.writeInt64String = function(value) {
       (+value >= -jspb.BinaryConstants.TWO_TO_63) &&
       (+value < jspb.BinaryConstants.TWO_TO_63));
   jspb.utils.splitHash64(jspb.utils.decimalStringToHash64(value));
-  this.writeSplitFixed64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitFixed64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -384,6 +406,7 @@ jspb.BinaryEncoder.prototype.writeInt64String = function(value) {
  * Writes a single-precision floating point value to the buffer. Numbers
  * requiring more than 32 bits of precision will be truncated.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeFloat = function(value) {
   jspb.asserts.assert(
@@ -391,7 +414,7 @@ jspb.BinaryEncoder.prototype.writeFloat = function(value) {
       ((value >= -jspb.BinaryConstants.FLOAT32_MAX) &&
        (value <= jspb.BinaryConstants.FLOAT32_MAX)));
   jspb.utils.splitFloat32(value);
-  this.writeUint32(jspb.utils.split64Low);
+  this.writeUint32(jspb.utils.getSplit64Low());
 };
 
 
@@ -399,6 +422,7 @@ jspb.BinaryEncoder.prototype.writeFloat = function(value) {
  * Writes a double-precision floating point value to the buffer. As this is
  * the native format used by JavaScript, no precision will be lost.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeDouble = function(value) {
   jspb.asserts.assert(
@@ -406,8 +430,8 @@ jspb.BinaryEncoder.prototype.writeDouble = function(value) {
       ((value >= -jspb.BinaryConstants.FLOAT64_MAX) &&
        (value <= jspb.BinaryConstants.FLOAT64_MAX)));
   jspb.utils.splitFloat64(value);
-  this.writeUint32(jspb.utils.split64Low);
-  this.writeUint32(jspb.utils.split64High);
+  this.writeUint32(jspb.utils.getSplit64Low());
+  this.writeUint32(jspb.utils.getSplit64High());
 };
 
 
@@ -416,6 +440,7 @@ jspb.BinaryEncoder.prototype.writeDouble = function(value) {
  * because the JSPB code generator uses 0/1 instead of true/false to save space
  * in the string representation of the proto.
  * @param {boolean|number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeBool = function(value) {
   jspb.asserts.assert(
@@ -427,6 +452,7 @@ jspb.BinaryEncoder.prototype.writeBool = function(value) {
 /**
  * Writes an enum value to the buffer as a varint.
  * @param {number} value The value to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeEnum = function(value) {
   jspb.asserts.assert(value == Math.floor(value));
@@ -440,6 +466,7 @@ jspb.BinaryEncoder.prototype.writeEnum = function(value) {
 /**
  * Writes an arbitrary byte array to the buffer.
  * @param {!Uint8Array} bytes The array of bytes to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeBytes = function(bytes) {
   this.buffer_.push.apply(this.buffer_, bytes);
@@ -450,10 +477,11 @@ jspb.BinaryEncoder.prototype.writeBytes = function(bytes) {
  * Writes a 64-bit hash string (8 characters @ 8 bits of data each) to the
  * buffer as a varint.
  * @param {string} hash The hash to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeVarintHash64 = function(hash) {
   jspb.utils.splitHash64(hash);
-  this.writeSplitVarint64(jspb.utils.split64Low, jspb.utils.split64High);
+  this.writeSplitVarint64(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
 };
 
 
@@ -461,11 +489,12 @@ jspb.BinaryEncoder.prototype.writeVarintHash64 = function(hash) {
  * Writes a 64-bit hash string (8 characters @ 8 bits of data each) to the
  * buffer as a fixed64.
  * @param {string} hash The hash to write.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeFixedHash64 = function(hash) {
   jspb.utils.splitHash64(hash);
-  this.writeUint32(jspb.utils.split64Low);
-  this.writeUint32(jspb.utils.split64High);
+  this.writeUint32(jspb.utils.getSplit64Low());
+  this.writeUint32(jspb.utils.getSplit64High());
 };
 
 
@@ -474,6 +503,7 @@ jspb.BinaryEncoder.prototype.writeFixedHash64 = function(hash) {
  * TODO(aappleby): Add support for surrogate pairs, reject unpaired surrogates.
  * @param {string} value The string to write.
  * @return {number} The number of bytes used to encode the string.
+ * @export
  */
 jspb.BinaryEncoder.prototype.writeString = function(value) {
   var oldLength = this.buffer_.length;

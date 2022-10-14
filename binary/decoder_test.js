@@ -167,7 +167,7 @@ describe('binaryDecoderTest', () => {
     // cache.
     jspb.BinaryDecoder.alloc().free();
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(1);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(1);
 
     // Allocating and then freeing three decoders should leave us with three in
     // the cache.
@@ -179,7 +179,7 @@ describe('binaryDecoderTest', () => {
     decoder2.free();
     decoder3.free();
 
-    expect(jspb.BinaryDecoder.instanceCache_.length).toEqual(3);
+    expect(jspb.BinaryDecoder.getInstanceCacheLength()).toEqual(3);
   });
 
 
@@ -229,8 +229,9 @@ describe('binaryDecoderTest', () => {
             (bitsLow >>> 0).toString(16)}`;
       }
       function hexJoinHash(hash64) {
-        jspb.utils.splitHash64(hash64);
-        return hexJoin(jspb.utils.split64Low, jspb.utils.split64High);
+        jspb.utils.splitHash64(hash64, true);
+
+        return hexJoin(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
       }
 
       expect(decoder.readSplitVarint64(hexJoin)).toEqual(hexJoinHash(hashA));
@@ -293,7 +294,7 @@ describe('binaryDecoderTest', () => {
       }
       function hexJoinHash(hash64) {
         jspb.utils.splitHash64(hash64);
-        return hexJoin(jspb.utils.split64Low, jspb.utils.split64High);
+        return hexJoin(jspb.utils.getSplit64Low(), jspb.utils.getSplit64High());
       }
 
       expect(decoder.readSplitZigzagVarint64(hexJoin))

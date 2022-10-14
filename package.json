@@ -23,7 +23,8 @@
   },
   "scripts": {
     "build": "node ./node_modules/gulp/bin/gulp.js dist",
-    "test": "node ./node_modules/gulp/bin/gulp.js test"
+    "test": "node ./node_modules/gulp/bin/gulp.js test",
+    "clean": "node ./node_modules/gulp/bin/gulp.js clean"
   },
   "repository": {
     "type": "git",
