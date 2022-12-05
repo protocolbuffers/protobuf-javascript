@@ -1164,12 +1164,12 @@ bool HasOneofFields(const Descriptor* desc) {
   return false;
 }
 
-static const char* kOneofGroupArrayName = ".oneofGroups_";
+static const char* kOneofGroupArrayName = "oneofGroups_";
 
 std::string OneofFieldsArrayName(const GeneratorOptions& options,
                                  const Descriptor* desc) {
   return HasOneofFields(desc)
-             ? (GetMessagePath(options, desc) + kOneofGroupArrayName)
+             ? (GetMessagePath(options, desc) + "." + kOneofGroupArrayName)
              : "null";
 }
 
@@ -2174,6 +2174,14 @@ void Generator::GenerateClassFieldInfo(const GeneratorOptions& options,
   }
 
   if (HasOneofFields(desc)) {
+    const std::string className = GetMessagePath(options, desc);
+    const std::string assignment = (
+      options.import_style == GeneratorOptions::kImportEs6
+    ) ? (
+      std::string("static ") + kOneofGroupArrayName + " = " + OneofGroupList(desc) + ";"
+    ) : (
+      className + "." + kOneofGroupArrayName + " = " + OneofGroupList(desc) + ";"
+    );
     printer->Print(
         "/**\n"
         " * Oneof group definitions for this message. Each group defines the "
@@ -2187,10 +2195,10 @@ void Generator::GenerateClassFieldInfo(const GeneratorOptions& options,
         " * @private {!Array<!Array<number>>}\n"
         " * @const\n"
         " */\n"
-        "$classname$$oneofgrouparray$ = $oneofgroups$;\n"
+        "$assignment$\n"
         "\n",
-        "classname", GetMessagePath(options, desc), "oneofgrouparray",
-        kOneofGroupArrayName, "oneofgroups", OneofGroupList(desc));
+        "classname", className,
+        "assignment", assignment);
 
     for (int i = 0; i < desc->oneof_decl_count(); i++) {
       if (IgnoreOneof(desc->oneof_decl(i))) {
@@ -2214,14 +2222,22 @@ void Generator::GenerateClassXid(const GeneratorOptions& options,
 void Generator::GenerateOneofCaseDefinition(
     const GeneratorOptions& options, io::Printer* printer,
     const OneofDescriptor* oneof) const {
+  
+  const std::string className = GetMessagePath(options, oneof->containing_type());
+
+  const std::string oneofCaseName = WantEs6(options) ? (
+    JSOneofName(oneof) + "Case"
+  ) : (
+    className + "." + JSOneofName(oneof) + "Case"
+  );
   printer->Print(
       "/**\n"
       " * @enum {number}\n"
       " */\n"
-      "$classname$.$oneof$Case = {\n"
+      "$lhs$ = {\n"
       "  $upcase$_NOT_SET: 0",
-      "classname", GetMessagePath(options, oneof->containing_type()), "oneof",
-      JSOneofName(oneof), "upcase", ToEnumCase(oneof->name()));
+      "lhs", oneofCaseName,
+      "upcase", ToEnumCase(oneof->name()));
 
   for (int i = 0; i < oneof->field_count(); i++) {
     if (IgnoreField(oneof->field(i))) {
@@ -2242,14 +2258,23 @@ void Generator::GenerateOneofCaseDefinition(
       "\n"
       "/**\n"
       " * @return {$class$.$oneof$Case}\n"
-      " */\n"
-      "$class$.prototype.get$oneof$Case = function() {\n"
+      " */\n",
+      "class", className);
+  
+  GenerateMethodStart(options, printer, className.c_str(),
+    (std::string("get") + JSOneofName(oneof) + "Case").c_str());
+
+  printer->Print(
+      "() {\n"
       "  return /** @type {$class$.$oneof$Case} */(jspb.Message."
-      "computeOneofCase(this, $class$.oneofGroups_[$oneofindex$]));\n"
-      "};\n"
-      "\n",
-      "class", GetMessagePath(options, oneof->containing_type()), "oneof",
-      JSOneofName(oneof), "oneofindex", JSOneofIndex(oneof));
+      "computeOneofCase(this, $class$.oneofGroups_[$oneofindex$]));\n",
+      "class", className,
+      "oneof", JSOneofName(oneof),
+      "oneofindex", JSOneofIndex(oneof));
+  GenerateMethodEnd(options, printer);
+  printer->Print(
+      "\n"
+      "\n");
 }
 
 void Generator::GenerateClassToObject(const GeneratorOptions& options,
@@ -2628,10 +2653,8 @@ void GenerateBytesWrapper(const GeneratorOptions& options, io::Printer* printer,
 void Generator::GenerateClassField(const GeneratorOptions& options,
                                    io::Printer* printer,
                                    const FieldDescriptor* field) const {
-                                    
-const char * endBrace =
-      (options.import_style == GeneratorOptions::kImportEs6) ?
-        "}" : "};";
+const std::string classSymbol = GetMessagePath(options, field->containing_type());
+const char * methodEndBrace = WantEs6(options) ? "}" : "};";
 
   if (field->is_map()) {
     const FieldDescriptor* key_field = MapFieldKey(field);
@@ -2667,7 +2690,7 @@ const char * endBrace =
     } else {
       printer->Print(
           "$class$.prototype.$gettername$ = function(opt_noLazyCreate) {\n",
-          "class", GetMessagePath(options, field->containing_type()),
+          "class", classSymbol,
           "gettername", "get" + JSGetterName(options, field));
     }
 
@@ -2699,7 +2722,7 @@ const char * endBrace =
         "$endbrace$\n"
         "\n"
         "\n",
-        "endbrace", endBrace);
+        "endbrace", methodEndBrace);
 
     // End function body contents.
 
@@ -2729,7 +2752,7 @@ const char * endBrace =
     } else {
       printer->Print(
           "$class$.prototype.$gettername$ = function() {\n",
-          "class", GetMessagePath(options, field->containing_type()),
+          "class", classSymbol,
           "gettername", "get" + JSGetterName(options, field));
     }
 
@@ -2748,34 +2771,44 @@ const char * endBrace =
         JSFieldIndex(field), "wrapperclass", SubmessageTypeRef(options, field),
         "required",
         (field->label() == FieldDescriptor::LABEL_REQUIRED ? ", 1" : ""),
-        "endbrace", endBrace);
+        "endbrace", methodEndBrace);
     printer->Annotate("gettername", field);
+
     printer->Print(
         "/**\n"
         " * @param {$optionaltype$} value\n"
         " * @return {!$class$} returns this\n"
-        "*/\n"
-        "$class$.prototype.$settername$ = function(value) {\n"
+        "*/\n",
+        "optionaltype",
+        JSFieldTypeAnnotation(options, field,
+                              /* is_setter_argument = */ true,
+                              /* force_present = */ false,
+                              /* singular_if_not_packed = */ false),
+        "class", classSymbol);
+    GenerateMethodStart(options, printer, classSymbol.c_str(),
+      ("set" + JSGetterName(options, field)).c_str());
+    printer->Print(
+        "(value) {\n"
         "  return jspb.Message.set$oneoftag$$repeatedtag$WrapperField(",
         "optionaltype",
         JSFieldTypeAnnotation(options, field,
                               /* is_setter_argument = */ true,
                               /* force_present = */ false,
                               /* singular_if_not_packed = */ false),
-        "class", GetMessagePath(options, field->containing_type()),
-        "settername", "set" + JSGetterName(options, field), "oneoftag",
+        "class", classSymbol,"oneoftag",
         (InRealOneof(field) ? "Oneof" : ""), "repeatedtag",
         (field->is_repeated() ? "Repeated" : ""));
     printer->Annotate("settername", field);
 
     printer->Print(
-        "this, $index$$oneofgroup$, value);\n"
-        "$endbrace$\n"
+        "this, $index$$oneofgroup$, value);\n",
+        "index", JSFieldIndex(field),
+        "oneofgroup", (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""));
+    GenerateMethodEnd(options, printer);
+    printer->Print(
         "\n"
-        "\n",
-        "index", JSFieldIndex(field), "oneofgroup",
-        (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""),
-        "endbrace", endBrace);
+        "\n"
+        "\n");
 
     if (field->is_repeated()) {
       GenerateRepeatedMessageHelperMethods(options, printer, field);
@@ -2815,19 +2848,12 @@ const char * endBrace =
           FieldComments(field, bytes_mode), "type", typed_annotation);
     }
 
-    // Function definition begin.. depends on ES6 style or not
-    if (options.import_style == GeneratorOptions::kImportEs6) {
-        printer->Print(
-          "$gettername$() {\n",
-          "gettername", "get" + JSGetterName(options, field));
-    } else {
-      printer->Print(
-          "$class$.prototype.$gettername$ = function() {\n",
-          "class", GetMessagePath(options, field->containing_type()),
-          "gettername", "get" + JSGetterName(options, field));
-    }
+    GenerateMethodStart(options, printer, classSymbol.c_str(),
+      ("get" + JSGetterName(options, field)).c_str());
     // TODO delete this annotate call?
     printer->Annotate("gettername", field);
+
+    printer->Print("() {\n");
 
     if (untyped) {
       printer->Print("  return ");
@@ -2850,22 +2876,15 @@ const char * endBrace =
     }
 
     GenerateFieldValueExpression(printer, "this", field, use_default);
-
     if (untyped) {
-      printer->Print(
-          ";\n"
-          "$endbrace$\n"
-          "\n"
-          "\n",
-          "endbrace", endBrace);
+      printer->Print(";\n");
     } else {
-      printer->Print(
-          ");\n"
-          "$endbrace$\n"
-          "\n"
-          "\n",
-          "endbrace", endBrace);
+      printer->Print(");\n");
     }
+    GenerateMethodEnd(options, printer);
+    printer->Print(
+        "\n"
+        "\n");
 
     if (field->type() == FieldDescriptor::TYPE_BYTES && !untyped) {
       GenerateBytesWrapper(options, printer, field, BYTES_B64);
@@ -2877,7 +2896,7 @@ const char * endBrace =
         " * @param {$optionaltype$} value\n"
         " * @return {!$class$} returns this\n"
         " */\n",
-        "class", GetMessagePath(options, field->containing_type()),
+        "class", classSymbol,
         "optionaltype",
         untyped ? "*"
                 : JSFieldTypeAnnotation(options, field,
@@ -2888,28 +2907,38 @@ const char * endBrace =
     if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
         !field->is_repeated() && !field->is_map() &&
         !HasFieldPresence(options, field)) {
+
       // Proto3 non-repeated and non-map fields without presence use the
       // setProto3*Field function.
+      GenerateMethodStart(options, printer, classSymbol.c_str(),
+      ("set" + JSGetterName(options, field)).c_str());
+
       printer->Print(
-          "$class$.prototype.$settername$ = function(value) {\n"
+          "(value) {\n"
           "  return jspb.Message.setProto3$typetag$Field(this, $index$, "
-          "value);"
+          "value);\n",
+          "typetag", JSTypeTag(field),
+          "index", JSFieldIndex(field));
+      
+      GenerateMethodEnd(options, printer);
+      printer->Print(
           "\n"
-          "};\n"
-          "\n"
-          "\n",
-          "class", GetMessagePath(options, field->containing_type()),
-          "settername", "set" + JSGetterName(options, field), "typetag",
-          JSTypeTag(field), "index", JSFieldIndex(field));
-      printer->Annotate("settername", field);
+          "\n");
+      
+      // DO NOT SUBMIT: Can the Annotate call be safely removed?
+      // printer->Annotate("settername", field);
+
     } else {
+
+      GenerateMethodStart(options, printer, classSymbol.c_str(),
+      ("set" + JSGetterName(options, field)).c_str());
       // Otherwise, use the regular setField function.
       printer->Print(
-          "$class$.prototype.$settername$ = function(value) {\n"
+          "(value) {\n"
           "  return jspb.Message.set$oneoftag$Field(this, $index$",
-          "class", GetMessagePath(options, field->containing_type()),
-          "settername", "set" + JSGetterName(options, field), "oneoftag",
-          (InRealOneof(field) ? "Oneof" : ""), "index", JSFieldIndex(field));
+          "class", classSymbol,
+          "oneoftag", (InRealOneof(field) ? "Oneof" : ""),
+          "index", JSFieldIndex(field));
       printer->Annotate("settername", field);
       printer->Print(
           "$oneofgroup$, $type$value$rptvalueinit$$typeclose$);\n"
@@ -2929,13 +2958,17 @@ const char * endBrace =
           " * Clears the value.\n"
           " * @return {!$class$} returns this\n"
           " */\n",
-          "class", GetMessagePath(options, field->containing_type()));
+          "class", classSymbol);
     }
 
     if (field->is_repeated()) {
       GenerateRepeatedPrimitiveHelperMethods(options, printer, field, untyped);
     }
   }
+
+  const std::string clearerName = "clear" + JSGetterName(options, field);
+  const std::string clearerMethodStart = MethodStart(
+    options, classSymbol.c_str(), clearerName.c_str());
 
   // Generate clearFoo() method for map fields, repeated fields, and other
   // fields with presence.
@@ -2946,14 +2979,15 @@ const char * endBrace =
         " * Clears values from the map. The map will be non-null.\n"
         " * @return {!$class$} returns this\n"
         " */\n"
-        "$class$.prototype.$clearername$ = function() {\n"
+        "$methodstart$() {\n"
         "  this.$gettername$().clear();\n"
         "  return this;\n"
-        "};\n"
+        "$methodend$\n"
         "\n"
         "\n",
-        "class", GetMessagePath(options, field->containing_type()),
-        "clearername", "clear" + JSGetterName(options, field),
+        "class", classSymbol,
+        "methodstart", clearerMethodStart,
+        "methodend", methodEndBrace,
         "gettername", "get" + JSGetterName(options, field));
     // clang-format on
     printer->Annotate("clearername", field);
@@ -2967,7 +3001,7 @@ const char * endBrace =
         " * $jsdoc$\n"
         " * @return {!$class$} returns this\n"
         " */\n"
-        "$class$.prototype.$clearername$ = function() {\n"
+        "$methodstart$() {\n"
         "  return this.$settername$($clearedvalue$);\n"
         "};\n"
         "\n"
@@ -2975,8 +3009,8 @@ const char * endBrace =
        "jsdoc", field->is_repeated()
            ? "Clears the list making it empty but non-null."
            : "Clears the message field making it undefined.",
-        "class", GetMessagePath(options, field->containing_type()),
-        "clearername", "clear" + JSGetterName(options, field),
+        "class", classSymbol,
+        "methodstart", clearerMethodStart,
         "settername", "set" + JSGetterName(options, field),
         "clearedvalue", (field->is_repeated() ? "[]" : "undefined"));
     // clang-format on
@@ -2990,11 +3024,11 @@ const char * endBrace =
         " * Clears the field making it undefined.\n"
         " * @return {!$class$} returns this\n"
         " */\n"
-        "$class$.prototype.$clearername$ = function() {\n"
+        "$methodstart$() {\n"
         "  return jspb.Message.set$maybeoneof$Field(this, "
             "$index$$maybeoneofgroup$, ",
-        "class", GetMessagePath(options, field->containing_type()),
-        "clearername", "clear" + JSGetterName(options, field),
+        "class", classSymbol,
+        "methodstart", clearerMethodStart,
         "maybeoneof", (InRealOneof(field) ? "Oneof" : ""),
         "maybeoneofgroup", (InRealOneof(field)
                             ? (", " + JSOneofArray(options, field))
@@ -3011,18 +3045,24 @@ const char * endBrace =
   }
 
   if (HasFieldPresence(options, field)) {
+    const std::string haserName = "has" + JSGetterName(options, field);
+    const std::string haserMethodStart = MethodStart(
+      options, classSymbol.c_str(), clearerName.c_str());
+
     printer->Print(
         "/**\n"
         " * Returns whether this field is set.\n"
         " * @return {boolean}\n"
         " */\n"
-        "$class$.prototype.$hasername$ = function() {\n"
+        "$methodstart$() {\n"
         "  return jspb.Message.getField(this, $index$) != null;\n"
-        "};\n"
+        "$methodend$\n"
         "\n"
         "\n",
-        "class", GetMessagePath(options, field->containing_type()), "hasername",
-        "has" + JSGetterName(options, field), "index", JSFieldIndex(field));
+        "class", classSymbol,
+        "methodstart", haserMethodStart,
+        "methodend", methodEndBrace,
+        "index", JSFieldIndex(field));
     printer->Annotate("hasername", field);
   }
 }
@@ -3030,6 +3070,7 @@ const char * endBrace =
 void Generator::GenerateRepeatedPrimitiveHelperMethods(
     const GeneratorOptions& options, io::Printer* printer,
     const FieldDescriptor* field, bool untyped) const {
+  const std::string classSymbol = GetMessagePath(options, field->containing_type());
   // clang-format off
   printer->Print(
       "/**\n"
@@ -3040,7 +3081,7 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
       "$class$.prototype.$addername$ = function(value, opt_index) {\n"
       "  return jspb.Message.addToRepeatedField(this, "
       "$index$",
-      "class", GetMessagePath(options, field->containing_type()), "addername",
+      "class", classSymbol, "addername",
       "add" + JSGetterName(options, field, BYTES_DEFAULT,
                            /* drop_list = */ true),
       "optionaltype",
@@ -3488,16 +3529,25 @@ void Generator::GenerateClassSerializeBinaryField(
   printer->Print("  }\n");
 }
 
+bool Generator::WantEs6(const GeneratorOptions& options) const {
+  return options.import_style == GeneratorOptions::kImportEs6;
+}
+
 void Generator::GenerateEnum(const GeneratorOptions& options,
                              io::Printer* printer,
                              const EnumDescriptor* enumdesc) const {
+  const std::string enumNameForDefinition = WantEs6(options) ? (
+    enumdesc->name()
+  ) : (
+    GetEnumPathPrefix(options, enumdesc) + enumdesc->name()
+  );
   printer->Print(
       "/**\n"
       " * @enum {number}\n"
       " */\n"
-      "$enumprefix$$name$ = {\n",
-      "enumprefix", GetEnumPathPrefix(options, enumdesc), "name",
-      enumdesc->name());
+      "$defname$ = {\n",
+      "defname", enumNameForDefinition,
+      "name", enumdesc->name());
   printer->Annotate("name", enumdesc);
 
   std::set<std::string> used_name;
@@ -4111,9 +4161,17 @@ void Generator::GenerateMethodStart(const GeneratorOptions& options,
                          const char * classSymbol,
                          const char * methodName) const {
   if(options.import_style == GeneratorOptions::kImportEs6) {
-    printer->Print("$method$", "method", methodName);
+    printer->PrintRaw(MethodStart(options, classSymbol, methodName));
+  }
+}
+
+const std::string Generator::MethodStart(const GeneratorOptions& options,
+                                const char * classSymbol,
+                                const char * methodName) const {
+  if (WantEs6(options)) {
+    return methodName;
   } else {
-    printer->Print("$class$ = function", "class", classSymbol);
+    return std::string(classSymbol) + ".prototype." + methodName + " = function";
   }
 }
 
