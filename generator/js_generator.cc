@@ -152,6 +152,15 @@ std::string ModuleAlias(const std::string& filename) {
 // file descriptor's package.
 std::string GetNamespace(const GeneratorOptions& options,
                          const FileDescriptor* file) {
+  if (options.import_style == GeneratorOptions::kImportEs6) {
+    std::string dotSeparated = "proto." + file->package();
+    // Use $ because it's not valid in proto package names
+    // (https://developers.google.com/protocol-buffers/docs/reference/proto3-spec#identifiers).
+    // If we used _, "foo.a_b" would be equivalent to "foo.a.b".
+    ReplaceCharacters(&dotSeparated, ".", '$');
+    return dotSeparated;
+  }
+
   if (!options.namespace_prefix.empty()) {
     return options.namespace_prefix;
   } else if (!file->package().empty()) {
@@ -3839,10 +3848,13 @@ void Generator::GenerateFile(const GeneratorOptions& options,
 
   // Generate "require" statements.
   if (options.import_style == GeneratorOptions::kImportEs6) {
+    printer->Print("import jspb from \"google-protobuf\";\n");
+
     for (int i = 0; i < file->dependency_count(); i++) {
       const std::string& name = file->dependency(i)->name();
       printer->Print(
-          "// TODO: import {used types here} from \"$file$\";\n",
+          "import * as $alias$ from \"$file$\";\n",
+          "alias", ModuleAlias(name),
           "file", GetRootPath(file->name(), name) + GetJSFilename(options, name));
     }
 
