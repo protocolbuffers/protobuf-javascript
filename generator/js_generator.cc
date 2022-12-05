@@ -152,14 +152,14 @@ std::string ModuleAlias(const std::string& filename) {
 // file descriptor's package.
 std::string GetNamespace(const GeneratorOptions& options,
                          const FileDescriptor* file) {
-  if (options.import_style == GeneratorOptions::kImportEs6) {
-    std::string dotSeparated = "proto." + file->package();
-    // Use $ because it's not valid in proto package names
-    // (https://developers.google.com/protocol-buffers/docs/reference/proto3-spec#identifiers).
-    // If we used _, "foo.a_b" would be equivalent to "foo.a.b".
-    ReplaceCharacters(&dotSeparated, ".", '$');
-    return dotSeparated;
-  }
+  // if (options.import_style == GeneratorOptions::kImportEs6) {
+  //   //std::string dotSeparated = "proto." + file->package();
+  //   // Use $ because it's not valid in proto package names
+  //   // (https://developers.google.com/protocol-buffers/docs/reference/proto3-spec#identifiers).
+  //   // If we used _, "foo.a_b" would be equivalent to "foo.a.b".
+  //   //ReplaceCharacters(&dotSeparated, ".", '$');
+  //   //return dotSeparated;
+  // }
 
   if (!options.namespace_prefix.empty()) {
     return options.namespace_prefix;
@@ -246,11 +246,11 @@ std::string MaybeCrossFileRef(const GeneratorOptions& options,
   }
 }
 
-std::string SubmessageTypeRef(const GeneratorOptions& options,
-                              const FieldDescriptor* field) {
-  GOOGLE_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
-  return MaybeCrossFileRef(options, field->file(), field->message_type());
-}
+// std::string SubmessageTypeRef(const GeneratorOptions& options,
+//                               const FieldDescriptor* field) {
+//   GOOGLE_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
+//   return MaybeCrossFileRef(options, field->file(), field->message_type());
+// }
 
 // - Object field name: LOWER_UNDERSCORE -> LOWER_CAMEL, except for group fields
 // (UPPER_CAMEL -> LOWER_CAMEL), with "List" (or "Map") appended if appropriate,
@@ -1735,8 +1735,9 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
        it != provided->end(); ++it) {
     if (options.import_style == GeneratorOptions::kImportClosure) {
       printer->Print("goog.provide('$name$');\n", "name", *it);
-    } else if (options.import_style == GeneratorOptions::kImportEs6) {
-      printer->Print("// DEBUG: in ES6 mode, no need for provide $name$');\n", "name", *it);
+    } else if (options.WantEs6()) {
+      // In ES6 mode, we do not construct the tree of objects
+      // using goog.exportSymbol.
     } else {
       // We aren't using Closure's import system, but we use goog.exportSymbol()
       // to construct the expected tree of objects, eg.
@@ -1863,6 +1864,12 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
                                      std::set<std::string>* provided,
                                      bool require_jspb, bool require_extension,
                                      bool require_map) const {
+                                      
+  if (options.WantEs6()) {
+    // In ES6 mode, imports are handled by GenerateFile and
+    // goog.* isn't used.
+    return;
+  }
   if (require_jspb) {
     required->insert("jspb.Message");
     required->insert("jspb.BinaryReader");
@@ -1965,6 +1972,7 @@ void Generator::GenerateTestOnly(const GeneratorOptions& options,
 }
 
 void Generator::GenerateClassesAndEnums(const GeneratorOptions& options,
+                                        const TypeNames& type_names,
                                         io::Printer* printer,
                                         const FileDescriptor* file) const {
   // In ES6 module mode, class constructors are generated within
@@ -1976,7 +1984,7 @@ void Generator::GenerateClassesAndEnums(const GeneratorOptions& options,
     }
   }
   for (int i = 0; i < file->message_type_count(); i++) {
-    GenerateClass(options, printer, file->message_type(i));
+    GenerateClass(options, type_names, printer, file->message_type(i));
   }
   for (int i = 0; i < file->enum_type_count(); i++) {
     GenerateEnum(options, printer, file->enum_type(i));
@@ -1984,10 +1992,11 @@ void Generator::GenerateClassesAndEnums(const GeneratorOptions& options,
 }
 
 void Generator::GenerateClass(const GeneratorOptions& options,
+                              const  TypeNames& type_names,
                               io::Printer* printer,
                               const Descriptor* desc) const {
   if (options.import_style == GeneratorOptions::kImportEs6) {
-    GenerateClassEs6(options, printer, desc);
+    GenerateClassEs6(options, type_names, printer, desc);
     return;
   }
   if (IgnoreMessage(desc)) {
@@ -1998,13 +2007,13 @@ void Generator::GenerateClass(const GeneratorOptions& options,
     printer->Print("\n");
     GenerateClassFieldInfo(options, printer, desc);
 
-    GenerateClassToObject(options, printer, desc);
+    GenerateClassToObject(options, type_names, printer, desc);
     // These must come *before* the extension-field info generation in
     // GenerateClassRegistration so that references to the binary
     // serialization/deserialization functions may be placed in the extension
     // objects.
-    GenerateClassDeserializeBinary(options, printer, desc);
-    GenerateClassSerializeBinary(options, printer, desc);
+    GenerateClassDeserializeBinary(options, type_names, printer, desc);
+    GenerateClassSerializeBinary(options, type_names, printer, desc);
   }
 
   // Recurse on nested types. These must come *before* the extension-field
@@ -2014,24 +2023,25 @@ void Generator::GenerateClass(const GeneratorOptions& options,
     GenerateEnum(options, printer, desc->enum_type(i));
   }
   for (int i = 0; i < desc->nested_type_count(); i++) {
-    GenerateClass(options, printer, desc->nested_type(i));
+    GenerateClass(options, type_names, printer, desc->nested_type(i));
   }
 
   if (!NamespaceOnly(desc)) {
-    GenerateClassRegistration(options, printer, desc);
-    GenerateClassFields(options, printer, desc);
+    GenerateClassRegistration(options, type_names, printer, desc);
+    GenerateClassFields(options, type_names, printer, desc);
 
     if (options.import_style != GeneratorOptions::kImportClosure) {
       for (int i = 0; i < desc->extension_count(); i++) {
-        GenerateExtension(options, printer, desc->extension(i));
+        GenerateExtension(options, type_names, printer, desc->extension(i));
       }
     }
   }
 }
 
 void Generator::GenerateClassEs6(const GeneratorOptions& options,
-                              io::Printer* printer,
-                              const Descriptor* desc) const {
+                                 const TypeNames& type_names,
+                                 io::Printer* printer,
+                                 const Descriptor* desc) const {
   if (IgnoreMessage(desc)) {
     return;
   }
@@ -2071,8 +2081,8 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
   // GenerateClassRegistration so that references to the binary
   // serialization/deserialization functions may be placed in the extension
   // objects.
-  GenerateClassDeserializeBinary(options, printer, desc);
-  GenerateClassSerializeBinary(options, printer, desc);
+  GenerateClassDeserializeBinary(options, type_names, printer, desc);
+  GenerateClassSerializeBinary(options, type_names, printer, desc);
 
   // Recurse on nested types. These must come *before* the extension-field
   // info generation in GenerateClassRegistration so that extensions that
@@ -2081,13 +2091,13 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
     GenerateEnum(options, printer, desc->enum_type(i));
   }
   for (int i = 0; i < desc->nested_type_count(); i++) {
-    GenerateClass(options, printer, desc->nested_type(i));
+    GenerateClass(options, type_names, printer, desc->nested_type(i));
   }
 
-  GenerateClassRegistration(options, printer, desc);
-  GenerateClassFields(options, printer, desc);
+  GenerateClassRegistration(options, type_names, printer, desc);
+  GenerateClassFields(options, type_names, printer, desc);
   for (int i = 0; i < desc->extension_count(); i++) {
-    GenerateExtension(options, printer, desc->extension(i));
+    GenerateExtension(options, type_names, printer, desc->extension(i));
   }
 
   printer->Outdent();
@@ -2234,7 +2244,7 @@ void Generator::GenerateOneofCaseDefinition(
   
   const std::string className = GetMessagePath(options, oneof->containing_type());
 
-  const std::string oneofCaseName = WantEs6(options) ? (
+  const std::string oneofCaseName = options.WantEs6() ? (
     JSOneofName(oneof) + "Case"
   ) : (
     className + "." + JSOneofName(oneof) + "Case"
@@ -2287,6 +2297,7 @@ void Generator::GenerateOneofCaseDefinition(
 }
 
 void Generator::GenerateClassToObject(const GeneratorOptions& options,
+                                      const TypeNames& type_names,
                                       io::Printer* printer,
                                       const Descriptor* desc) const {
   printer->Print(
@@ -2340,7 +2351,7 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       first = false;
     }
 
-    GenerateClassFieldToObject(options, printer, field);
+    GenerateClassFieldToObject(options, type_names, printer, field);
   }
 
   if (!first) {
@@ -2420,6 +2431,7 @@ void Generator::GenerateFieldValueExpression(io::Printer* printer,
 }
 
 void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
+                                           const TypeNames& type_names,
                                            io::Printer* printer,
                                            const FieldDescriptor* field) const {
   printer->Print("$fieldname$: ", "fieldname",
@@ -2448,14 +2460,14 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
             "jspb.Message.toObjectList(msg.get$getter$(),\n"
             "    $type$.toObject, includeInstance)",
             "getter", JSGetterName(options, field), "type",
-            SubmessageTypeRef(options, field));
+            type_names.SubmessageTypeRef(field));
       }
     } else {
       printer->Print(
           "(f = msg.get$getter$()) && "
           "$type$.toObject(includeInstance, f)",
           "getter", JSGetterName(options, field), "type",
-          SubmessageTypeRef(options, field));
+          type_names.SubmessageTypeRef(field));
     }
   } else if (field->type() == FieldDescriptor::TYPE_BYTES) {
     // For bytes fields we want to always return the B64 data.
@@ -2523,6 +2535,7 @@ void Generator::GenerateObjectTypedef(const GeneratorOptions& options,
 }
 
 void Generator::GenerateClassFromObject(const GeneratorOptions& options,
+                                        const TypeNames& type_names,
                                         io::Printer* printer,
                                         const Descriptor* desc) const {
   printer->Print("if (jspb.Message.GENERATE_FROM_OBJECT) {\n\n");
@@ -2543,7 +2556,7 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
   for (int i = 0; i < desc->field_count(); i++) {
     const FieldDescriptor* field = desc->field(i);
     if (!IgnoreField(field)) {
-      GenerateClassFieldFromObject(options, printer, field);
+      GenerateClassFieldFromObject(options, type_names, printer, field);
     }
   }
 
@@ -2554,7 +2567,9 @@ void Generator::GenerateClassFromObject(const GeneratorOptions& options,
 }
 
 void Generator::GenerateClassFieldFromObject(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options,
+    const TypeNames& type_names,
+    io::Printer* printer,
     const FieldDescriptor* field) const {
   if (field->is_map()) {
     const FieldDescriptor* value_field = MapFieldValue(field);
@@ -2589,14 +2604,15 @@ void Generator::GenerateClassFieldFromObject(
             "          $fieldclass$.fromObject));\n",
             "name", JSObjectFieldName(options, field), "index",
             JSFieldIndex(field), "fieldclass",
-            SubmessageTypeRef(options, field));
+            type_names.SubmessageTypeRef(field));
       }
     } else {
       printer->Print(
           "  obj.$name$ && jspb.Message.setWrapperField(\n"
           "      msg, $index$, $fieldclass$.fromObject(obj.$name$));\n",
           "name", JSObjectFieldName(options, field), "index",
-          JSFieldIndex(field), "fieldclass", SubmessageTypeRef(options, field));
+          JSFieldIndex(field), "fieldclass",
+          type_names.SubmessageTypeRef(field));
     }
   } else {
     // Simple (primitive) field.
@@ -2609,23 +2625,25 @@ void Generator::GenerateClassFieldFromObject(
 }
 
 void Generator::GenerateClassRegistration(const GeneratorOptions& options,
+                                          const TypeNames& type_names,
                                           io::Printer* printer,
                                           const Descriptor* desc) const {
   // Register any extensions defined inside this message type.
   for (int i = 0; i < desc->extension_count(); i++) {
     const FieldDescriptor* extension = desc->extension(i);
     if (ShouldGenerateExtension(extension)) {
-      GenerateExtension(options, printer, extension);
+      GenerateExtension(options, type_names, printer, extension);
     }
   }
 }
 
 void Generator::GenerateClassFields(const GeneratorOptions& options,
+                                    const TypeNames& type_names,
                                     io::Printer* printer,
                                     const Descriptor* desc) const {
   for (int i = 0; i < desc->field_count(); i++) {
     if (!IgnoreField(desc->field(i))) {
-      GenerateClassField(options, printer, desc->field(i));
+      GenerateClassField(options, type_names, printer, desc->field(i));
     }
   }
 }
@@ -2660,10 +2678,11 @@ void GenerateBytesWrapper(const GeneratorOptions& options, io::Printer* printer,
 }
 
 void Generator::GenerateClassField(const GeneratorOptions& options,
+                                   const TypeNames& type_names,
                                    io::Printer* printer,
                                    const FieldDescriptor* field) const {
 const std::string classSymbol = GetMessagePath(options, field->containing_type());
-const char * methodEndBrace = WantEs6(options) ? "}" : "};";
+const char * methodEndBrace = options.WantEs6() ? "}" : "};";
 
   if (field->is_map()) {
     const FieldDescriptor* key_field = MapFieldKey(field);
@@ -2777,7 +2796,8 @@ const char * methodEndBrace = WantEs6(options) ? "}" : "};";
                               /* force_present = */ false,
                               /* singular_if_not_packed = */ false),
         "rpt", (field->is_repeated() ? "Repeated" : ""), "index",
-        JSFieldIndex(field), "wrapperclass", SubmessageTypeRef(options, field),
+        JSFieldIndex(field), "wrapperclass",
+        type_names.SubmessageTypeRef(field),
         "required",
         (field->label() == FieldDescriptor::LABEL_REQUIRED ? ", 1" : ""),
         "endbrace", methodEndBrace);
@@ -3207,6 +3227,7 @@ void Generator::GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
 }
 
 void Generator::GenerateClassDeserializeBinary(const GeneratorOptions& options,
+                                               const TypeNames& type_names,
                                                io::Printer* printer,
                                                const Descriptor* desc) const {
   // TODO(cfallin): Handle lazy decoding when requested by field option and/or
@@ -3255,7 +3276,7 @@ printer->Print(
 
   for (int i = 0; i < desc->field_count(); i++) {
     if (!IgnoreField(desc->field(i))) {
-      GenerateClassDeserializeBinaryField(options, printer, desc->field(i));
+      GenerateClassDeserializeBinaryField(options, type_names, printer, desc->field(i));
     }
   }
 
@@ -3290,7 +3311,9 @@ printer->Print(
 }
 
 void Generator::GenerateClassDeserializeBinaryField(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options,
+    const TypeNames& type_names,
+    io::Printer* printer,
     const FieldDescriptor* field) const {
   printer->Print("    case $num$:\n", "num", StrCat(field->number()));
 
@@ -3331,7 +3354,8 @@ void Generator::GenerateClassDeserializeBinaryField(
           "      var value = new $fieldclass$;\n"
           "      reader.read$msgOrGroup$($grpfield$value,"
           "$fieldclass$.deserializeBinaryFromReader);\n",
-          "fieldclass", SubmessageTypeRef(options, field), "msgOrGroup",
+          "fieldclass",
+          type_names.SubmessageTypeRef(field), "msgOrGroup",
           (field->type() == FieldDescriptor::TYPE_GROUP) ? "Group" : "Message",
           "grpfield",
           (field->type() == FieldDescriptor::TYPE_GROUP)
@@ -3381,6 +3405,7 @@ void Generator::GenerateClassDeserializeBinaryField(
 }
 
 void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
+                                             const TypeNames& type_names,
                                              io::Printer* printer,
                                              const Descriptor* desc) const {
 
@@ -3419,7 +3444,7 @@ void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
 
 for (int i = 0; i < desc->field_count(); i++) {
     if (!IgnoreField(desc->field(i))) {
-      GenerateClassSerializeBinaryField(options, printer, desc->field(i));
+      GenerateClassSerializeBinaryField(options, type_names, printer, desc->field(i));
     }
   }
 
@@ -3440,7 +3465,9 @@ for (int i = 0; i < desc->field_count(); i++) {
 }
 
 void Generator::GenerateClassSerializeBinaryField(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options,
+    const TypeNames& type_names,
+    io::Printer* printer,
     const FieldDescriptor* field) const {
   if (HasFieldPresence(options, field) &&
       field->cpp_type() != FieldDescriptor::CPPTYPE_MESSAGE) {
@@ -3540,7 +3567,7 @@ void Generator::GenerateClassSerializeBinaryField(
       printer->Print(
           ",\n"
           "      $submsg$.serializeBinaryToWriter\n",
-          "submsg", SubmessageTypeRef(options, field));
+          "submsg", type_names.SubmessageTypeRef(field));
     } else {
       printer->Print("\n");
     }
@@ -3552,14 +3579,10 @@ void Generator::GenerateClassSerializeBinaryField(
   printer->Print("  }\n");
 }
 
-bool Generator::WantEs6(const GeneratorOptions& options) const {
-  return options.import_style == GeneratorOptions::kImportEs6;
-}
-
 void Generator::GenerateEnum(const GeneratorOptions& options,
                              io::Printer* printer,
                              const EnumDescriptor* enumdesc) const {
-  const std::string enumNameForDefinition = WantEs6(options) ? (
+  const std::string enumNameForDefinition = options.WantEs6() ? (
     enumdesc->name()
   ) : (
     GetEnumPathPrefix(options, enumdesc) + enumdesc->name()
@@ -3596,6 +3619,7 @@ void Generator::GenerateEnum(const GeneratorOptions& options,
 }
 
 void Generator::GenerateExtension(const GeneratorOptions& options,
+                                  const TypeNames& type_names,
                                   io::Printer* printer,
                                   const FieldDescriptor* field) const {
   std::string extension_scope =
@@ -3629,11 +3653,11 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       "    $repeated$);\n",
       "index", StrCat(field->number()), "name", extension_object_name, "ctor",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE
-           ? SubmessageTypeRef(options, field)
+           ? type_names.SubmessageTypeRef(field)
            : std::string("null")),
       "toObject",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE
-           ? (SubmessageTypeRef(options, field) + ".toObject")
+           ? (type_names.SubmessageTypeRef(field) + ".toObject")
            : std::string("null")),
       "repeated", (field->is_repeated() ? "1" : "0"));
 
@@ -3652,11 +3676,11 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       JSBinaryReaderMethodName(options, field), "binaryWriterFn",
       JSBinaryWriterMethodName(options, field), "binaryMessageSerializeFn",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE)
-          ? (SubmessageTypeRef(options, field) + ".serializeBinaryToWriter")
+          ? (type_names.SubmessageTypeRef(field) + ".serializeBinaryToWriter")
           : "undefined",
       "binaryMessageDeserializeFn",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE)
-          ? (SubmessageTypeRef(options, field) + ".deserializeBinaryFromReader")
+          ? (type_names.SubmessageTypeRef(field) + ".deserializeBinaryFromReader")
           : "undefined");
 
   printer->Print("    $isPacked$);\n", "isPacked",
@@ -3774,6 +3798,10 @@ GeneratorOptions::OutputMode GeneratorOptions::output_mode() const {
   return kOneOutputFilePerSCC;
 }
 
+bool GeneratorOptions::WantEs6() const {
+  return this->import_style == GeneratorOptions::kImportEs6;
+}
+
 void Generator::GenerateFilesInDepOrder(
     const GeneratorOptions& options, io::Printer* printer,
     const std::vector<const FileDescriptor*>& files) const {
@@ -3788,9 +3816,15 @@ void Generator::GenerateFilesInDepOrder(
 }
 
 void Generator::GenerateFileAndDeps(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options,
+    io::Printer* printer,
     const FileDescriptor* root, std::set<const FileDescriptor*>* all_files,
     std::set<const FileDescriptor*>* generated) const {
+  // ES6 must use kOneOutputFilePerInputFile.
+  GOOGLE_CHECK_NE(GeneratorOptions::kOneOutputFilePerInputFile,
+                  options.output_mode());
+  TypeNames type_names = TypeNames::NonEs6TypeNames(options);
+
   // Skip if already generated.
   if (generated->find(root) != generated->end()) {
     return;
@@ -3807,7 +3841,7 @@ void Generator::GenerateFileAndDeps(
   // original set requested to be generated; i.e., don't take all transitive
   // deps down to the roots.
   if (all_files->find(root) != all_files->end()) {
-    GenerateClassesAndEnums(options, printer, root);
+    GenerateClassesAndEnums(options, type_names, printer, root);
   }
 }
 
@@ -3841,20 +3875,134 @@ bool Generator::GenerateFile(const FileDescriptor* file,
   return true;
 }
 
+TypeNames TypeNames::NonEs6TypeNames(const GeneratorOptions& options) {
+  return TypeNames(options, nullptr, std::map<std::string, std::string>());
+}
+
+TypeNames TypeNames::Es6TypeNames(
+  const GeneratorOptions& options,
+  const FileDescriptor* codegen_file) {
+  // First, generate a map with values that may be duplicates. Then rename
+  // ambiguous values from the rhs.
+  std::map<std::string, std::string> ideal_mapping;
+
+  auto register_types = [&](const FileDescriptor* file) -> void {
+    for (int j = 0; j < file->message_type_count(); j++) {
+      auto message_type = file->message_type(j);
+      ideal_mapping.insert(std::make_pair(
+        message_type->full_name(), message_type->name()));
+    }
+    
+    for (int j = 0; j < file->enum_type_count(); j++) {
+      auto enum_type = file->enum_type(j);
+      ideal_mapping.insert(std::make_pair(
+        enum_type->full_name(), enum_type->name()));
+    }
+  };
+
+  // Loop through all dependencies and add their types.
+  for (int i = 0; i < codegen_file->dependency_count(); i++) {
+    auto dep_file = codegen_file->dependency(i);
+    register_types(dep_file);
+  }
+  register_types(codegen_file);
+
+  // TODO(reddaly): Replace conflicting identifiers.
+  return TypeNames(options, codegen_file, ideal_mapping);
+}
+
+/**
+ * Returns the JavaScript expression for referring to the passed message type.
+ */
+std::string TypeNames::JsExpression(const google::protobuf::Descriptor& desc) const {
+  if (this->options.WantEs6()) {
+    return this->JsExpression(desc.full_name());
+  }
+
+  return MaybeCrossFileRef(this->options, this->codegen_file, &desc);
+}
+
+/**
+ * Returns the JavaScript expression for referring to the given enum type.
+ */
+std::string TypeNames::JsExpression(const google::protobuf::EnumDescriptor& desc) const {
+  if (this->options.WantEs6()) {
+    return this->JsExpression(desc.full_name());
+  }
+  return GetEnumPath(this->options, &desc);
+}
+
+std::string TypeNames::SubmessageTypeRef(const FieldDescriptor* field) const {
+  GOOGLE_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
+  GOOGLE_CHECK(this->codegen_file == nullptr ||
+               this->codegen_file == field->file());
+  GOOGLE_CHECK_NOTNULL(field->message_type());
+  return JsExpression(*field->message_type());
+}
+
+std::string TypeNames::JsExpression(const std::string& full_name) const {
+  GOOGLE_CHECK_OK(this->options.WantEs6());
+
+  auto iter = this->map_.find(full_name);
+  if (iter != this->map_.end()) {
+    return iter->second;
+  }
+  // See if the parent full_name is available.
+  auto parts = google::protobuf::Split(full_name, ".", false);
+  if (parts.size() > 1) {
+    // uh oh... not sure how this happend.
+    std::vector<std::string> parent_parts = {parts.begin(), parts.end() - 1};
+    auto parent_path = google::protobuf::JoinStrings(
+      parent_parts,
+      ".");
+    return this->JsExpression(parent_path);
+  }
+  return std::string("INVALID TYPE NAME ") + full_name;
+}
+
+/**
+ * Returns the import alias for all the top-level messages and enums
+ * in the given dependency file.
+*/
+std::vector<std::string> ImportAliases(
+  const TypeNames& type_names,
+  const FileDescriptor& dep_file) {
+  std::vector<std::string> out;
+  for (int j = 0; j < dep_file.message_type_count(); j++) {
+    auto message_type = dep_file.message_type(j);
+    out.push_back(type_names.JsExpression(*message_type));
+  }
+  
+  for (int j = 0; j < dep_file.enum_type_count(); j++) {
+    auto enum_type = dep_file.enum_type(j);
+    out.push_back(type_names.JsExpression(*enum_type));
+  }
+  return out;
+}
+
 void Generator::GenerateFile(const GeneratorOptions& options,
                              io::Printer* printer,
                              const FileDescriptor* file) const {
   GenerateHeader(options, file, printer);
+
+  auto type_names = options.WantEs6() ?
+   TypeNames::Es6TypeNames(options, file) :
+   TypeNames::NonEs6TypeNames(options);
 
   // Generate "require" statements.
   if (options.import_style == GeneratorOptions::kImportEs6) {
     printer->Print("import jspb from \"google-protobuf\";\n");
 
     for (int i = 0; i < file->dependency_count(); i++) {
+      std::string aliases_comma_delimited =
+        google::protobuf::JoinStrings(
+          ImportAliases(type_names, *file->dependency(i)),
+          ",");
       const std::string& name = file->dependency(i)->name();
       printer->Print(
-          "import * as $alias$ from \"$file$\";\n",
-          "alias", ModuleAlias(name),
+          "import {$aliases$} from \"$file$\";\n",
+          "aliases", aliases_comma_delimited,
+          "modulealias", ModuleAlias(name),
           "file", GetRootPath(file->name(), name) + GetJSFilename(options, name));
     }
 
@@ -3923,13 +4071,13 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     GenerateRequiresForLibrary(options, printer, files, &provided);
   }
 
-  GenerateClassesAndEnums(options, printer, file);
+  GenerateClassesAndEnums(options, type_names, printer, file);
 
   // Generate code for top-level extensions. Extensions nested inside messages
   // are emitted inside GenerateClassesAndEnums().
   for (std::set<const FieldDescriptor*>::const_iterator it = extensions.begin();
        it != extensions.end(); ++it) {
-    GenerateExtension(options, printer, *it);
+    GenerateExtension(options, type_names, printer, *it);
   }
 
   // if provided is empty, do not export anything
@@ -3963,6 +4111,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
   }
 
   if (options.output_mode() == GeneratorOptions::kEverythingInOneFile) {
+    auto type_names = TypeNames::NonEs6TypeNames(options);
     // All output should go in a single file.
     std::string filename = options.output_dir + "/" + options.library +
                            options.GetFileNameExtension();
@@ -4002,7 +4151,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
     for (int i = 0; i < extensions.size(); i++) {
       if (ShouldGenerateExtension(extensions[i])) {
-        GenerateExtension(options, &printer, extensions[i]);
+        GenerateExtension(options, type_names, &printer, extensions[i]);
       }
     }
 
@@ -4013,6 +4162,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
       EmbedCodeAnnotations(annotations, &printer);
     }
   } else if (options.output_mode() == GeneratorOptions::kOneOutputFilePerSCC) {
+    TypeNames type_names = TypeNames::NonEs6TypeNames(options);
     std::set<const Descriptor*> have_printed;
     SCCAnalyzer<DepsGenerator> analyzer;
     std::map<const void*, std::string> allowed_map;
@@ -4071,7 +4221,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         }
         for (auto one_desc : scc->descriptors) {
           if (one_desc->containing_type() == nullptr) {
-            GenerateClass(options, &printer, one_desc);
+            GenerateClass(options, type_names, &printer, one_desc);
           }
         }
 
@@ -4154,7 +4304,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         for (int j = 0; j < files[i]->extension_count(); j++) {
           if (ShouldGenerateExtension(files[i]->extension(j))) {
-            GenerateExtension(options, &printer, files[i]->extension(j));
+            GenerateExtension(options, type_names, &printer, files[i]->extension(j));
           }
         }
         if (options.annotate_code) {
@@ -4194,7 +4344,7 @@ void Generator::GenerateMethodStart(const GeneratorOptions& options,
 const std::string Generator::MethodStart(const GeneratorOptions& options,
                                 const char * classSymbol,
                                 const char * methodName) const {
-  if (WantEs6(options)) {
+  if (options.WantEs6()) {
     return methodName;
   } else {
     return std::string(classSymbol) + ".prototype." + methodName + " = function";
@@ -4214,7 +4364,7 @@ const std::string Generator::StaticMemberAssignmentLhs(
     const GeneratorOptions& options,
     const char * classSymbol,
     const char * fieldName) const {
-      if (WantEs6(options)) {
+      if (options.WantEs6()) {
         return std::string("static ") + fieldName;
       } else {
         return std::string("") + classSymbol + "." + fieldName;

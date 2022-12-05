@@ -59,6 +59,8 @@ class Printer;
 namespace compiler {
 namespace js {
 
+class TypeNames;
+
 struct GeneratorOptions {
   // Output path.
   std::string output_dir;
@@ -108,6 +110,11 @@ struct GeneratorOptions {
   // Indicates how to output the generated code based on the provided options.
   OutputMode output_mode() const;
 
+  // True if the code generator is in ES6 module generation mode.
+  //
+  // In this mode, ES6 classes and module-style imports will be used.
+  bool WantEs6() const;
+
   // The remaining options are only relevant when we are using kImportClosure.
 
   // Add a `goog.requires()` call for each enum type used. If not set, a
@@ -128,6 +135,78 @@ struct GeneratorOptions {
   // are encoded as base64 proto of GeneratedCodeInfo message (see
   // descriptor.proto).
   bool annotate_code;
+};
+
+/**
+ * Maps known protobuf type names for enums, messages to a JavaScript
+ * expresseion used to reference that type.
+ */
+class TypeNames {
+public:
+  /**
+   * Returns a TypeNames namer for naming types while generating code
+   * for the given proto file. Assumes kOneOutputFilePerInputFile.
+  */
+  static TypeNames Es6TypeNames(
+    const GeneratorOptions& options,
+    const FileDescriptor* codegen_file);
+
+  /**
+   * Returns a TypeNames object for naming types while generating
+   * code in non-es6-mode. Use dot-delmited type names and
+   * goog.provide/goog.requires.
+  */
+  static TypeNames NonEs6TypeNames(const GeneratorOptions& options);
+
+  /**
+   * Returns the JavaScript expression for referring to the passed message type.
+   */
+  std::string JsExpression(const google::protobuf::Descriptor& desc) const;
+
+  /**
+   * Returns the JavaScript expression for referring to the given enum type.
+   */
+  std::string JsExpression(const google::protobuf::EnumDescriptor& desc) const;
+
+  /**
+   * Returns the JavaScript expression for referring to type of the
+   * given field, which must be a message field.
+   */
+  std::string SubmessageTypeRef(const FieldDescriptor* field) const;
+  
+private:
+  TypeNames(
+    GeneratorOptions options_,
+    const FileDescriptor* codegen_file_,
+    const std::map<std::string, std::string>& map) :
+    options(options_),
+    codegen_file(codegen_file_),
+    map_(map) {}
+
+  GeneratorOptions options;
+
+  // The proto file for which code is being generated.
+  //
+  // If in ES6 mode, this will always be set. Otherwise, this may
+  // be null if in kOneOutputFilePerSCC or kEverythingInOneFile mode.
+  const FileDescriptor* codegen_file;
+
+  // Maps a fully qualified proto type name (as returned from
+  // Descriptor::full_name()) to a JavaScript expression to use to refer to that
+  // type within the generated code.
+  std::map<std::string, std::string> map_;
+
+  // True for non-ES6 mode. Use dot-delimited identifiers to refer
+  // to protos. e.g., "proto.foo.bar.Baz.Bim" for nested message Bim
+  // within message Baz within package "foo.bar".
+  //bool UseDotDelimitedNames();
+
+  /**
+   * Returns the JavaScript expression for referring to the Enum
+   * or Message with the provided full name (as obtained from the type
+   * descriptor).
+   */
+  std::string JsExpression(const std::string& full_name) const;
 };
 
 // CodeGenerator implementation which generates a JavaScript source file and
@@ -238,6 +317,7 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 
   // Generate definitions for all message classes and enums.
   void GenerateClassesAndEnums(const GeneratorOptions& options,
+                               const TypeNames& type_names,
                                io::Printer* printer,
                                const FileDescriptor* file) const;
 
@@ -247,10 +327,14 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                                     bool use_default) const;
 
   // Generate definition for one class.
-  void GenerateClass(const GeneratorOptions& options, io::Printer* printer,
+  void GenerateClass(const GeneratorOptions& options,
+                     const TypeNames& type_names,
+                     io::Printer* printer,
                      const Descriptor* desc) const;
-  void GenerateClassEs6(const GeneratorOptions& options, io::Printer* printer,
-                     const Descriptor* desc) const;
+  void GenerateClassEs6(const GeneratorOptions& options,
+                        const TypeNames& type_names,
+                        io::Printer* printer,
+                        const Descriptor* desc) const;
   void GenerateClassConstructor(const GeneratorOptions& options,
                                 io::Printer* printer,
                                 const Descriptor* desc) const;
@@ -269,40 +353,53 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                              io::Printer* printer,
                              const Descriptor* desc) const;
   void GenerateClassToObject(const GeneratorOptions& options,
+                             const TypeNames& type_names,
                              io::Printer* printer,
                              const Descriptor* desc) const;
   void GenerateClassFieldToObject(const GeneratorOptions& options,
+                                  const TypeNames& type_names,
                                   io::Printer* printer,
                                   const FieldDescriptor* field) const;
   void GenerateClassFromObject(const GeneratorOptions& options,
+                               const TypeNames& type_names,
                                io::Printer* printer,
                                const Descriptor* desc) const;
   void GenerateClassFieldFromObject(const GeneratorOptions& options,
+                                    const TypeNames& type_names,
                                     io::Printer* printer,
                                     const FieldDescriptor* field) const;
   void GenerateClassRegistration(const GeneratorOptions& options,
+                                 const TypeNames& type_names,
                                  io::Printer* printer,
                                  const Descriptor* desc) const;
   void GenerateClassFields(const GeneratorOptions& options,
+                           const TypeNames& type_names,
                            io::Printer* printer, const Descriptor* desc) const;
-  void GenerateClassField(const GeneratorOptions& options, io::Printer* printer,
+  void GenerateClassField(const GeneratorOptions& options,
+                          const TypeNames& type_names,
+                          io::Printer* printer,
                           const FieldDescriptor* desc) const;
   void GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
                                        io::Printer* printer,
                                        const Descriptor* desc) const;
   void GenerateClassDeserialize(const GeneratorOptions& options,
+                                const TypeNames& type_names,
                                 io::Printer* printer,
                                 const Descriptor* desc) const;
   void GenerateClassDeserializeBinary(const GeneratorOptions& options,
+                                      const TypeNames& type_names,
                                       io::Printer* printer,
                                       const Descriptor* desc) const;
   void GenerateClassDeserializeBinaryField(const GeneratorOptions& options,
+                                           const TypeNames& type_names,
                                            io::Printer* printer,
                                            const FieldDescriptor* field) const;
   void GenerateClassSerializeBinary(const GeneratorOptions& options,
+                                    const TypeNames& type_names,
                                     io::Printer* printer,
                                     const Descriptor* desc) const;
   void GenerateClassSerializeBinaryField(const GeneratorOptions& options,
+                                         const TypeNames& type_names,
                                          io::Printer* printer,
                                          const FieldDescriptor* field) const;
 
@@ -311,7 +408,9 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                     const EnumDescriptor* enumdesc) const;
 
   // Generate an extension definition.
-  void GenerateExtension(const GeneratorOptions& options, io::Printer* printer,
+  void GenerateExtension(const GeneratorOptions& options,
+                         const TypeNames& type_names,
+                         io::Printer* printer,
                          const FieldDescriptor* field) const;
 
   // Generate addFoo() method for repeated primitive fields.
@@ -332,10 +431,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                           const char * methodName) const;
   void GenerateMethodEnd(const GeneratorOptions& options,
                           io::Printer* printer) const;
-
-  // True if the implementation code should be es6-style classes.
-  // This is set to true if the import style is set to "es6".
-  bool WantEs6(const GeneratorOptions& options) const;
 
   const std::string MethodStart(const GeneratorOptions& options,
                                 const char * classSymbol,
