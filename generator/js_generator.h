@@ -330,15 +330,21 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                           io::Printer* printer,
                           const char * classSymbol,
                           const char * methodName) const;
-  const std::string MethodStart(const GeneratorOptions& options,
-                                const char * classSymbol,
-                                const char * methodName) const;
   void GenerateMethodEnd(const GeneratorOptions& options,
                           io::Printer* printer) const;
 
   // True if the implementation code should be es6-style classes.
   // This is set to true if the import style is set to "es6".
   bool WantEs6(const GeneratorOptions& options) const;
+
+  const std::string MethodStart(const GeneratorOptions& options,
+                                const char * classSymbol,
+                                const char * methodName) const;
+
+  const std::string StaticMemberAssignmentLhs(
+    const GeneratorOptions& options,
+    const char * classSymbol,
+    const char * fieldName) const;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Generator);
 };

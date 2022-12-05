@@ -1146,12 +1146,12 @@ bool HasRepeatedFields(const GeneratorOptions& options,
   return false;
 }
 
-static const char* kRepeatedFieldArrayName = ".repeatedFields_";
+static const char* kRepeatedFieldArrayName = "repeatedFields_";
 
 std::string RepeatedFieldsArrayName(const GeneratorOptions& options,
                                     const Descriptor* desc) {
   return HasRepeatedFields(options, desc)
-             ? (GetMessagePath(options, desc) + kRepeatedFieldArrayName)
+             ? (GetMessagePath(options, desc) + "." + kRepeatedFieldArrayName)
              : "null";
 }
 
@@ -2027,6 +2027,10 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
     return;
   }
 
+  
+  std::string prefix = (desc->containing_type() == nullptr) ?
+    "export " : ("static " + desc->name() + " = ");
+
   printer->Print("\n");
   printer->Print(
     "/**\n"
@@ -2044,12 +2048,8 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
     " * @extends {jspb.Message}\n"
     " * @constructor\n"
     " */\n"
-
-    " // DO NOT SUBMIT: \n"
-    " // classprefix = $classprefix$\n"
-    " // classname = $classname$ \n"
-
-    "export class $classname$ extends jspb.Message {\n",
+    "$prefix$class $classname$ extends jspb.Message {\n",
+    "prefix", prefix,
     "classname", desc->name());
   
   printer->Indent();
@@ -2159,6 +2159,7 @@ void Generator::GenerateClassConstructorAndDeclareExtensionFieldInfo(
 void Generator::GenerateClassFieldInfo(const GeneratorOptions& options,
                                        io::Printer* printer,
                                        const Descriptor* desc) const {
+  const std::string className = GetMessagePath(options, desc);
   if (HasRepeatedFields(options, desc)) {
     printer->Print(
         "/**\n"
@@ -2166,15 +2167,14 @@ void Generator::GenerateClassFieldInfo(const GeneratorOptions& options,
         " * @private {!Array<number>}\n"
         " * @const\n"
         " */\n"
-        "$classname$$rptfieldarray$ = $rptfields$;\n"
+        "$lhs$ = $rptfields$;\n"
         "\n",
-        "classname", GetMessagePath(options, desc), "rptfieldarray",
-        kRepeatedFieldArrayName, "rptfields",
-        RepeatedFieldNumberList(options, desc));
+        "lhs", StaticMemberAssignmentLhs(
+          options, className.c_str(), kRepeatedFieldArrayName),
+        "rptfields", RepeatedFieldNumberList(options, desc));
   }
 
   if (HasOneofFields(desc)) {
-    const std::string className = GetMessagePath(options, desc);
     const std::string assignment = (
       options.import_style == GeneratorOptions::kImportEs6
     ) ? (
@@ -3070,7 +3070,13 @@ const char * methodEndBrace = WantEs6(options) ? "}" : "};";
 void Generator::GenerateRepeatedPrimitiveHelperMethods(
     const GeneratorOptions& options, io::Printer* printer,
     const FieldDescriptor* field, bool untyped) const {
+  
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
+  const std::string adderName = JSGetterName(options, field, BYTES_DEFAULT,
+                           /* drop_list = */ true);
+  const std::string adderMethodStart = MethodStart(
+    options, classSymbol.c_str(), adderName.c_str());
+
   // clang-format off
   printer->Print(
       "/**\n"
@@ -3078,9 +3084,10 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
       " * @param {number=} opt_index\n"
       " * @return {!$class$} returns this\n"
       " */\n"
-      "$class$.prototype.$addername$ = function(value, opt_index) {\n"
+      "$methodstart$(value, opt_index) {\n"
       "  return jspb.Message.addToRepeatedField(this, "
       "$index$",
+      "methodstart", adderMethodStart,
       "class", classSymbol, "addername",
       "add" + JSGetterName(options, field, BYTES_DEFAULT,
                            /* drop_list = */ true),
@@ -3110,16 +3117,23 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
 void Generator::GenerateRepeatedMessageHelperMethods(
     const GeneratorOptions& options, io::Printer* printer,
     const FieldDescriptor* field) const {
+
+  const std::string classSymbol = GetMessagePath(options, field->containing_type());
+  const std::string adderName = JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
+  const std::string adderMethodStart = MethodStart(
+    options, classSymbol.c_str(), adderName.c_str());
+
   printer->Print(
       "/**\n"
       " * @param {!$optionaltype$=} opt_value\n"
       " * @param {number=} opt_index\n"
       " * @return {!$optionaltype$}\n"
       " */\n"
-      "$class$.prototype.$addername$ = function(opt_value, opt_index) {\n"
+      "$methodstart$(opt_value, opt_index) {\n"
       "  return jspb.Message.addTo$repeatedtag$WrapperField(",
-      "optionaltype", JSTypeName(options, field, BYTES_DEFAULT), "class",
-      GetMessagePath(options, field->containing_type()), "addername",
+      "optionaltype", JSTypeName(options, field, BYTES_DEFAULT), "class", classSymbol,
+      "methodstart", adderMethodStart,
+      "addername",
       "add" + JSGetterName(options, field, BYTES_DEFAULT,
                            /* drop_list = */ true),
       "repeatedtag", (field->is_repeated() ? "Repeated" : ""));
@@ -4183,6 +4197,17 @@ void Generator::GenerateMethodEnd(const GeneratorOptions& options,
     printer->Print("};");
   }
 }
+
+const std::string Generator::StaticMemberAssignmentLhs(
+    const GeneratorOptions& options,
+    const char * classSymbol,
+    const char * fieldName) const {
+      if (WantEs6(options)) {
+        return std::string("static ") + fieldName;
+      } else {
+        return std::string("") + classSymbol + "." + fieldName;
+      }
+    }
 
 }  // namespace js
 }  // namespace compiler
