@@ -263,14 +263,14 @@ char ToLowerASCII(char c) {
 std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
   std::vector<std::string> words;
   std::string running = "";
-  for (int i = 0; i < input.size(); i++) {
-    if (input[i] == '_') {
+  for (auto c : input) {
+    if (c == '_') {
       if (!running.empty()) {
         words.push_back(running);
         running.clear();
       }
     } else {
-      running += ToLowerASCII(input[i]);
+      running += ToLowerASCII(c);
     }
   }
   if (!running.empty()) {
@@ -282,12 +282,12 @@ std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
 std::vector<std::string> ParseUpperCamel(const std::string& input) {
   std::vector<std::string> words;
   std::string running = "";
-  for (int i = 0; i < input.size(); i++) {
-    if (input[i] >= 'A' && input[i] <= 'Z' && !running.empty()) {
+  for (auto c : input) {
+    if (c >= 'A' && c <= 'Z' && !running.empty()) {
       words.push_back(running);
       running.clear();
     }
-    running += ToLowerASCII(input[i]);
+    running += ToLowerASCII(c);
   }
   if (!running.empty()) {
     words.push_back(running);
@@ -297,22 +297,22 @@ std::vector<std::string> ParseUpperCamel(const std::string& input) {
 
 std::string ToLowerCamel(const std::vector<std::string>& words) {
   std::string result;
-  for (int i = 0; i < words.size(); i++) {
-    std::string word = words[i];
-    if (i == 0 && (word[0] >= 'A' && word[0] <= 'Z')) {
+  auto first = true;
+  for (auto word : words) {
+    if (first && (word[0] >= 'A' && word[0] <= 'Z')) {
       word[0] = (word[0] - 'A') + 'a';
-    } else if (i != 0 && (word[0] >= 'a' && word[0] <= 'z')) {
+    } else if (!first && (word[0] >= 'a' && word[0] <= 'z')) {
       word[0] = (word[0] - 'a') + 'A';
     }
     result += word;
+    first = false;
   }
   return result;
 }
 
 std::string ToUpperCamel(const std::vector<std::string>& words) {
   std::string result;
-  for (int i = 0; i < words.size(); i++) {
-    std::string word = words[i];
+  for (auto word : words) {
     if (word[0] >= 'a' && word[0] <= 'z') {
       word[0] = (word[0] - 'a') + 'A';
     }
@@ -328,11 +328,11 @@ std::string ToEnumCase(const std::string& input) {
   std::string result;
   result.reserve(input.size());
 
-  for (int i = 0; i < input.size(); i++) {
-    if ('a' <= input[i] && input[i] <= 'z') {
-      result.push_back(input[i] - 'a' + 'A');
+  for (auto c : input) {
+    if ('a' <= c && c <= 'z') {
+      result.push_back(c - 'a' + 'A');
     } else {
-      result.push_back(input[i]);
+      result.push_back(c);
     }
   }
 
@@ -343,11 +343,11 @@ std::string ToLower(const std::string& input) {
   std::string result;
   result.reserve(input.size());
 
-  for (int i = 0; i < input.size(); i++) {
-    if ('A' <= input[i] && input[i] <= 'Z') {
-      result.push_back(input[i] - 'A' + 'a');
+  for (auto c : input) {
+    if ('A' <= c && c <= 'Z') {
+      result.push_back(c - 'A' + 'a');
     } else {
-      result.push_back(input[i]);
+      result.push_back(c);
     }
   }
 
@@ -1226,7 +1226,7 @@ std::string RelativeTypeName(const FieldDescriptor* field) {
   // prefix that yield common prefixes in the containing type's name and this
   // type's name.
   int prefix = 0;
-  for (int i = 0; i < type.size() && i < containing_type.size(); i++) {
+  for (size_t i = 0; i < type.size() && i < containing_type.size(); i++) {
     if (type[i] != containing_type[i]) {
       break;
     }
@@ -1488,9 +1488,9 @@ void GenerateJspbFileOrder(const std::vector<const FileDescriptor*>& input,
   ordered->clear();
   std::set<const FileDescriptor*> seen;
   std::set<const FileDescriptor*> input_set;
-  for (int i = 0; i < input.size(); i++) {
-    DepthFirstSearch(input[i], ordered, &seen);
-    input_set.insert(input[i]);
+  for (auto c : input) {
+    DepthFirstSearch(c, ordered, &seen);
+    input_set.insert(c);
   }
 
   // Now remove the entries that are not actually in our input list.
@@ -1537,9 +1537,9 @@ bool GenerateJspbAllowedMap(const GeneratorOptions& options,
   // Choose the last descriptor for each filename.
   FileDeduplicator dedup(options);
   std::set<const SCC*> added;
-  for (int i = 0; i < files_ordered.size(); i++) {
-    for (int j = 0; j < files_ordered[i]->message_type_count(); j++) {
-      const Descriptor* desc = files_ordered[i]->message_type(j);
+  for (auto file : files_ordered) {
+    for (int j = 0; j < file->message_type_count(); j++) {
+      const Descriptor* desc = file->message_type(j);
       if (added.insert(analyzer->GetSCC(desc)).second &&
           !dedup.AddFile(
               std::make_pair(
@@ -1549,8 +1549,8 @@ bool GenerateJspbAllowedMap(const GeneratorOptions& options,
         return false;
       }
     }
-    for (int j = 0; j < files_ordered[i]->enum_type_count(); j++) {
-      const EnumDescriptor* desc = files_ordered[i]->enum_type(j);
+    for (int j = 0; j < file->enum_type_count(); j++) {
+      const EnumDescriptor* desc = file->enum_type(j);
       if (!dedup.AddFile(std::make_pair(GetEnumFileName(options, desc, false),
                                         GetEnumFileName(options, desc, true)),
                          desc)) {
@@ -1561,18 +1561,17 @@ bool GenerateJspbAllowedMap(const GeneratorOptions& options,
     // Pull out all free-floating extensions and generate files for those too.
     bool has_extension = false;
 
-    for (int j = 0; j < files_ordered[i]->extension_count(); j++) {
-      if (ShouldGenerateExtension(files_ordered[i]->extension(j))) {
+    for (int j = 0; j < file->extension_count(); j++) {
+      if (ShouldGenerateExtension(file->extension(j))) {
         has_extension = true;
       }
     }
 
     if (has_extension) {
       if (!dedup.AddFile(
-              std::make_pair(
-                  GetExtensionFileName(options, files_ordered[i], false),
-                  GetExtensionFileName(options, files_ordered[i], true)),
-              files_ordered[i])) {
+              std::make_pair(GetExtensionFileName(options, file, false),
+                             GetExtensionFileName(options, file, true)),
+              file)) {
         return false;
       }
     }
@@ -1645,8 +1644,8 @@ void Generator::FindProvides(const GeneratorOptions& options,
                              io::Printer* printer,
                              const std::vector<const FileDescriptor*>& files,
                              std::set<std::string>* provided) const {
-  for (int i = 0; i < files.size(); i++) {
-    FindProvidesForFile(options, printer, files[i], provided);
+  for (auto file : files) {
+    FindProvidesForFile(options, printer, file, provided);
   }
 
   printer->Print("\n");
@@ -1706,9 +1705,7 @@ void Generator::FindProvidesForFields(
     const GeneratorOptions& options, io::Printer* printer,
     const std::vector<const FieldDescriptor*>& fields,
     std::set<std::string>* provided) const {
-  for (int i = 0; i < fields.size(); i++) {
-    const FieldDescriptor* field = fields[i];
-
+  for (auto field : fields) {
     if (IgnoreField(field)) {
       continue;
     }
@@ -1786,25 +1783,25 @@ void Generator::GenerateRequiresForLibrary(
   bool have_map = false;
   bool have_message = false;
 
-  for (int i = 0; i < files.size(); i++) {
-    for (int j = 0; j < files[i]->message_type_count(); j++) {
-      const Descriptor* desc = files[i]->message_type(j);
+  for (auto file : files) {
+    for (int j = 0; j < file->message_type_count(); j++) {
+      const Descriptor* desc = file->message_type(j);
       if (!IgnoreMessage(desc)) {
         FindRequiresForMessage(options, desc, &required, &forwards,
                                &have_message);
       }
     }
 
-    if (!have_extensions && HasExtensions(files[i])) {
+    if (!have_extensions && HasExtensions(file)) {
       have_extensions = true;
     }
 
-    if (!have_map && FileHasMap(options, files[i])) {
+    if (!have_map && FileHasMap(options, file)) {
       have_map = true;
     }
 
-    for (int j = 0; j < files[i]->extension_count(); j++) {
-      const FieldDescriptor* extension = files[i]->extension(j);
+    for (int j = 0; j < file->extension_count(); j++) {
+      const FieldDescriptor* extension = file->extension(j);
       if (IgnoreField(extension)) {
         continue;
       }
@@ -1829,8 +1826,7 @@ void Generator::GenerateRequiresForExtensions(
     std::set<std::string>* provided) const {
   std::set<std::string> required;
   std::set<std::string> forwards;
-  for (int i = 0; i < fields.size(); i++) {
-    const FieldDescriptor* field = fields[i];
+  for (auto field : fields) {
     if (IgnoreField(field)) {
       continue;
     }
@@ -3446,60 +3442,60 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
 bool GeneratorOptions::ParseFromOptions(
     const std::vector<std::pair<std::string, std::string> >& options,
     std::string* error) {
-  for (int i = 0; i < options.size(); i++) {
-    if (options[i].first == "add_require_for_enums") {
-      if (options[i].second != "") {
+  for (auto option : options) {
+    if (option.first == "add_require_for_enums") {
+      if (option.second != "") {
         *error = "Unexpected option value for add_require_for_enums";
         return false;
       }
       add_require_for_enums = true;
-    } else if (options[i].first == "binary") {
-      if (options[i].second != "") {
+    } else if (option.first == "binary") {
+      if (option.second != "") {
         *error = "Unexpected option value for binary";
         return false;
       }
       binary = true;
-    } else if (options[i].first == "testonly") {
-      if (options[i].second != "") {
+    } else if (option.first == "testonly") {
+      if (option.second != "") {
         *error = "Unexpected option value for testonly";
         return false;
       }
       testonly = true;
 
-    } else if (options[i].first == "error_on_name_conflict") {
+    } else if (option.first == "error_on_name_conflict") {
       GOOGLE_LOG(WARNING) << "Ignoring error_on_name_conflict option, this "
                              "will be removed in a future release";
-    } else if (options[i].first == "output_dir") {
-      output_dir = options[i].second;
-    } else if (options[i].first == "namespace_prefix") {
-      namespace_prefix = options[i].second;
-    } else if (options[i].first == "library") {
-      library = options[i].second;
-    } else if (options[i].first == "import_style") {
-      if (options[i].second == "closure") {
+    } else if (option.first == "output_dir") {
+      output_dir = option.second;
+    } else if (option.first == "namespace_prefix") {
+      namespace_prefix = option.second;
+    } else if (option.first == "library") {
+      library = option.second;
+    } else if (option.first == "import_style") {
+      if (option.second == "closure") {
         import_style = kImportClosure;
-      } else if (options[i].second == "commonjs") {
+      } else if (option.second == "commonjs") {
         import_style = kImportCommonJs;
-      } else if (options[i].second == "commonjs_strict") {
+      } else if (option.second == "commonjs_strict") {
         import_style = kImportCommonJsStrict;
-      } else if (options[i].second == "browser") {
+      } else if (option.second == "browser") {
         import_style = kImportBrowser;
-      } else if (options[i].second == "es6") {
+      } else if (option.second == "es6") {
         import_style = kImportEs6;
       } else {
-        *error = "Unknown import style " + options[i].second + ", expected " +
+        *error = "Unknown import style " + option.second + ", expected " +
                  "one of: closure, commonjs, browser, es6.";
       }
-    } else if (options[i].first == "extension") {
-      extension = options[i].second;
-    } else if (options[i].first == "one_output_file_per_input_file") {
-      if (!options[i].second.empty()) {
+    } else if (option.first == "extension") {
+      extension = option.second;
+    } else if (option.first == "one_output_file_per_input_file") {
+      if (!option.second.empty()) {
         *error = "Unexpected option value for one_output_file_per_input_file";
         return false;
       }
       one_output_file_per_input_file = true;
-    } else if (options[i].first == "annotate_code") {
-      if (!options[i].second.empty()) {
+    } else if (option.first == "annotate_code") {
+      if (!option.second.empty()) {
         *error = "Unexpected option value for annotate_code";
         return false;
       }
@@ -3507,11 +3503,11 @@ bool GeneratorOptions::ParseFromOptions(
     } else {
       // Assume any other option is an output directory, as long as it is a bare
       // `key` rather than a `key=value` option.
-      if (options[i].second != "") {
-        *error = "Unknown option: " + options[i].first;
+      if (option.second != "") {
+        *error = "Unknown option: " + option.first;
         return false;
       }
-      output_dir = options[i].first;
+      output_dir = option.first;
     }
   }
 
@@ -3552,8 +3548,8 @@ void Generator::GenerateFilesInDepOrder(
   std::set<const FileDescriptor*> all_files(files.begin(), files.end());
   // Track the in-progress set of files that have been generated already.
   std::set<const FileDescriptor*> generated;
-  for (int i = 0; i < files.size(); i++) {
-    GenerateFileAndDeps(options, printer, files[i], &all_files, &generated);
+  for (auto file : files) {
+    GenerateFileAndDeps(options, printer, file, &all_files, &generated);
   }
 }
 
@@ -3736,9 +3732,9 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
     // Pull out all extensions -- we need these to generate all
     // provides/requires.
     std::vector<const FieldDescriptor*> extensions;
-    for (int i = 0; i < files.size(); i++) {
-      for (int j = 0; j < files[i]->extension_count(); j++) {
-        const FieldDescriptor* extension = files[i]->extension(j);
+    for (auto file : files) {
+      for (int j = 0; j < file->extension_count(); j++) {
+        const FieldDescriptor* extension = file->extension(j);
         extensions.push_back(extension);
       }
     }
@@ -3758,9 +3754,9 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
     GenerateFilesInDepOrder(options, &printer, files);
 
-    for (int i = 0; i < extensions.size(); i++) {
-      if (ShouldGenerateExtension(extensions[i])) {
-        GenerateExtension(options, &printer, extensions[i]);
+    for (auto extension : extensions) {
+      if (ShouldGenerateExtension(extension)) {
+        GenerateExtension(options, &printer, extension);
       }
     }
 
@@ -3779,8 +3775,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
     }
 
     bool generated = false;
-    for (int i = 0; i < files.size(); i++) {
-      const FileDescriptor* file = files[i];
+    for (auto file : files) {
       // Force well known type to generate in a whole file.
       if (IsWellKnownTypeFile(file)) {
         if (!GenerateFile(file, options, context, true)) {
@@ -3899,9 +3894,9 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         std::set<std::string> provided;
         std::vector<const FieldDescriptor*> fields;
 
-        for (int j = 0; j < files[i]->extension_count(); j++) {
-          if (ShouldGenerateExtension(files[i]->extension(j))) {
-            fields.push_back(files[i]->extension(j));
+        for (int j = 0; j < file->extension_count(); j++) {
+          if (ShouldGenerateExtension(file->extension(j))) {
+            fields.push_back(file->extension(j));
           }
         }
 
@@ -3910,9 +3905,9 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         GenerateTestOnly(options, &printer);
         GenerateRequiresForExtensions(options, &printer, fields, &provided);
 
-        for (int j = 0; j < files[i]->extension_count(); j++) {
-          if (ShouldGenerateExtension(files[i]->extension(j))) {
-            GenerateExtension(options, &printer, files[i]->extension(j));
+        for (int j = 0; j < file->extension_count(); j++) {
+          if (ShouldGenerateExtension(file->extension(j))) {
+            GenerateExtension(options, &printer, file->extension(j));
           }
         }
         if (options.annotate_code) {
@@ -3929,8 +3924,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
   } else /* options.output_mode() == kOneOutputFilePerInputFile */ {
     // Generate one output file per input (.proto) file.
 
-    for (int i = 0; i < files.size(); i++) {
-      const FileDescriptor* file = files[i];
+    for (auto file : files) {
       if (!GenerateFile(file, options, context, false)) {
         return false;
       }
