@@ -17,6 +17,9 @@ rules_pkg_dependencies()
 
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
+#
+# Run bazel run @hedron_compile_commands//:refresh_all to get autocomplete
+# working in VS Code and other editors.
 http_archive(
     name = "hedron_compile_commands",
 
