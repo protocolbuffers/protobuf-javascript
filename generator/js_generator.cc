@@ -4000,10 +4000,11 @@ void Generator::GenerateFile(const GeneratorOptions& options,
           ",");
       const std::string& name = file->dependency(i)->name();
       printer->Print(
-          "import {$aliases$} from \"$file$\";\n",
+          "import {$aliases$} from \"$file$\"; // proto import: \"$proto_filename$\"\n",
           "aliases", aliases_comma_delimited,
           "modulealias", ModuleAlias(name),
-          "file", GetRootPath(file->name(), name) + GetJSFilename(options, name));
+          "file", GetRootPath(file->name(), name) + GetJSFilename(options, name),
+          "proto_filename", name);
     }
 
   } else if ((options.import_style == GeneratorOptions::kImportCommonJs ||
