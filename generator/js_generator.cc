@@ -2077,7 +2077,7 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
   
   GenerateClassFieldInfo(options, printer, desc);
 
-  // DO NOT SUBMIT GenerateClassToObject(options, printer, desc);
+  GenerateClassToObject(options, type_names, printer, desc);
 
   // These must come *before* the extension-field info generation in
   // GenerateClassRegistration so that references to the binary
@@ -2294,7 +2294,8 @@ void Generator::GenerateOneofCaseDefinition(
       "/**\n"
       " * @return {$class$.$oneof$Case}\n"
       " */\n",
-      "class", className);
+      "class", className,
+      "oneof", JSOneofName(oneof));
   
   GenerateMethodStart(options, printer, className.c_str(),
     (std::string("get") + JSOneofName(oneof) + "Case").c_str());
@@ -2316,10 +2317,15 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
                                       const TypeNames& type_names,
                                       io::Printer* printer,
                                       const Descriptor* desc) const {
+
+  const char * if_guard_start = options.WantEs6() ? "" : "if (jspb.Message.GENERATE_TO_OBJECT) {\n";
+  const char * if_guard_end = options.WantEs6() ? "" : "}\n";
+  const std::string classSymbol = options.WantEs6() ? desc->name() : GetMessagePath(options, desc);
+  
   printer->Print(
       "\n"
       "\n"
-      "if (jspb.Message.GENERATE_TO_OBJECT) {\n"
+      "$if_guard_start$"
       "/**\n"
       " * Creates an object representation of this proto.\n"
       " * Field names that are reserved in JavaScript and will be renamed to "
@@ -2334,9 +2340,9 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       " *     http://goto/soy-param-migration\n"
       " * @return {!Object}\n"
       " */\n"
-      "$classname$.prototype.toObject = function(opt_includeInstance) {\n"
+      "$methodstart$(opt_includeInstance) {\n"
       "  return $classname$.toObject(opt_includeInstance, this);\n"
-      "};\n"
+      "}\n"
       "\n"
       "\n"
       "/**\n"
@@ -2349,9 +2355,12 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       " * @return {!Object}\n"
       " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
       " */\n"
-      "$classname$.toObject = function(includeInstance, msg) {\n"
+      "$classmethodstart$(includeInstance, msg) {\n"
       "  var f, obj = {",
-      "classname", GetMessagePath(options, desc));
+      "if_guard_start", if_guard_start,
+      "methodstart", MethodStart(options, classSymbol.c_str(), "toObject"),
+      "classmethodstart", MethodStartStatic(options, classSymbol.c_str(), "toObject"),
+      "classname", classSymbol);
 
   bool first = true;
   for (int i = 0; i < desc->field_count(); i++) {
@@ -2391,11 +2400,12 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       "    obj.$$jspbMessageInstance = msg;\n"
       "  }\n"
       "  return obj;\n"
-      "};\n"
       "}\n"
+      "$if_guard_end$"
       "\n"
       "\n",
-      "classname", GetMessagePath(options, desc));
+      "classname", GetMessagePath(options, desc),
+      "if_guard_end", if_guard_end);
 }
 
 void Generator::GenerateFieldValueExpression(io::Printer* printer,
@@ -4365,6 +4375,16 @@ const std::string Generator::MethodStart(const GeneratorOptions& options,
     return methodName;
   } else {
     return std::string(classSymbol) + ".prototype." + methodName + " = function";
+  }
+}
+
+const std::string Generator::MethodStartStatic(const GeneratorOptions& options,
+                                const char * classSymbol,
+                                const char * methodName) const {
+  if (options.WantEs6()) {
+    return std::string("static ") + methodName;
+  } else {
+    return std::string(classSymbol) + "." + methodName + " = function";
   }
 }
 
