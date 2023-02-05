@@ -61,6 +61,16 @@ namespace js {
 
 class TypeNames;
 
+// The mode of operation for bytes fields. Historically JSPB always carried
+// bytes as JS {string}, containing base64 content by convention. With binary
+// and proto3 serialization the new convention is to represent it as binary
+// data in Uint8Array. See b/26173701 for background on the migration.
+enum BytesMode {
+  BYTES_DEFAULT,  // Default type for getBytesField to return.
+  BYTES_B64,      // Explicitly coerce to base64 string where needed.
+  BYTES_U8,       // Explicitly coerce to Uint8Array where needed.
+};
+
 struct GeneratorOptions {
   // Output path.
   std::string output_dir;
@@ -423,6 +433,9 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void GenerateRepeatedMessageHelperMethods(const GeneratorOptions& options,
                                             io::Printer* printer,
                                             const FieldDescriptor* field) const;
+
+  void GenerateBytesWrapper(const GeneratorOptions& options, io::Printer* printer,
+                          const FieldDescriptor* field, BytesMode bytes_mode) const;
 
   // Prints the beginning/end of a method of some class.
   void GenerateMethodStart(const GeneratorOptions& options,
