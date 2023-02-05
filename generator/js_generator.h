@@ -199,8 +199,7 @@ private:
     const std::map<std::string, std::string>& map) :
     options(options_),
     codegen_file(codegen_file_),
-    map_(map),
-    exported_names_(ExportedNamesOfDeps(codegen_file_)) {}
+    map_(map) {}
 
   GeneratorOptions options;
 
@@ -215,11 +214,6 @@ private:
   // type within the generated code.
   std::map<std::string, std::string> map_;
 
-  // For each top-level messages or enum in each dependency file, there should
-  // be an entry in this map from full name to the exported name of the
-  // corresponding class.
-  std::map<std::string, std::string> exported_names_;
-
   // True for non-ES6 mode. Use dot-delimited identifiers to refer
   // to protos. e.g., "proto.foo.bar.Baz.Bim" for nested message Bim
   // within message Baz within package "foo.bar".
@@ -231,14 +225,6 @@ private:
    * descriptor).
    */
   std::string JsExpression(const std::string& full_name) const;
-
-  /**
-   * For each top-level messages or enum in each dependency file, there should
-   * be an entry in the returned map from full name to the exported name of the
-   * corresponding class definition.
-  */
-  static std::map<std::string, std::string> ExportedNamesOfDeps(
-    const FileDescriptor* codegen_file);
 };
 
 // CodeGenerator implementation which generates a JavaScript source file and

@@ -3912,30 +3912,6 @@ TypeNames TypeNames::NonEs6TypeNames(const GeneratorOptions& options) {
   return TypeNames(options, nullptr, std::map<std::string, std::string>());
 }
 
-std::map<std::string, std::string> TypeNames::ExportedNamesOfDeps(
-    const FileDescriptor* codegen_file) {
-  std::map<std::string, std::string> full_name_to_exported_name;
-
-  for (int i = 0; i < codegen_file->dependency_count(); i++) {
-    auto dep_file = codegen_file->dependency(i);
-
-    for (int j = 0; j < dep_file->message_type_count(); j++) {
-      auto message_type = dep_file->message_type(j);
-      full_name_to_exported_name.insert(std::make_pair(
-        message_type->full_name(),
-        TypeNames::JsName(message_type->full_name())));
-    }
-    
-    for (int j = 0; j < dep_file->enum_type_count(); j++) {
-      auto enum_type = dep_file->enum_type(j);
-      full_name_to_exported_name.insert(std::make_pair(
-        enum_type->full_name(),
-        TypeNames::JsName(enum_type->full_name())));
-    }
-  }
-  return full_name_to_exported_name;
-}
-
 void ReservedForLocalIdentifiers(const Descriptor* desc, std::set<std::string>& reserved_identifiers);
 
 void ReservedForLocalIdentifiers(const EnumDescriptor* desc, std::set<std::string>& reserved_identifiers);
