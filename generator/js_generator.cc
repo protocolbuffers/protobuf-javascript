@@ -2702,7 +2702,7 @@ void Generator::GenerateBytesWrapper(const GeneratorOptions& options, io::Printe
       "comment", FieldComments(field, bytes_mode),
       "type", type,
       "methodstart", methodStart,
-      "methodend", methodStart,
+      "methodend", methodEnd,
       "class", GetMessagePath(options, field->containing_type()),
       "name", JSGetterName(options, field, bytes_mode),
       "list", field->is_repeated() ? "List" : "",
@@ -3912,24 +3912,103 @@ TypeNames TypeNames::NonEs6TypeNames(const GeneratorOptions& options) {
   return TypeNames(options, nullptr, std::map<std::string, std::string>());
 }
 
+std::map<std::string, std::string> TypeNames::ExportedNamesOfDeps(
+    const FileDescriptor* codegen_file) {
+  std::map<std::string, std::string> full_name_to_exported_name;
+
+  for (int i = 0; i < codegen_file->dependency_count(); i++) {
+    auto dep_file = codegen_file->dependency(i);
+
+    for (int j = 0; j < dep_file->message_type_count(); j++) {
+      auto message_type = dep_file->message_type(j);
+      full_name_to_exported_name.insert(std::make_pair(
+        message_type->full_name(),
+        TypeNames::JsName(message_type->full_name())));
+    }
+    
+    for (int j = 0; j < dep_file->enum_type_count(); j++) {
+      auto enum_type = dep_file->enum_type(j);
+      full_name_to_exported_name.insert(std::make_pair(
+        enum_type->full_name(),
+        TypeNames::JsName(enum_type->full_name())));
+    }
+  }
+  return full_name_to_exported_name;
+}
+
+void ReservedForLocalIdentifiers(const Descriptor* desc, std::set<std::string>& reserved_identifiers);
+
+void ReservedForLocalIdentifiers(const EnumDescriptor* desc, std::set<std::string>& reserved_identifiers);
+
+void ReservedForLocalIdentifiers(const Descriptor* desc, std::set<std::string>& reserved_identifiers) {
+  reserved_identifiers.insert(TypeNames::JsName(desc->full_name()));
+  for (int j = 0; j < desc->nested_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->nested_type(j), reserved_identifiers);
+  }
+  for (int j = 0; j < desc->enum_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->enum_type(j), reserved_identifiers);
+  }
+}
+
+void ReservedForLocalIdentifiers(const EnumDescriptor* desc, std::set<std::string>& reserved_identifiers) {
+  reserved_identifiers.insert(TypeNames::JsName(desc->full_name()));
+}
+
+
+/**
+ * ReservedForLocalIdentifiers computes the set of symbols that should not be
+ * used for imports because they might conflict with definitions (class names,
+ * etc.).
+ */
+void ReservedForLocalIdentifiers(const FileDescriptor* desc, std::set<std::string>& reserved_identifiers) {
+  for (int j = 0; j < desc->message_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->message_type(j), reserved_identifiers);
+  }
+  for (int j = 0; j < desc->enum_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->enum_type(j), reserved_identifiers);
+  }
+}
+
 TypeNames TypeNames::Es6TypeNames(
   const GeneratorOptions& options,
   const FileDescriptor* codegen_file) {
-  // First, generate a map with values that may be duplicates. Then rename
-  // ambiguous values from the rhs.
-  std::map<std::string, std::string> ideal_mapping;
+  
+  // Full proto name -> local alias in JS codegen file.
+  std::map<std::string, std::string> full_name_to_alias;
+  // Local aliases that are already reserved
+  std::set<std::string> reserved_aliases;
+  ReservedForLocalIdentifiers(codegen_file, reserved_aliases);
+
+  auto pick_name = [&](const std::string full_name, const std::string ideal_name) -> void {
+    std::string base_candidate = ideal_name;
+    for (int i = -1; i < 10000; i++) {
+      if (i == 0) {
+        base_candidate = full_name;
+        ReplaceCharacters(&base_candidate, ".", '_');
+      }
+      std::string candidate = base_candidate;
+      if (i > 0) {
+        candidate += std::to_string(i);
+      }
+
+      if (reserved_aliases.find(candidate) == reserved_aliases.end()) {
+        reserved_aliases.insert(candidate);
+        full_name_to_alias.insert(std::make_pair(full_name, candidate));
+        return;
+      }
+    }
+    full_name_to_alias.insert(std::make_pair(full_name, "PICK_NAME_FAILED_INTERNAL_ERROR"));
+  };
 
   auto register_types = [&](const FileDescriptor* file) -> void {
     for (int j = 0; j < file->message_type_count(); j++) {
       auto message_type = file->message_type(j);
-      ideal_mapping.insert(std::make_pair(
-        message_type->full_name(), message_type->name()));
+      pick_name(message_type->full_name(), message_type->name());
     }
     
     for (int j = 0; j < file->enum_type_count(); j++) {
       auto enum_type = file->enum_type(j);
-      ideal_mapping.insert(std::make_pair(
-        enum_type->full_name(), enum_type->name()));
+      pick_name(enum_type->full_name(), enum_type->name());
     }
   };
 
@@ -3941,7 +4020,7 @@ TypeNames TypeNames::Es6TypeNames(
   register_types(codegen_file);
 
   // TODO(reddaly): Replace conflicting identifiers.
-  return TypeNames(options, codegen_file, ideal_mapping);
+  return TypeNames(options, codegen_file, full_name_to_alias);
 }
 
 /**
@@ -3993,6 +4072,13 @@ std::string TypeNames::JsExpression(const std::string& full_name) const {
   return std::string("INVALID TYPE NAME ") + full_name;
 }
 
+std::string TypeNames::JsName(const std::string& full_name) {
+  // TODO(reddaly): There should probably be some logic to rename messages that
+  // conflict with reserved names, right?
+  auto parts = google::protobuf::Split(full_name, ".", false);
+  return parts[parts.size()-1];
+}
+
 /**
  * Returns the import alias for all the top-level messages and enums
  * in the given dependency file.
@@ -4003,7 +4089,13 @@ std::vector<std::string> ImportAliases(
   std::vector<std::string> out;
   for (int j = 0; j < dep_file.message_type_count(); j++) {
     auto message_type = dep_file.message_type(j);
-    out.push_back(type_names.JsExpression(*message_type));
+    auto alias = type_names.JsExpression(*message_type);
+    auto exported_name = TypeNames::JsName(message_type->full_name());
+    if (alias == exported_name) {
+      out.push_back(alias);
+    } else {
+      out.push_back(exported_name + " as " + alias);
+    }
   }
   
   for (int j = 0; j < dep_file.enum_type_count(); j++) {
@@ -4030,7 +4122,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
       std::string aliases_comma_delimited =
         google::protobuf::JoinStrings(
           ImportAliases(type_names, *file->dependency(i)),
-          ",");
+          ", ");
       const std::string& name = file->dependency(i)->name();
       printer->Print(
           "import {$aliases$} from \"$file$\"; // proto import: \"$proto_filename$\"\n",

@@ -169,6 +169,14 @@ public:
   static TypeNames NonEs6TypeNames(const GeneratorOptions& options);
 
   /**
+   * Returns the JavaScript expression that is exported by the ES6 module
+   * that defines the type with the given full name as obtained from the
+   * type descriptor. If the symbol is not directly exported by the
+   * ES6 module, the empty string should be returned.
+   */
+  static std::string JsName(const std::string& full_name);
+
+  /**
    * Returns the JavaScript expression for referring to the passed message type.
    */
   std::string JsExpression(const google::protobuf::Descriptor& desc) const;
@@ -191,7 +199,8 @@ private:
     const std::map<std::string, std::string>& map) :
     options(options_),
     codegen_file(codegen_file_),
-    map_(map) {}
+    map_(map),
+    exported_names_(ExportedNamesOfDeps(codegen_file_)) {}
 
   GeneratorOptions options;
 
@@ -206,6 +215,11 @@ private:
   // type within the generated code.
   std::map<std::string, std::string> map_;
 
+  // For each top-level messages or enum in each dependency file, there should
+  // be an entry in this map from full name to the exported name of the
+  // corresponding class.
+  std::map<std::string, std::string> exported_names_;
+
   // True for non-ES6 mode. Use dot-delimited identifiers to refer
   // to protos. e.g., "proto.foo.bar.Baz.Bim" for nested message Bim
   // within message Baz within package "foo.bar".
@@ -217,6 +231,14 @@ private:
    * descriptor).
    */
   std::string JsExpression(const std::string& full_name) const;
+
+  /**
+   * For each top-level messages or enum in each dependency file, there should
+   * be an entry in the returned map from full name to the exported name of the
+   * corresponding class definition.
+  */
+  static std::map<std::string, std::string> ExportedNamesOfDeps(
+    const FileDescriptor* codegen_file);
 };
 
 // CodeGenerator implementation which generates a JavaScript source file and
