@@ -1,0 +1,128 @@
+name: Build, Test and Release
+
+on: push
+
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 16
+          cache: ${{ !env.ACT && 'npm' || '' }} # cache API not available in ACT
+          cache-dependency-path: |
+            package-lock.json
+            .github/actions/setup-protoc-env/package-lock.json
+
+      - uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm ci --omit=dev
+        working-directory: .github/actions/setup-protoc-env
+
+      - name: Setup protoc environment
+        uses: ./.github/actions/setup-protoc-env
+
+      - uses: bazelbuild/setup-bazelisk@v2
+        if: ${{ !env.ACT }} # cache API not available in ACT
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: npm ci
+
+      - run: npm run test
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: js
+          path: |
+            google-protobuf.js
+            google
+
+  package:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        cpu:
+          - k8
+        # would need some kind of CROSSTOOL chain to build the other architectures
+        # or we'd have to use the https://github.com/uraimo/run-on-arch-action (which lacks support for x86_32) to build these
+#          - x86_32
+#          - systemz
+#          - aarch64
+#          - ppc64
+        include:
+          # to ensure backwards compatibility as long as possible, use earliest versions of OS available on Github Actions
+          - os: windows-2019
+            cpu: x64_windows
+            bazel_target: dist_zip
+          - os: windows-2019
+            cpu: x64_x86_windows
+            bazel_target: dist_zip
+          - os: macos-11
+            cpu: darwin_arm64
+          - os: macos-11
+            cpu: darwin_x86_64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        if: ${{ !env.ACT }}
+        with:
+          name: js
+
+      - uses: bazelbuild/setup-bazelisk@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: mkdir out
+
+        # setup-bazelisk fails when running in ACT because the cache is not available so we need to ignore to let the bazel step run
+      - if: success() || env.ACT && failure()
+        run: bazel build --cpu=${{ matrix.cpu }} ${{ matrix.bazel_target || 'dist_all' }}
+        shell: bash
+
+      # need to copy to output directory as `bazel-bin` is a symlink and cannot be read by the actions/upload-artifact action
+      - run: cp bazel-bin/protobuf-javascript-* out/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: releases
+          path: out
+
+  release:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: releases
+
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: protobuf-javascript-*
+          file_glob: true
+          tag: ${{ github.ref }}
+          overwrite: true

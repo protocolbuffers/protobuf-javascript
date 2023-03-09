@@ -16,9 +16,15 @@ config_setting(
     values = {"cpu": "x64_windows"},
 )
 
+config_setting(
+    name = "k8",
+    values = {"cpu": "k8"},
+)
+
 package_naming(
     name = "protobuf_javascript_pkg_naming",
     platform = select({
+        ":k8": "linux-x86_64", # currently the only supported build type in Github Actions
         ":x64_x86_windows": "win32",
         ":x64_windows": "win64",
         "//conditions:default": ""
