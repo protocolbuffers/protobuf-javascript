@@ -6,8 +6,23 @@ load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_files", "strip_prefix")
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//:protobuf_javascript_release.bzl", "package_naming")
 
+config_setting(
+    name = "x64_x86_windows",
+    values = {"cpu": "x64_x86_windows"},
+)
+
+config_setting(
+    name = "x64_windows",
+    values = {"cpu": "x64_windows"},
+)
+
 package_naming(
     name = "protobuf_javascript_pkg_naming",
+    platform = select({
+        ":x64_x86_windows": "win32",
+        ":x64_windows": "win64",
+        "//conditions:default": ""
+    })
 )
 
 pkg_files(

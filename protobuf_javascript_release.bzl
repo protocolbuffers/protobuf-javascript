@@ -10,6 +10,10 @@ def _package_naming_impl(ctx):
   values = {}
   values["version"] = _PROTOBUF_JAVASCRIPT_VERSION
 
+  if ctx.attr.platform != "":
+    values["platform"] = ctx.attr.platform
+    return PackageVariablesInfo(values=values)
+
   # infer from the current cpp toolchain.
   toolchain = find_cpp_toolchain(ctx)
   cpu = toolchain.cpu
@@ -46,6 +50,7 @@ package_naming = rule(
         "_cc_toolchain":
             attr.label(
                 default=Label("@bazel_tools//tools/cpp:current_cc_toolchain"),),
+        "platform": attr.string(),
     },
     toolchains=["@bazel_tools//tools/cpp:toolchain_type"],
     incompatible_use_toolchain_transition=True,
