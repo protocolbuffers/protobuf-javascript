@@ -27,7 +27,7 @@ package_naming(
         ":k8": "linux-x86_64", # currently the only supported build type in Github Actions
         ":x64_x86_windows": "win32",
         ":x64_windows": "win64",
-        "//conditions:default": ""
+        "//conditions:default": "" # continues with current behavior when no --cpu is specified allowing existing internal builds to function
     })
 )
 

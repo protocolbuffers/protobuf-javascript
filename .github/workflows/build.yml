@@ -56,27 +56,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest ]
-        cpu:
-          - k8
-        # would need some kind of CROSSTOOL chain to build the other architectures
-        # or we'd have to use the https://github.com/uraimo/run-on-arch-action (which lacks support for x86_32) to build these
+# for now I'm disabling linux building as we don't have the tooling to support it
+#        os: [ ubuntu-latest ]
+#        cpu:
+#          - k8  # this build 'linux-x86_64', is currently working but not useful without the other architectures
+# would need some kind of CROSSTOOL chain to build the other architectures
+# or we'd have to use the https://github.com/uraimo/run-on-arch-action (which lacks support for x86_32) to build these
 #          - x86_32
 #          - systemz
 #          - aarch64
 #          - ppc64
         include:
-          # to ensure backwards compatibility as long as possible, use earliest versions of OS available on Github Actions
+# to ensure backwards compatibility as long as possible, use earliest versions of OSs available on Github Actions
           - os: windows-2019
             cpu: x64_windows
             bazel_target: dist_zip
           - os: windows-2019
             cpu: x64_x86_windows
             bazel_target: dist_zip
-          - os: macos-11
-            cpu: darwin_arm64
-          - os: macos-11
-            cpu: darwin_x86_64
+# disabling Mac OS releases for now since they are working through existing build process
+#          - os: macos-11
+#            cpu: darwin_arm64
+#          - os: macos-11
+#            cpu: darwin_x86_64
 
     steps:
       - uses: actions/checkout@v3
