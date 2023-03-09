@@ -3266,7 +3266,7 @@ void Generator::GenerateClassDeserializeBinary(const GeneratorOptions& options,
   // TODO(cfallin): Handle lazy decoding when requested by field option and/or
   // by default for 'bytes' fields and packed repeated fields.
 
-  const std::string classSymbol = GetMessagePath(options, desc);
+  const std::string classSymbol = desc->name();
 
   printer->Print(
       "/**\n"
@@ -3275,12 +3275,12 @@ void Generator::GenerateClassDeserializeBinary(const GeneratorOptions& options,
       " * @return {!$class$}\n"
       " */\n",
       "class", classSymbol);
-  GenerateMethodStart(options, printer, classSymbol.c_str(), "deserializeBinary");
   printer->Print(
-      "(bytes) {\n"
+      "$methodstart$(bytes) {\n"
       "  var reader = new jspb.BinaryReader(bytes);\n"
       "  var msg = new $class$;\n"
       "  return $class$.deserializeBinaryFromReader(msg, reader);\n",
+      "methodstart", this->MethodStartStatic(options, classSymbol.c_str(), "deserializeBinary"),
       "class", classSymbol);
 
   GenerateMethodEnd(options, printer);
@@ -3297,15 +3297,15 @@ printer->Print(
       " * @return {!$class$}\n"
       " */\n",
       "class", classSymbol);
-  GenerateMethodStart(options, printer, classSymbol.c_str(), "deserializeBinaryFromReader");
   printer->Print(
-      "(msg, reader) {\n"
+      "$methodstart$(msg, reader) {\n"
       "  while (reader.nextField()) {\n"
       "    if (reader.isEndGroup()) {\n"
       "      break;\n"
       "    }\n"
       "    var field = reader.getFieldNumber();\n"
-      "    switch (field) {\n");
+      "    switch (field) {\n",
+      "methodstart", MethodStartStatic(options, classSymbol.c_str(), "deserializeBinaryFromReader"));
 
   for (int i = 0; i < desc->field_count(); i++) {
     if (!IgnoreField(desc->field(i))) {
@@ -3442,19 +3442,19 @@ void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
                                              io::Printer* printer,
                                              const Descriptor* desc) const {
 
-  const std::string classSymbol = GetMessagePath(options, desc);
+  const std::string classSymbol = desc->name();
 
   printer->Print(
       "/**\n"
       " * Serializes the message to binary data (in protobuf wire format).\n"
       " * @return {!Uint8Array}\n"
       " */\n");
-  GenerateMethodStart(options, printer, classSymbol.c_str(), "serializeBinary");
   printer->Print(
-      "() {\n"
+      "$methodstart$() {\n"
       "  var writer = new jspb.BinaryWriter();\n"
-      "  $class$.serializeBinaryToWriter(this, writer);\n"
+      "  this.constructor.serializeBinaryToWriter(this, writer);\n"
       "  return writer.getResultBuffer();\n",
+      "methodstart", MethodStart(options, classSymbol.c_str(), "serializeBinary"),
       "class", classSymbol);
 
   GenerateMethodEnd(options, printer);
@@ -3468,12 +3468,11 @@ void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
       " * @param {!$class$} message\n"
       " * @param {!jspb.BinaryWriter} writer\n"
       " * @suppress {unusedLocalVariables} f is only used for nested messages\n"
-      " */\n",
+      " */\n"
+      "$methodstart$(message, writer) {\n"
+      "  var f = undefined;\n",
+      "methodstart", MethodStartStatic(options, classSymbol.c_str(), "serializeBinaryToWriter"),
       "class", classSymbol);
-  GenerateMethodStart(options, printer, classSymbol.c_str(), "serializeBinaryToWriter");
-  printer->Print(
-      "(message, writer) {\n"
-      "  var f = undefined;\n");
 
 for (int i = 0; i < desc->field_count(); i++) {
     if (!IgnoreField(desc->field(i))) {
