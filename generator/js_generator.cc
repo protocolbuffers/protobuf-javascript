@@ -3615,8 +3615,14 @@ void Generator::GenerateClassSerializeBinaryField(
 void Generator::GenerateEnum(const GeneratorOptions& options,
                              io::Printer* printer,
                              const EnumDescriptor* enumdesc) const {
+
+  const bool is_toplevel = enumdesc->containing_type() == nullptr;
+  const std::string enumNamePrefix = is_toplevel ? "export const " : "";
+
+  // TODO(reddaly): If the enum is defined at top-level, we need
+  // 'const <EnumName> = ' instead of '<EnumType> = '
   const std::string enumNameForDefinition = options.WantEs6() ? (
-    enumdesc->name()
+    enumNamePrefix + enumdesc->name()
   ) : (
     GetEnumPathPrefix(options, enumdesc) + enumdesc->name()
   );
