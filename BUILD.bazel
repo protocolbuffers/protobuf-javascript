@@ -6,8 +6,29 @@ load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_files", "strip_prefix")
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//:protobuf_javascript_release.bzl", "package_naming")
 
+config_setting(
+    name = "x64_x86_windows",
+    values = {"cpu": "x64_x86_windows"},
+)
+
+config_setting(
+    name = "x64_windows",
+    values = {"cpu": "x64_windows"},
+)
+
+config_setting(
+    name = "k8",
+    values = {"cpu": "k8"},
+)
+
 package_naming(
     name = "protobuf_javascript_pkg_naming",
+    platform = select({
+        ":k8": "linux-x86_64", # currently the only supported build type in Github Actions
+        ":x64_x86_windows": "win32",
+        ":x64_windows": "win64",
+        "//conditions:default": "" # continues with current behavior when no --cpu is specified allowing existing internal builds to function
+    })
 )
 
 pkg_files(

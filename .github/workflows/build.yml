@@ -1,0 +1,134 @@
+name: Build, Test and Release
+
+on: push
+
+permissions: read-all
+
+# update in build.yml and codeql.yml at same time
+env:
+  PROTOC_VERSION: 21.3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      PROTOC: protoc-release/bin/protoc
+      PROTOC_INC: protoc-release/include
+      PROTOC_PLATFORM: linux-x86_64
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: 16
+          cache: ${{ !env.ACT && 'npm' || '' }} # cache API not available in ACT
+
+      - uses: bazelbuild/setup-bazelisk@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Protoc
+        run: |
+          echo "Fetching protoc"
+          curl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            -L https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip \
+            --output protoc-release.zip
+          unzip protoc-release.zip -d protoc-release
+          rm protoc-release.zip
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: js
+          path: |
+            google-protobuf.js
+            google
+
+  package:
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+# for now I'm disabling linux building as we don't have the tooling to support it
+#        os: [ ubuntu-latest ]
+#        cpu:
+#          - k8  # this build 'linux-x86_64', is currently working but not useful without the other architectures
+# would need some kind of CROSSTOOL chain to build the other architectures
+# or we'd have to use the https://github.com/uraimo/run-on-arch-action (which lacks support for x86_32) to build these
+#          - x86_32
+#          - systemz
+#          - aarch64
+#          - ppc64
+        include:
+# to ensure backwards compatibility as long as possible, use earliest versions of OSs available on Github Actions
+          - os: windows-2019
+            cpu: x64_windows
+            bazel_target: dist_zip
+          - os: windows-2019
+            cpu: x64_x86_windows
+            bazel_target: dist_zip
+# disabling Mac OS releases for now since they are working through existing build process
+#          - os: macos-11
+#            cpu: darwin_arm64
+#          - os: macos-11
+#            cpu: darwin_x86_64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        if: ${{ !env.ACT }}
+        with:
+          name: js
+
+      - uses: bazelbuild/setup-bazelisk@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: mkdir out
+
+        # setup-bazelisk fails when running in ACT because the cache is not available so we need to ignore to let the bazel step run
+      - if: success() || env.ACT && failure()
+        run: bazel build --cpu=${{ matrix.cpu }} ${{ matrix.bazel_target || 'dist_all' }}
+        shell: bash
+
+      # need to copy to output directory as `bazel-bin` is a symlink and cannot be read by the actions/upload-artifact action
+      - run: cp bazel-bin/protobuf-javascript-* out/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: releases
+          path: out
+
+  release:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: releases
+
+      - name: Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: protobuf-javascript-*
+          file_glob: true
+          tag: ${{ github.ref }}
+          overwrite: true

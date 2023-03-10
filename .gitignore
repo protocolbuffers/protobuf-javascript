@@ -1,5 +1,5 @@
 .idea
-/node_modules/
+node_modules
 commonjs_out
 google/protobuf
 bazel-*
