@@ -1168,7 +1168,7 @@ static const char* kOneofGroupArrayName = "oneofGroups_";
 std::string OneofFieldsArrayName(const GeneratorOptions& options,
                                  const Descriptor* desc) {
   return HasOneofFields(desc)
-             ? (GetMessagePath(options, desc) + "." + kOneofGroupArrayName)
+             ? (desc->name() + "." + kOneofGroupArrayName)
              : "null";
 }
 
@@ -3177,7 +3177,9 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
 }
 
 void Generator::GenerateRepeatedMessageHelperMethods(
-    const GeneratorOptions& options, const TypeNames& type_names, io::Printer* printer,
+    const GeneratorOptions& options,
+    const TypeNames& type_names,
+    io::Printer* printer,
     const FieldDescriptor* field) const {
 
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
