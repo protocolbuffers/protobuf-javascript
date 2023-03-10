@@ -3622,7 +3622,7 @@ void Generator::GenerateEnum(const GeneratorOptions& options,
                              const EnumDescriptor* enumdesc) const {
 
   const bool is_toplevel = enumdesc->containing_type() == nullptr;
-  const std::string enumNamePrefix = is_toplevel ? "export const " : "";
+  const std::string enumNamePrefix = is_toplevel ? "export const " : "static ";
 
   // TODO(reddaly): If the enum is defined at top-level, we need
   // 'const <EnumName> = ' instead of '<EnumType> = '
