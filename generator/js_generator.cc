@@ -1150,7 +1150,7 @@ static const char* kRepeatedFieldArrayName = "repeatedFields_";
 std::string RepeatedFieldsArrayName(const GeneratorOptions& options,
                                     const Descriptor* desc) {
   return HasRepeatedFields(options, desc)
-             ? (GetMessagePath(options, desc) + "." + kRepeatedFieldArrayName)
+             ? (desc->name() + "." + kRepeatedFieldArrayName)
              : "null";
 }
 
@@ -2873,7 +2873,7 @@ const char * methodEndBrace = options.WantEs6() ? "}" : "};";
         "\n");
 
     if (field->is_repeated()) {
-      GenerateRepeatedMessageHelperMethods(options, printer, field);
+      GenerateRepeatedMessageHelperMethods(options, type_names, printer, field);
     }
 
   } else {
@@ -3177,7 +3177,7 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
 }
 
 void Generator::GenerateRepeatedMessageHelperMethods(
-    const GeneratorOptions& options, io::Printer* printer,
+    const GeneratorOptions& options, const TypeNames& type_names, io::Printer* printer,
     const FieldDescriptor* field) const {
 
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
@@ -3202,13 +3202,13 @@ void Generator::GenerateRepeatedMessageHelperMethods(
 
   printer->Annotate("addername", field);
   printer->Print(
-      "this, $index$$oneofgroup$, opt_value, $ctor$, opt_index);\n"
+      "this, $index$$oneofgroup$, opt_value, $class$, opt_index);\n"
       "};\n"
       "\n"
       "\n",
       "index", JSFieldIndex(field), "oneofgroup",
-      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""), "ctor",
-      GetMessagePath(options, field->message_type()));
+      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""), "class",
+      type_names.SubmessageTypeRef(field));
 }
 
 void Generator::GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
