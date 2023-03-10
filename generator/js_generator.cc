@@ -2259,7 +2259,7 @@ void Generator::GenerateOneofCaseDefinition(
   const std::string className = GetMessagePath(options, oneof->containing_type());
 
   const std::string oneofCaseName = options.WantEs6() ? (
-    JSOneofName(oneof) + "Case"
+    "static " + JSOneofName(oneof) + "Case"
   ) : (
     className + "." + JSOneofName(oneof) + "Case"
   );
