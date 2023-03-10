@@ -3956,6 +3956,22 @@ void ReservedForLocalIdentifiers(const FileDescriptor* desc, std::set<std::strin
   }
 }
 
+/**
+ * ReservedForLocalIdentifiers computes the set of symbols that should not be
+ * used for imports because they might conflict with definitions (class names,
+ * etc.).
+void RegisterTypesDefinedInGeneratedFile(
+  const FileDescriptor* desc,
+  std::map<std::string, std::string>& full_name_to_alias) {
+  for (int j = 0; j < desc->message_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->message_type(j), reserved_identifiers);
+  }
+  for (int j = 0; j < desc->enum_type_count(); j++) {
+    ReservedForLocalIdentifiers(desc->enum_type(j), reserved_identifiers);
+  }
+}
+ */
+
 TypeNames TypeNames::Es6TypeNames(
   const GeneratorOptions& options,
   const FileDescriptor* codegen_file) {
@@ -3965,6 +3981,7 @@ TypeNames TypeNames::Es6TypeNames(
   // Local aliases that are already reserved
   std::set<std::string> reserved_aliases;
   ReservedForLocalIdentifiers(codegen_file, reserved_aliases);
+  //RegisterTypesDefinedInGeneratedFile(codegen_file, full_name_to_alias);
 
   auto pick_name = [&](const std::string full_name, const std::string ideal_name) -> void {
     std::string base_candidate = ideal_name;
@@ -3990,21 +4007,37 @@ TypeNames TypeNames::Es6TypeNames(
   auto register_types = [&](const FileDescriptor* file) -> void {
     for (int j = 0; j < file->message_type_count(); j++) {
       auto message_type = file->message_type(j);
-      pick_name(message_type->full_name(), message_type->name());
+      if (file == codegen_file) {
+        // Ensure that messages and enums declared at top level in the .proto
+        // file corresponding to the currently generaed code get identifiers
+        // equal to their message identifiers.
+        // reserved_aliases was already updated.
+        full_name_to_alias.insert(std::make_pair(message_type->full_name(), message_type->name()));
+      } else {
+        pick_name(message_type->full_name(), message_type->name());
+      }
     }
     
     for (int j = 0; j < file->enum_type_count(); j++) {
       auto enum_type = file->enum_type(j);
+      if (file == codegen_file) {
+        // Ensure that messages and enums declared at top level in the .proto
+        // file corresponding to the currently generaed code get identifiers
+        // equal to their message identifiers.
+        // reserved_aliases was already updated.
+        full_name_to_alias.insert(std::make_pair(enum_type->full_name(), enum_type->name()));
+      } else {
       pick_name(enum_type->full_name(), enum_type->name());
+      }
     }
   };
 
+  register_types(codegen_file);
   // Loop through all dependencies and add their types.
   for (int i = 0; i < codegen_file->dependency_count(); i++) {
     auto dep_file = codegen_file->dependency(i);
     register_types(dep_file);
   }
-  register_types(codegen_file);
 
   // TODO(reddaly): Replace conflicting identifiers.
   return TypeNames(options, codegen_file, full_name_to_alias);
