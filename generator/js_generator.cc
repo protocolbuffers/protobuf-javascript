@@ -3134,14 +3134,16 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
     const FieldDescriptor* field, bool untyped) const {
   
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
-  const std::string adderName = JSGetterName(options, field, BYTES_DEFAULT,
-                           /* drop_list = */ true);
+  const std::string adderName = std::string("add") + 
+    JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
   const std::string adderMethodStart = MethodStart(
     options, classSymbol.c_str(), adderName.c_str());
 
   // clang-format off
   printer->Print(
       "/**\n"
+      " * Adds a value to the repeated field $field_name$ \n"
+      " *\n"
       " * @param {$optionaltype$} value\n"
       " * @param {number=} opt_index\n"
       " * @return {!$class$} returns this\n"
@@ -3150,9 +3152,8 @@ void Generator::GenerateRepeatedPrimitiveHelperMethods(
       "  return jspb.Message.addToRepeatedField(this, "
       "$index$",
       "methodstart", adderMethodStart,
-      "class", classSymbol, "addername",
-      "add" + JSGetterName(options, field, BYTES_DEFAULT,
-                           /* drop_list = */ true),
+      "class", classSymbol,
+      "addername", adderName,
       "optionaltype",
           JSFieldTypeAnnotation(
                                 options, field,
@@ -3183,23 +3184,26 @@ void Generator::GenerateRepeatedMessageHelperMethods(
     const FieldDescriptor* field) const {
 
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
-  const std::string adderName = JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
+  const std::string adderName = std::string("add") + 
+    JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
   const std::string adderMethodStart = MethodStart(
     options, classSymbol.c_str(), adderName.c_str());
 
   printer->Print(
       "/**\n"
+      " * Adds a value to the repeated field $field_name$ \n"
+      " *\n"
       " * @param {!$optionaltype$=} opt_value\n"
       " * @param {number=} opt_index\n"
       " * @return {!$optionaltype$}\n"
       " */\n"
       "$methodstart$(opt_value, opt_index) {\n"
       "  return jspb.Message.addTo$repeatedtag$WrapperField(",
-      "optionaltype", JSTypeName(options, field, BYTES_DEFAULT), "class", classSymbol,
+      "optionaltype", JSTypeName(options, field, BYTES_DEFAULT),
+      "field_name", field->name(),
+      "class", classSymbol,
       "methodstart", adderMethodStart,
-      "addername",
-      "add" + JSGetterName(options, field, BYTES_DEFAULT,
-                           /* drop_list = */ true),
+      "addername", adderName,
       "repeatedtag", (field->is_repeated() ? "Repeated" : ""));
 
   printer->Annotate("addername", field);
@@ -3209,8 +3213,8 @@ void Generator::GenerateRepeatedMessageHelperMethods(
       "\n"
       "\n",
       "index", JSFieldIndex(field), "oneofgroup",
-      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""), "class",
-      type_names.SubmessageTypeRef(field));
+      (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""),
+      "class", type_names.SubmessageTypeRef(field));
 }
 
 void Generator::GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
