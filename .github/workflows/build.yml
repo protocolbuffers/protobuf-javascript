@@ -4,9 +4,18 @@ on: push
 
 permissions: read-all
 
+# update in build.yml and codeql.yml at same time
+env:
+  PROTOC_VERSION: 21.3
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      PROTOC: protoc-release/bin/protoc
+      PROTOC_INC: protoc-release/include
+      PROTOC_PLATFORM: linux-x86_64
 
     steps:
 
@@ -17,28 +26,23 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           node-version: 16
           cache: ${{ !env.ACT && 'npm' || '' }} # cache API not available in ACT
-          cache-dependency-path: |
-            package-lock.json
-            .github/actions/setup-protoc-env/package-lock.json
-
-      - uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: npm ci --omit=dev
-        working-directory: .github/actions/setup-protoc-env
-
-      - name: Setup protoc environment
-        uses: ./.github/actions/setup-protoc-env
 
       - uses: bazelbuild/setup-bazelisk@v2
-        if: ${{ !env.ACT }} # cache API not available in ACT
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Protoc
+        run: |
+          echo "Fetching protoc"
+          curl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            -L https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip \
+            --output protoc-release.zip
+          unzip protoc-release.zip -d protoc-release
+          rm protoc-release.zip
+
       - run: npm ci
 
-      - run: npm run test
+      - run: npm test
 
       - run: npm run build
 

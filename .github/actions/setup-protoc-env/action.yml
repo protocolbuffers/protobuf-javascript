@@ -1,5 +1,0 @@
-name: 'Setup the protoc environment'
-description: 'Setup the protoc environment with the right PROTOC and PROTOC_INC environment variables'
-runs:
-  using: 'node16'
-  main: 'index.js'
