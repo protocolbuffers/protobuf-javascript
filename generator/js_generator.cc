@@ -4069,7 +4069,7 @@ std::string TypeNames::SubmessageTypeRef(const FieldDescriptor* field) const {
   GOOGLE_CHECK(this->codegen_file == nullptr ||
                this->codegen_file == field->file());
   GOOGLE_CHECK_NOTNULL(field->message_type());
-  return JsExpression(*field->message_type()) + "/* message_type =  " + field->message_type()->DebugString() +"  */";
+  return JsExpression(*field->message_type());
 }
 
 std::string TypeNames::JsExpression(const std::string& full_name) const {
