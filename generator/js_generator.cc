@@ -1854,7 +1854,7 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
                                      std::set<std::string>* provided,
                                      bool require_jspb, bool require_extension,
                                      bool require_map) const {
-                                      
+
   if (options.WantEs6()) {
     // In ES6 mode, imports are handled by GenerateFile and
     // goog.* isn't used.
@@ -2044,7 +2044,7 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
     return;
   }
 
-  
+
   std::string prefix = (desc->containing_type() == nullptr) ?
     "export " : ("static " + desc->name() + " = ");
 
@@ -2068,11 +2068,11 @@ void Generator::GenerateClassEs6(const GeneratorOptions& options,
     "$prefix$class $classname$ extends jspb.Message {\n",
     "prefix", prefix,
     "classname", desc->name());
-  
+
   printer->Indent();
 
   GenerateClassConstructor(options, printer, desc);
-  
+
   GenerateClassFieldInfo(options, printer, desc);
 
   GenerateClassToObject(options, type_names, printer, desc);
@@ -2255,7 +2255,7 @@ void Generator::GenerateClassXid(const GeneratorOptions& options,
 void Generator::GenerateOneofCaseDefinition(
     const GeneratorOptions& options, io::Printer* printer,
     const OneofDescriptor* oneof) const {
-  
+
   const std::string className = GetMessagePath(options, oneof->containing_type());
 
   const std::string oneofCaseName = options.WantEs6() ? (
@@ -2294,7 +2294,7 @@ void Generator::GenerateOneofCaseDefinition(
       " */\n",
       "class", className,
       "oneof", JSOneofName(oneof));
-  
+
   GenerateMethodStart(options, printer, className.c_str(),
     (std::string("get") + JSOneofName(oneof) + "Case").c_str());
 
@@ -2319,7 +2319,7 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
   const char * if_guard_start = options.WantEs6() ? "" : "if (jspb.Message.GENERATE_TO_OBJECT) {\n";
   const char * if_guard_end = options.WantEs6() ? "" : "}\n";
   const std::string classSymbol = options.WantEs6() ? desc->name() : GetMessagePath(options, desc);
-  
+
   printer->Print(
       "\n"
       "\n"
@@ -2742,7 +2742,7 @@ const char * methodEndBrace = options.WantEs6() ? "}" : "};";
         "fielddef", FieldDefinition(options, field),
         "keytype", key_type,
         "valuetype", value_type);
-    
+
     // Function start
     if (options.import_style == GeneratorOptions::kImportEs6) {
         printer->Print(
@@ -2981,12 +2981,12 @@ const char * methodEndBrace = options.WantEs6() ? "}" : "};";
           "value);\n",
           "typetag", JSTypeTag(field),
           "index", JSFieldIndex(field));
-      
+
       GenerateMethodEnd(options, printer);
       printer->Print(
           "\n"
           "\n");
-      
+
       // DO NOT SUBMIT: Can the Annotate call be safely removed?
       // printer->Annotate("settername", field);
 
@@ -3132,9 +3132,9 @@ const char * methodEndBrace = options.WantEs6() ? "}" : "};";
 void Generator::GenerateRepeatedPrimitiveHelperMethods(
     const GeneratorOptions& options, io::Printer* printer,
     const FieldDescriptor* field, bool untyped) const {
-  
+
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
-  const std::string adderName = std::string("add") + 
+  const std::string adderName = std::string("add") +
     JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
   const std::string adderMethodStart = MethodStart(
     options, classSymbol.c_str(), adderName.c_str());
@@ -3184,7 +3184,7 @@ void Generator::GenerateRepeatedMessageHelperMethods(
     const FieldDescriptor* field) const {
 
   const std::string classSymbol = GetMessagePath(options, field->containing_type());
-  const std::string adderName = std::string("add") + 
+  const std::string adderName = std::string("add") +
     JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true);
   const std::string adderMethodStart = MethodStart(
     options, classSymbol.c_str(), adderName.c_str());
@@ -3975,7 +3975,7 @@ void RegisterTypesDefinedInGeneratedFile(
 TypeNames TypeNames::Es6TypeNames(
   const GeneratorOptions& options,
   const FileDescriptor* codegen_file) {
-  
+
   // Full proto name -> local alias in JS codegen file.
   std::map<std::string, std::string> full_name_to_alias;
   // Local aliases that are already reserved
@@ -4017,7 +4017,7 @@ TypeNames TypeNames::Es6TypeNames(
         pick_name(message_type->full_name(), message_type->name());
       }
     }
-    
+
     for (int j = 0; j < file->enum_type_count(); j++) {
       auto enum_type = file->enum_type(j);
       if (file == codegen_file) {
@@ -4069,7 +4069,7 @@ std::string TypeNames::SubmessageTypeRef(const FieldDescriptor* field) const {
   GOOGLE_CHECK(this->codegen_file == nullptr ||
                this->codegen_file == field->file());
   GOOGLE_CHECK_NOTNULL(field->message_type());
-  return JsExpression(*field->message_type());
+  return JsExpression(*field->message_type()) + "/* message_type =  " + field->message_type()->DebugString() +"  */";
 }
 
 std::string TypeNames::JsExpression(const std::string& full_name) const {
@@ -4079,15 +4079,14 @@ std::string TypeNames::JsExpression(const std::string& full_name) const {
   if (iter != this->map_.end()) {
     return iter->second;
   }
-  // See if the parent full_name is available.
+  // See if the parent full_name is available. If it is, use it as the prefix.
   auto parts = google::protobuf::Split(full_name, ".", false);
   if (parts.size() > 1) {
-    // uh oh... not sure how this happend.
     std::vector<std::string> parent_parts = {parts.begin(), parts.end() - 1};
     auto parent_path = google::protobuf::JoinStrings(
       parent_parts,
       ".");
-    return this->JsExpression(parent_path);
+    return this->JsExpression(parent_path) + "." + parts[parts.size() - 1];
   }
   return std::string("INVALID TYPE NAME ") + full_name;
 }
@@ -4117,7 +4116,7 @@ std::vector<std::string> ImportAliases(
       out.push_back(exported_name + " as " + alias);
     }
   }
-  
+
   for (int j = 0; j < dep_file.enum_type_count(); j++) {
     auto enum_type = dep_file.enum_type(j);
     out.push_back(type_names.JsExpression(*enum_type));
