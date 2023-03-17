@@ -2302,7 +2302,7 @@ void Generator::GenerateOneofCaseDefinition(
       "() {\n"
       "  return /** @type {$class$.$oneof$Case} */(jspb.Message."
       "computeOneofCase(this, $class$.oneofGroups_[$oneofindex$]));\n",
-      "class", className,
+      "class", oneof->containing_type()->name(),
       "oneof", JSOneofName(oneof),
       "oneofindex", JSOneofIndex(oneof));
   GenerateMethodEnd(options, printer);
@@ -3109,7 +3109,7 @@ const char * methodEndBrace = options.WantEs6() ? "}" : "};";
   if (HasFieldPresence(options, field)) {
     const std::string haserName = "has" + JSGetterName(options, field);
     const std::string haserMethodStart = MethodStart(
-      options, classSymbol.c_str(), clearerName.c_str());
+      options, classSymbol.c_str(), haserName.c_str());
 
     printer->Print(
         "/**\n"
