@@ -92,13 +92,13 @@ For Closure imports, `protoc` will generate a single output file
 (`myproto_libs.js` in this example).  The generated file will `goog.provide()`
 all of the types defined in your .proto files.  For example, for the unit
 tests the generated files contain many `goog.provide` statements like:
-
+```js
     goog.provide('proto.google.protobuf.DescriptorProto');
     goog.provide('proto.google.protobuf.DescriptorProto.ExtensionRange');
     goog.provide('proto.google.protobuf.DescriptorProto.ReservedRange');
     goog.provide('proto.google.protobuf.EnumDescriptorProto');
     goog.provide('proto.google.protobuf.EnumOptions');
-
+```
 The generated code will also `goog.require()` many types in the core library,
 and they will require many types in the Google Closure library.  So make sure
 that your `goog.provide()` / `goog.require()` setup can find all of your
@@ -107,11 +107,11 @@ Google Closure library itself.
 
 Once you've done this, you should be able to import your types with
 statements like:
-
+```js
     goog.require('proto.my.package.MyMessage');
 
     var message = proto.my.package.MyMessage();
-
+```
 If unfamiliar with Closure or its compiler, consider reviewing
 [Closure documentation](https://developers.google.com/closure/library).
 
@@ -134,11 +134,11 @@ to build it first by running:
 
 Once you've done this, you should be able to import your types with
 statements like:
-
+```js
     var messages = require('./messages_pb');
 
     var message = new messages.MyMessage();
-
+```
 The `--js_out` flag
 -------------------
 
@@ -165,7 +165,7 @@ API
 
 The API is not well-documented yet.  Here is a quick example to give you an
 idea of how the library generally works:
-
+```js
     var message = new MyMessage();
 
     message.setName("John Doe");
@@ -176,6 +176,6 @@ idea of how the library generally works:
     var bytes = message.serializeBinary();
 
     var message2 = MyMessage.deserializeBinary(bytes);
-
+```
 For more examples, see the tests.  You can also look at the generated code
 to see what methods are defined for your generated messages.
