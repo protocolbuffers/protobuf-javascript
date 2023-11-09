@@ -27,20 +27,22 @@ To use Protocol Buffers with JavaScript, you need two main components:
    (look for the `protoc-*.zip` files under **Downloads**).
 
 
-Project Status as of September 2022
+Project Status as of November 2023
 ===
 
-This project is currently in a somewhat broken state that we are working to rectify. We expect to have updated releases by the end of September 2022.
+This project is currently in a working state.
 
 **Support Status**
 
-Protobuf JavaScript is widely used and well maintained internally at Google but does not currently have staffing for more than minimal support for this open source project.
+We currently do not have staffing for more than minimal support for this open
+source project. We will answer questions and triage any issues.
 
 **Contributing**
 
-Contributions should preserve existing behavior where possible.  Current customers rely on applications continuing to work across minor version upgrades.
+Contributions should preserve existing behavior where possible. Current
+customers rely on applications continuing to work across minor version upgrades.
+We encourage small targeted contributions. Thanks!
 
-We also currently have limited staffing for this project, as such we encourage small targeted contributions.  Thanks!
 
 Setup
 =====
