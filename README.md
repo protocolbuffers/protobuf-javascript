@@ -28,7 +28,7 @@ To use Protocol Buffers with JavaScript, you need two main components:
 
 
 
-Project Status as of November
+Project Status
 ===
 
 This project is currently in a working state.
