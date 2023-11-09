@@ -27,7 +27,8 @@ To use Protocol Buffers with JavaScript, you need two main components:
    (look for the `protoc-*.zip` files under **Downloads**).
 
 
-Project Status as of November 2023
+
+Project Status as of November
 ===
 
 This project is currently in a working state.
