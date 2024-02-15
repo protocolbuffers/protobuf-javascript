@@ -145,6 +145,7 @@ function getClosureCompilerCommand(exportsFile, outputFile) {
     '--js=binary/decoder.js',
     '--js=binary/encoder.js',
     '--js=binary/reader.js',
+    '--js=binary/utf8.js',
     '--js=binary/utils.js',
     '--js=binary/writer.js',
     `--js=${exportsFile}`,
@@ -194,7 +195,7 @@ function commonjs_out(cb) {
 
 function closure_make_deps(cb) {
   exec(
-      './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js binary/arith.js binary/constants.js binary/decoder.js binary/encoder.js binary/reader.js binary/utils.js binary/writer.js asserts.js debug.js map.js message.js node_loader.js test_bootstrap.js > deps.js',
+      './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js binary/arith.js binary/constants.js binary/decoder.js binary/encoder.js binary/reader.js binary/utf8.js binary/utils.js binary/writer.js asserts.js debug.js map.js message.js node_loader.js test_bootstrap.js > deps.js',
       make_exec_logging_callback(cb));
 }
 
