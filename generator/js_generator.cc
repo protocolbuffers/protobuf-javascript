@@ -1073,17 +1073,21 @@ std::string JSFieldTypeAnnotation(const GeneratorOptions& options,
   return jstype;
 }
 
-std::string JSBinaryReaderMethodType(const FieldDescriptor* field) {
+std::string JSBinaryMethodType(const FieldDescriptor* field, bool is_writer) {
   std::string name = field->type_name();
   if (name[0] >= 'a' && name[0] <= 'z') {
     name[0] = (name[0] - 'a') + 'A';
+  }
+  if (!is_writer && field->type() == FieldDescriptor::TYPE_STRING &&
+      field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3) {
+    name = name + "RequireUtf8";
   }
   return IsIntegralFieldWithStringJSType(field) ? (name + "String") : name;
 }
 
 std::string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
                                         bool is_writer) {
-  std::string name = JSBinaryReaderMethodType(field);
+  std::string name = JSBinaryMethodType(field, is_writer);
   if (field->is_packed()) {
     name = "Packed" + name;
   } else if (is_writer && field->is_repeated()) {
@@ -3128,11 +3132,11 @@ void Generator::GenerateClassDeserializeBinaryField(
       printer->Print(
           "      var values = /** @type {$fieldtype$} */ "
           "(reader.isDelimited() "
-          "? reader.readPacked$reader$() : [reader.read$reader$()]);\n",
+          "? reader.read$reader$() : [reader.read$reader$()]);\n",
           "fieldtype",
           JSFieldTypeAnnotation(options, field, false, true,
                                 /* singular_if_not_packed */ false, BYTES_U8),
-          "reader", JSBinaryReaderMethodType(field));
+          "reader", JSBinaryReadWriteMethodName(field, /* is_writer=*/false));
     } else {
       printer->Print(
           "      var value = /** @type {$fieldtype$} */ "

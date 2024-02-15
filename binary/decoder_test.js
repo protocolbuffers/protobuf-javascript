@@ -354,7 +354,7 @@ describe('binaryDecoderTest', () => {
 
     const decoder = jspb.BinaryDecoder.alloc(encoder.end());
 
-    expect(decoder.readString(len)).toEqual(long_string);
+    expect(decoder.readString(len, true)).toEqual(long_string);
   });
 
   /**
@@ -375,11 +375,11 @@ describe('binaryDecoderTest', () => {
 
     const decoder = jspb.BinaryDecoder.alloc(encoder.end());
 
-    expect(decoder.readString(ascii.length)).toEqual(ascii);
-    expect(utf8_two_bytes).toEqual(decoder.readString(utf8_two_bytes.length));
+    expect(decoder.readString(ascii.length, true)).toEqual(ascii);
+    expect(utf8_two_bytes).toEqual(decoder.readString(2, true));
     expect(utf8_three_bytes)
-        .toEqual(decoder.readString(utf8_three_bytes.length));
-    expect(utf8_four_bytes).toEqual(decoder.readString(utf8_four_bytes.length));
+      .toEqual(decoder.readString(3, true));
+    expect(utf8_four_bytes).toEqual(decoder.readString(4, true));
   });
 
   /**
