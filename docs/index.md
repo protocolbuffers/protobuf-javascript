@@ -4,8 +4,8 @@
 This page describes exactly what JavaScript code the protocol buffer compiler
 generates for any given protocol definition. Any differences between proto2 and
 proto3 generated code are highlighted. You should read the
-[proto2 language guide](https://developers.google.com/protocol-buffers/docs/proto) and/or the
-[proto3 language guide](https://developers.google.com/protocol-buffers/docs/proto3) before reading this document.
+[proto2 language guide](https://protobuf.dev/programming-guides/proto2/) and/or the
+[proto3 language guide](https://protobuf.dev/programming-guides/proto3/) before reading this document.
 
 ## Compiler Invocation
 The protocol buffer compiler produces JavaScript output when invoked with the
@@ -130,7 +130,7 @@ Your generated class has accessors for all its fields (which we'll look at in
 the following sections) and the following methods that apply to the entire
 message:
 
-* `toObject()`: Returns an object representation of the message, suitable for use in Soy templates. This method comes in static and instance versions. Field names that are [reserved in JavaScript]("http://www.w3schools.com/js/js_reserved.asp") are renamed to `pb_name`. If you don't want to generate this method (for instance, if you're not going to use it and are concerned about code size), set [jspb.Message.GENERATE_TO_OBJECT](https://github.com/protocolbuffers/protobuf-javascript/blob/59a828fc713538404dcc9de8f42b4abfcfa5eb7d/message.js#L174) to false before code generation. Note that this representation is not the same as [proto3's JSON representation](https://developers.google.com/protocol-buffers/docs/proto3#json).
+* `toObject()`: Returns an object representation of the message, suitable for use in Soy templates. This method comes in static and instance versions. Field names that are [reserved in JavaScript]("http://www.w3schools.com/js/js_reserved.asp") are renamed to `pb_name`. If you don't want to generate this method (for instance, if you're not going to use it and are concerned about code size), set [jspb.Message.GENERATE_TO_OBJECT](https://github.com/protocolbuffers/protobuf-javascript/blob/59a828fc713538404dcc9de8f42b4abfcfa5eb7d/message.js#L174) to false before code generation. Note that this representation is not the same as [proto3's JSON representation](https://protobuf.dev/programming-guides/proto3/#json).
 * `clone()`: Creates a deep clone of this message and its fields.
 
 The following methods are also provided if you have enabled the `binary`
@@ -149,7 +149,7 @@ is a singular, repeated, map, or oneof field.
 
 Note that the generated accessors always use camel-case naming, even if the
 field name in the `.proto` file uses lower-case with underscores
-([as it should](https://developers.google.com/protocol-buffers/docs/style)). The case-conversion works as
+([as it should](https://protobuf.dev/programming-guides/style/)). The case-conversion works as
 follows:
 
 The proto field `foo_bar_baz` has, for example, a `getFooBarBaz()` method.
@@ -171,7 +171,7 @@ the compiler generates the following instance methods:
 * `clearFoo()`: Clears the value of this field: after this has been called `hasFoo()` returns `false` and `getFoo()` returns the default value.
 
 Similar methods are generated for any of protocol buffers'
-[scalar types](https://developers.google.com/protocol-buffers/docs/proto#scalar).
+[scalar types](https://protobuf.dev/programming-guides/proto2/#scalar).
 
 ### Singular Scalar Fields (proto3)
 For this field definition:
@@ -187,7 +187,7 @@ the compiler generates the following instance methods:
 
 
 Similar methods are generated for any of protocol buffers'
-[scalar types](https://developers.google.com/protocol-buffers/docs/proto3).
+[scalar types](https://protobuf.dev/programming-guides/proto3/).
 
 
 ### Bytes Fields
