@@ -120,7 +120,7 @@ var message = proto.my.package.MyMessage();
 ```
 
 If unfamiliar with Closure or its compiler, consider reviewing
-[Closure documentation](https://developers.google.com/closure/library).
+[Closure documentation](https://github.com/google/closure-library).
 
 CommonJS imports
 ----------------
