@@ -891,7 +891,14 @@ jspb.BinaryDecoder.prototype.readString = function(length) {
   var result = '';
   while (cursor < end) {
     var c = bytes[cursor++];
-    if (c < 128) {  // Regular 7-bit ASCII.
+    if (c == 0) { 
+      // NUL char should not occur in the middle of a String, abort decode
+      // We may get back in sync by avoiding malformed strings or there
+      // may be corruption in whatever was stored as text to begin with.
+      result += goog.crypt.byteArrayToString(codeUnits);
+      cursor=end;
+      continue;
+    } else if (c < 128) {  // Regular 7-bit ASCII.
       codeUnits.push(c);
     } else if (c < 192) {
       // UTF-8 continuation mark. We are out of sync. This
