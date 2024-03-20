@@ -36,7 +36,6 @@
 #include <set>
 #include <string>
 
-#include <google/protobuf/stubs/logging.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/compiler/code_generator.h>
@@ -138,6 +137,9 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
  public:
   Generator() {}
   virtual ~Generator() {}
+
+  Generator(const Generator&) = delete;
+  Generator& operator=(const Generator&) = delete;
 
   bool Generate(const FileDescriptor* file, const std::string& parameter,
                 GeneratorContext* context, std::string* error) const override {
@@ -322,8 +324,6 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
   void GenerateRepeatedMessageHelperMethods(const GeneratorOptions& options,
                                             io::Printer* printer,
                                             const FieldDescriptor* field) const;
-
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Generator);
 };
 
 }  // namespace js
