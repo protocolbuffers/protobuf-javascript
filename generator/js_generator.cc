@@ -102,8 +102,7 @@ bool IsReserved(const std::string& ident) {
 
 std::string GetSnakeFilename(const std::string& filename) {
   std::string snake_name = filename;
-  absl::StrReplaceAll(snake_name, {{"/", "_"}});
-  return snake_name;
+  return absl::StrReplaceAll(snake_name, {{"/", "_"}});
 }
 
 // Given a filename like foo/bar/baz.proto, returns the corresponding JavaScript
@@ -147,9 +146,9 @@ std::string ModuleAlias(const std::string& filename) {
   // We'll worry about this problem if/when we actually see it.  This name isn't
   // exposed to users so we can change it later if we need to.
   std::string basename = StripProto(filename);
-  absl::StrReplaceAll(basename, {{"-", "$"}});
-  absl::StrReplaceAll(basename, {{"/", "_"}});
-  absl::StrReplaceAll(basename, {{".", "_"}});
+  basename = absl::StrReplaceAll(basename, {{"-", "$"}});
+  basename = absl::StrReplaceAll(basename, {{"/", "_"}});
+  basename = absl::StrReplaceAll(basename, {{".", "_"}});
   return basename + "_pb";
 }
 
