@@ -2,8 +2,8 @@
  * @fileoverview Tests to make sure Kernel can read data in a backward
  * compatible way even when protobuf schema changes according to the rules
  * defined in
- * https://developers.google.com/protocol-buffers/docs/proto#updating and
- * https://developers.google.com/protocol-buffers/docs/proto3#updating.
+ * https://protobuf.dev/programming-guides/proto2/#updating and
+ * https://protobuf.dev/programming-guides/proto3/#updating.
  *
  * third_party/protobuf/conformance/binary_json_conformance_suite.cc already
  * covers many compatibility tests, this file covers only the tests not covered

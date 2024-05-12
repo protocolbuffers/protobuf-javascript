@@ -1,6 +1,6 @@
 // Protocol Buffers - Google's data interchange format
 // Copyright 2008 Google Inc.  All rights reserved.
-// https://developers.google.com/protocol-buffers/
+// https://protobuf.dev/
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -34,11 +34,16 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
+#include <google/protobuf/io/strtod.h>
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/stringprintf.h>
-#include <google/protobuf/stubs/strutil.h>
+#include <google/protobuf/descriptor_legacy.h>
+#include "absl/strings/escaping.h"
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_join.h"
+#include "absl/strings/str_replace.h"
+#include "absl/strings/strip.h"
 
 #include <algorithm>
 #include <limits>
@@ -97,8 +102,7 @@ bool IsReserved(const std::string& ident) {
 
 std::string GetSnakeFilename(const std::string& filename) {
   std::string snake_name = filename;
-  ReplaceCharacters(&snake_name, "/", '_');
-  return snake_name;
+  return absl::StrReplaceAll(snake_name, {{"/", "_"}});
 }
 
 // Given a filename like foo/bar/baz.proto, returns the corresponding JavaScript
@@ -142,9 +146,9 @@ std::string ModuleAlias(const std::string& filename) {
   // We'll worry about this problem if/when we actually see it.  This name isn't
   // exposed to users so we can change it later if we need to.
   std::string basename = StripProto(filename);
-  ReplaceCharacters(&basename, "-", '$');
-  ReplaceCharacters(&basename, "/", '_');
-  ReplaceCharacters(&basename, ".", '_');
+  basename = absl::StrReplaceAll(basename, {{"-", "$"}});
+  basename = absl::StrReplaceAll(basename, {{"/", "_"}});
+  basename = absl::StrReplaceAll(basename, {{".", "_"}});
   return basename + "_pb";
 }
 
@@ -170,7 +174,7 @@ std::string GetNestedMessageName(const Descriptor* descriptor) {
     return "";
   }
   std::string result =
-      StripPrefixString(descriptor->full_name(), descriptor->file()->package());
+      std::string(absl::StripPrefix(descriptor->full_name(), descriptor->file()->package()));
   // Add a leading dot if one is not already present.
   if (!result.empty() && result[0] != '.') {
     result = "." + result;
@@ -239,7 +243,7 @@ std::string MaybeCrossFileRef(const GeneratorOptions& options,
 
 std::string SubmessageTypeRef(const GeneratorOptions& options,
                               const FieldDescriptor* field) {
-  GOOGLE_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
+  ABSL_CHECK(field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
   return MaybeCrossFileRef(options, field->file(), field->message_type());
 }
 
@@ -406,7 +410,7 @@ std::string GetMessagesFileName(const GeneratorOptions& options, const SCC* scc,
       std::string snake_name = StripProto(
           GetSnakeFilename(scc->GetRepresentative()->file()->name()));
       (*long_name_dict)[scc->GetRepresentative()] =
-          StrCat(snake_name, "_long_sccs_",
+          absl::StrCat(snake_name, "_long_sccs_",
                  static_cast<uint64_t>((*long_name_dict).size()));
     }
     filename_base = (*long_name_dict)[scc->GetRepresentative()];
@@ -450,7 +454,7 @@ bool IgnoreMessage(const Descriptor* d) { return d->options().map_entry(); }
 
 // Does JSPB ignore this entire oneof? True only if all fields are ignored.
 bool IgnoreOneof(const OneofDescriptor* oneof) {
-  if (oneof->is_synthetic()) return true;
+  if (OneofDescriptorLegacy(oneof).is_synthetic()) return true;
   for (int i = 0; i < oneof->field_count(); i++) {
     if (!IgnoreField(oneof->field(i))) {
       return false;
@@ -548,18 +552,18 @@ std::string JSFieldIndex(const FieldDescriptor* field) {
     for (int i = 0; i < parent_type->field_count(); i++) {
       if (parent_type->field(i)->type() == FieldDescriptor::TYPE_GROUP &&
           parent_type->field(i)->message_type() == containing_type) {
-        return StrCat(field->number() - parent_type->field(i)->number());
+        return absl::StrCat(field->number() - parent_type->field(i)->number());
       }
     }
   }
-  return StrCat(field->number());
+  return absl::StrCat(field->number());
 }
 
 std::string JSOneofIndex(const OneofDescriptor* oneof) {
   int index = -1;
   for (int i = 0; i < oneof->containing_type()->oneof_decl_count(); i++) {
     const OneofDescriptor* o = oneof->containing_type()->oneof_decl(i);
-    if (o->is_synthetic()) continue;
+    if (OneofDescriptorLegacy(o).is_synthetic()) continue;
     // If at least one field in this oneof is not JSPB-ignored, count the oneof.
     for (int j = 0; j < o->field_count(); j++) {
       const FieldDescriptor* f = o->field(j);
@@ -572,7 +576,7 @@ std::string JSOneofIndex(const OneofDescriptor* oneof) {
       break;
     }
   }
-  return StrCat(index);
+  return absl::StrCat(index);
 }
 
 // Decodes a codepoint in \x0000 -- \xFFFF.
@@ -680,9 +684,9 @@ bool EscapeJSString(const std::string& in, std::string* out) {
         if (codepoint >= 0x20 && codepoint <= 0x7e) {
           *out += static_cast<char>(codepoint);
         } else if (codepoint >= 0x100) {
-          *out += StringPrintf("\\u%04x", codepoint);
+          *out += absl::StrFormat("\\u%04x", codepoint);
         } else {
-          *out += StringPrintf("\\x%02x", codepoint);
+          *out += absl::StrFormat("\\x%02x", codepoint);
         }
         break;
     }
@@ -769,18 +773,18 @@ std::string PostProcessFloat(std::string result) {
 }
 
 std::string FloatToString(float value) {
-  std::string result = SimpleFtoa(value);
+  std::string result = io::SimpleFtoa(value);
   return PostProcessFloat(result);
 }
 
 std::string DoubleToString(double value) {
-  std::string result = SimpleDtoa(value);
+  std::string result = io::SimpleDtoa(value);
   return PostProcessFloat(result);
 }
 
 bool InRealOneof(const FieldDescriptor* field) {
   return field->containing_oneof() &&
-         !field->containing_oneof()->is_synthetic();
+         !OneofDescriptorLegacy(field->containing_oneof()).is_synthetic();
 }
 
 // Return true if this is an integral field that should be represented as string
@@ -809,21 +813,21 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
 
   switch (field->cpp_type()) {
     case FieldDescriptor::CPPTYPE_INT32:
-      return MaybeNumberString(field, StrCat(field->default_value_int32()));
+      return MaybeNumberString(field, absl::StrCat(field->default_value_int32()));
     case FieldDescriptor::CPPTYPE_UINT32:
       // The original codegen is in Java, and Java protobufs store unsigned
       // integer values as signed integer values. In order to exactly match the
       // output, we need to reinterpret as base-2 signed. Ugh.
       return MaybeNumberString(
-          field, StrCat(static_cast<int32_t>(field->default_value_uint32())));
+          field, absl::StrCat(static_cast<int32_t>(field->default_value_uint32())));
     case FieldDescriptor::CPPTYPE_INT64:
-      return MaybeNumberString(field, StrCat(field->default_value_int64()));
+      return MaybeNumberString(field, absl::StrCat(field->default_value_int64()));
     case FieldDescriptor::CPPTYPE_UINT64:
       // See above note for uint32 -- reinterpreting as signed.
       return MaybeNumberString(
-          field, StrCat(static_cast<int64_t>(field->default_value_uint64())));
+          field, absl::StrCat(static_cast<int64_t>(field->default_value_uint64())));
     case FieldDescriptor::CPPTYPE_ENUM:
-      return StrCat(field->default_value_enum()->number());
+      return absl::StrCat(field->default_value_enum()->number());
     case FieldDescriptor::CPPTYPE_BOOL:
       return field->default_value_bool() ? "true" : "false";
     case FieldDescriptor::CPPTYPE_FLOAT:
@@ -836,7 +840,7 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
         bool is_valid = EscapeJSString(field->default_value_string(), &out);
         if (!is_valid) {
           // TODO(b/115551870): Decide whether this should be a hard error.
-          GOOGLE_LOG(WARNING)
+          ABSL_LOG(WARNING)
               << "The default value for field " << field->full_name()
               << " was truncated since it contained invalid UTF-8 or"
                  " codepoints outside the basic multilingual plane.";
@@ -848,7 +852,7 @@ std::string JSFieldDefault(const FieldDescriptor* field) {
     case FieldDescriptor::CPPTYPE_MESSAGE:
       return "null";
   }
-  GOOGLE_LOG(FATAL) << "Shouldn't reach here.";
+  ABSL_LOG(FATAL) << "Shouldn't reach here.";
   return "";
 }
 
@@ -980,7 +984,7 @@ bool DeclaredReturnTypeIsNullable(const GeneratorOptions& options,
     return false;
   }
 
-  if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
+  if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
       field->cpp_type() != FieldDescriptor::CPPTYPE_MESSAGE) {
     return false;
   }
@@ -1181,7 +1185,7 @@ std::string RepeatedFieldNumberList(const GeneratorOptions& options,
       numbers.push_back(JSFieldIndex(desc->field(i)));
     }
   }
-  return "[" + Join(numbers, ",") + "]";
+  return "[" + absl::StrJoin(numbers, ",") + "]";
 }
 
 std::string OneofGroupList(const Descriptor* desc) {
@@ -1200,9 +1204,9 @@ std::string OneofGroupList(const Descriptor* desc) {
       }
       oneof_fields.push_back(JSFieldIndex(oneof->field(j)));
     }
-    oneof_entries.push_back("[" + Join(oneof_fields, ",") + "]");
+    oneof_entries.push_back("[" + absl::StrJoin(oneof_fields, ",") + "]");
   }
-  return "[" + Join(oneof_entries, ",") + "]";
+  return "[" + absl::StrJoin(oneof_entries, ",") + "]";
 }
 
 std::string JSOneofArray(const GeneratorOptions& options,
@@ -1275,7 +1279,7 @@ std::string FieldDefinition(const GeneratorOptions& options,
     } else {
       value_type = ProtoTypeName(options, value_field);
     }
-    return StringPrintf("map<%s, %s> %s = %d;", key_type.c_str(),
+    return absl::StrFormat("map<%s, %s> %s = %d;", key_type.c_str(),
                         value_type.c_str(), field->name().c_str(),
                         field->number());
   } else {
@@ -1294,7 +1298,7 @@ std::string FieldDefinition(const GeneratorOptions& options,
       type = ProtoTypeName(options, field);
       name = field->name();
     }
-    return StringPrintf("%s %s %s = %d;", qualifier.c_str(), type.c_str(),
+    return absl::StrFormat("%s %s %s = %d;", qualifier.c_str(), type.c_str(),
                         name.c_str(), field->number());
   }
 }
@@ -1388,7 +1392,7 @@ std::string GetPivot(const Descriptor* desc) {
                                                      : kDefaultPivot;
   }
 
-  return StrCat(pivot);
+  return absl::StrCat(pivot);
 }
 
 // Whether this field represents presence.  For fields with presence, we
@@ -1590,7 +1594,7 @@ void EmbedCodeAnnotations(const GeneratedCodeInfo& annotations,
   std::string meta_content;
   annotations.SerializeToString(&meta_content);
   std::string meta_64;
-  Base64Escape(meta_content, &meta_64);
+  absl::Base64Escape(meta_content, &meta_64);
 
   // Print base64 encoded annotations at the end of output file in
   // a comment.
@@ -1599,7 +1603,7 @@ void EmbedCodeAnnotations(const GeneratedCodeInfo& annotations,
 }
 
 bool IsWellKnownTypeFile(const FileDescriptor* file) {
-  return HasPrefixString(file->name(), "google/protobuf/");
+  return absl::StartsWith(file->name(), "google/protobuf/");
 }
 
 }  // anonymous namespace
@@ -1736,7 +1740,7 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
       if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
         std::string namespaceObject = *it;
         // Remove "proto." from the namespace object
-        GOOGLE_CHECK_EQ(0, namespaceObject.compare(0, 6, "proto."));
+        ABSL_CHECK_EQ(0, namespaceObject.compare(0, 6, "proto."));
         namespaceObject.erase(0, 6);
         printer->Print("goog.exportSymbol('$name$', null, proto);\n", "name",
                        namespaceObject);
@@ -1775,7 +1779,7 @@ void Generator::GenerateRequiresForLibrary(
     const GeneratorOptions& options, io::Printer* printer,
     const std::vector<const FileDescriptor*>& files,
     std::set<std::string>* provided) const {
-  GOOGLE_CHECK_EQ(options.import_style, GeneratorOptions::kImportClosure);
+  ABSL_CHECK_EQ(options.import_style, GeneratorOptions::kImportClosure);
   // For Closure imports we need to import every message type individually.
   std::set<std::string> required;
   std::set<std::string> forwards;
@@ -2261,7 +2265,7 @@ void Generator::GenerateFieldValueExpression(io::Printer* printer,
 
   const std::string with_default = use_default ? "WithDefault" : "";
   const std::string default_arg =
-      use_default ? StrCat(", ", JSFieldDefault(field)) : "";
+      use_default ? absl::StrCat(", ", JSFieldDefault(field)) : "";
   const std::string cardinality = field->is_repeated() ? "Repeated" : "";
   std::string type = "";
   if (is_float_or_double) {
@@ -2343,7 +2347,7 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
   } else {
     bool use_default = field->has_default_value();
 
-    if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
+    if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
         // Repeated fields get initialized to their default in the constructor
         // (why?), so we emit a plain getField() call for them.
         !field->is_repeated()) {
@@ -2751,7 +2755,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
                                         /* force_present = */ false,
                                         /* singular_if_not_packed = */ false));
 
-    if (field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 &&
+    if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
         !field->is_repeated() && !field->is_map() &&
         !HasFieldPresence(options, field)) {
       // Proto3 non-repeated and non-map fields without presence use the
@@ -3079,7 +3083,7 @@ void Generator::GenerateClassDeserializeBinary(const GeneratorOptions& options,
 void Generator::GenerateClassDeserializeBinaryField(
     const GeneratorOptions& options, io::Printer* printer,
     const FieldDescriptor* field) const {
-  printer->Print("    case $num$:\n", "num", StrCat(field->number()));
+  printer->Print("    case $num$:\n", "num", absl::StrCat(field->number()));
 
   if (field->is_map()) {
     const FieldDescriptor* key_field = MapFieldKey(field);
@@ -3122,7 +3126,7 @@ void Generator::GenerateClassDeserializeBinaryField(
           (field->type() == FieldDescriptor::TYPE_GROUP) ? "Group" : "Message",
           "grpfield",
           (field->type() == FieldDescriptor::TYPE_GROUP)
-              ? (StrCat(field->number()) + ", ")
+              ? (absl::StrCat(field->number()) + ", ")
               : "");
     } else if (field->is_packable()) {
       printer->Print(
@@ -3292,7 +3296,7 @@ void Generator::GenerateClassSerializeBinaryField(
     printer->Print(
         "    f.serializeBinary($index$, writer, "
         "$keyWriterFn$, $valueWriterFn$",
-        "index", StrCat(field->number()), "keyWriterFn",
+        "index", absl::StrCat(field->number()), "keyWriterFn",
         JSBinaryWriterMethodName(options, key_field), "valueWriterFn",
         JSBinaryWriterMethodName(options, value_field));
 
@@ -3308,7 +3312,7 @@ void Generator::GenerateClassSerializeBinaryField(
         "      $index$,\n"
         "      f",
         "method", JSBinaryReadWriteMethodName(field, /* is_writer = */ true),
-        "index", StrCat(field->number()));
+        "index", absl::StrCat(field->number()));
 
     if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
         !field->is_map()) {
@@ -3351,7 +3355,7 @@ void Generator::GenerateEnum(const GeneratorOptions& options,
   for (auto i : valid_index) {
     const EnumValueDescriptor* value = enumdesc->value(i);
     printer->Print("  $name$: $value$$comma$\n", "name",
-                   ToEnumCase(value->name()), "value", StrCat(value->number()),
+                   ToEnumCase(value->name()), "value", absl::StrCat(value->number()),
                    "comma", (i == valid_index.back()) ? "" : ",");
     printer->Annotate("name", value);
   }
@@ -3393,7 +3397,7 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       "!Object} */ (\n"
       "         $toObject$),\n"
       "    $repeated$);\n",
-      "index", StrCat(field->number()), "name", extension_object_name, "ctor",
+      "index", absl::StrCat(field->number()), "name", extension_object_name, "ctor",
       (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE
            ? SubmessageTypeRef(options, field)
            : std::string("null")),
@@ -3413,7 +3417,7 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       "    $binaryMessageDeserializeFn$,\n",
       "extendName",
       JSExtensionsObjectName(options, field->file(), field->containing_type()),
-      "index", StrCat(field->number()), "class", extension_scope, "name",
+      "index", absl::StrCat(field->number()), "class", extension_scope, "name",
       extension_object_name, "binaryReaderFn",
       JSBinaryReaderMethodName(options, field), "binaryWriterFn",
       JSBinaryWriterMethodName(options, field), "binaryMessageSerializeFn",
@@ -3435,7 +3439,7 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       "\n",
       "extendName",
       JSExtensionsObjectName(options, field->file(), field->containing_type()),
-      "index", StrCat(field->number()), "class", extension_scope, "name",
+      "index", absl::StrCat(field->number()), "class", extension_scope, "name",
       extension_object_name);
 }
 
@@ -3463,7 +3467,7 @@ bool GeneratorOptions::ParseFromOptions(
       testonly = true;
 
     } else if (option.first == "error_on_name_conflict") {
-      GOOGLE_LOG(WARNING) << "Ignoring error_on_name_conflict option, this "
+      ABSL_LOG(WARNING) << "Ignoring error_on_name_conflict option, this "
                              "will be removed in a future release";
     } else if (option.first == "output_dir") {
       output_dir = option.second;
@@ -3587,7 +3591,7 @@ bool Generator::GenerateFile(const FileDescriptor* file,
                                  ? file->name().substr(file->name().rfind('/'))
                                  : file->name());
   std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
-  GOOGLE_CHECK(output);
+  ABSL_CHECK(output);
   GeneratedCodeInfo annotations;
   io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
       &annotations);
@@ -3721,7 +3725,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
     std::string filename = options.output_dir + "/" + options.library +
                            options.GetFileNameExtension();
     std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
-    GOOGLE_CHECK(output.get());
+    ABSL_CHECK(output.get());
     GeneratedCodeInfo annotations;
     io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
         &annotations);
@@ -3796,7 +3800,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         const std::string& filename = allowed_map[scc];
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
-        GOOGLE_CHECK(output.get());
+        ABSL_CHECK(output.get());
         GeneratedCodeInfo annotations;
         io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
             &annotations);
@@ -3849,7 +3853,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
         const std::string& filename = allowed_map[enumdesc];
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
-        GOOGLE_CHECK(output.get());
+        ABSL_CHECK(output.get());
         GeneratedCodeInfo annotations;
         io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
             &annotations);
@@ -3881,7 +3885,7 @@ bool Generator::GenerateAll(const std::vector<const FileDescriptor*>& files,
 
         std::unique_ptr<io::ZeroCopyOutputStream> output(
             context->Open(filename));
-        GOOGLE_CHECK(output.get());
+        ABSL_CHECK(output.get());
         GeneratedCodeInfo annotations;
         io::AnnotationProtoCollector<GeneratedCodeInfo> annotation_collector(
             &annotations);

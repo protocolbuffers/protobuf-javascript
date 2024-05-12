@@ -40,7 +40,7 @@ const encoderFunction = getEncoderFunction();
 /**
  * Writer provides methods for encoding all protobuf supported type into a
  * binary format bytes array.
- * Check https://developers.google.com/protocol-buffers/docs/encoding for binary
+ * Check https://protobuf.dev/programming-guides/encoding/ for binary
  * format definition.
  * @final
  * @package

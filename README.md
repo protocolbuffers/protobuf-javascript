@@ -27,20 +27,23 @@ To use Protocol Buffers with JavaScript, you need two main components:
    (look for the `protoc-*.zip` files under **Downloads**).
 
 
-Project Status as of September 2022
+
+Project Status
 ===
 
-This project is currently in a somewhat broken state that we are working to rectify. We expect to have updated releases by the end of September 2022.
+This project is currently in a working state.
 
 **Support Status**
 
-Protobuf JavaScript is widely used and well maintained internally at Google but does not currently have staffing for more than minimal support for this open source project.
+We currently do not have staffing for more than minimal support for this open
+source project. We will answer questions and triage any issues.
 
 **Contributing**
 
-Contributions should preserve existing behavior where possible.  Current customers rely on applications continuing to work across minor version upgrades.
+Contributions should preserve existing behavior where possible. Current
+customers rely on applications continuing to work across minor version upgrades.
+We encourage small targeted contributions. Thanks!
 
-We also currently have limited staffing for this project, as such we encourage small targeted contributions.  Thanks!
 
 Setup
 =====
@@ -93,11 +96,13 @@ For Closure imports, `protoc` will generate a single output file
 all of the types defined in your .proto files.  For example, for the unit
 tests the generated files contain many `goog.provide` statements like:
 
-    goog.provide('proto.google.protobuf.DescriptorProto');
-    goog.provide('proto.google.protobuf.DescriptorProto.ExtensionRange');
-    goog.provide('proto.google.protobuf.DescriptorProto.ReservedRange');
-    goog.provide('proto.google.protobuf.EnumDescriptorProto');
-    goog.provide('proto.google.protobuf.EnumOptions');
+```js
+goog.provide('proto.google.protobuf.DescriptorProto');
+goog.provide('proto.google.protobuf.DescriptorProto.ExtensionRange');
+goog.provide('proto.google.protobuf.DescriptorProto.ReservedRange');
+goog.provide('proto.google.protobuf.EnumDescriptorProto');
+goog.provide('proto.google.protobuf.EnumOptions');
+```
 
 The generated code will also `goog.require()` many types in the core library,
 and they will require many types in the Google Closure library.  So make sure
@@ -108,12 +113,14 @@ Google Closure library itself.
 Once you've done this, you should be able to import your types with
 statements like:
 
-    goog.require('proto.my.package.MyMessage');
+```js
+goog.require('proto.my.package.MyMessage');
 
-    var message = proto.my.package.MyMessage();
+var message = proto.my.package.MyMessage();
+```
 
 If unfamiliar with Closure or its compiler, consider reviewing
-[Closure documentation](https://developers.google.com/closure/library).
+[Closure documentation](https://github.com/google/closure-library).
 
 CommonJS imports
 ----------------
@@ -135,9 +142,11 @@ to build it first by running:
 Once you've done this, you should be able to import your types with
 statements like:
 
-    var messages = require('./messages_pb');
+```js
+var messages = require('./messages_pb');
 
-    var message = new messages.MyMessage();
+var message = new messages.MyMessage();
+```
 
 The `--js_out` flag
 -------------------
@@ -149,7 +158,7 @@ The syntax of the `--js_out` flag is:
 Where `OPTIONS` are separated by commas.  Options are either `opt=val` or
 just `opt` (for options that don't take a value).  The available options
 are specified and documented in the `GeneratorOptions` struct in
-[src/google/protobuf/compiler/js/js_generator.h](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/compiler/js/js_generator.h#L53).
+[generator/js_generator.h](https://github.com/protocolbuffers/protobuf-javascript/blob/main/generator/js_generator.h#L53).
 
 Some examples:
 
@@ -166,16 +175,18 @@ API
 The API is not well-documented yet.  Here is a quick example to give you an
 idea of how the library generally works:
 
-    var message = new MyMessage();
+```js
+var message = new MyMessage();
 
-    message.setName("John Doe");
-    message.setAge(25);
-    message.setPhoneNumbers(["800-555-1212", "800-555-0000"]);
+message.setName("John Doe");
+message.setAge(25);
+message.setPhoneNumbers(["800-555-1212", "800-555-0000"]);
 
-    // Serializes to a UInt8Array.
-    var bytes = message.serializeBinary();
+// Serializes to a UInt8Array.
+var bytes = message.serializeBinary();
 
-    var message2 = MyMessage.deserializeBinary(bytes);
+var message2 = MyMessage.deserializeBinary(bytes);
+```
 
 For more examples, see the tests.  You can also look at the generated code
 to see what methods are defined for your generated messages.

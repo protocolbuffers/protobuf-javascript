@@ -13,6 +13,10 @@ name: "CodeQL"
 
 permissions: read-all
 
+# update in build.yml and codeql.yml at same time
+env:
+  PROTOC_VERSION: 23.1
+
 on:
   push:
     branches: [ "main" ]
@@ -38,19 +42,24 @@ jobs:
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
+    env:
+      PROTOC: protoc-release/bin/protoc
+      PROTOC_INC: protoc-release/include
+      PROTOC_PLATFORM: linux-x86_64
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
-        
+
         # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
@@ -58,14 +67,18 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
-    - run: |
-        echo "Fetch protoc"
-        curl -L https://github.com/protocolbuffers/protobuf/releases/download/v21.3/protoc-21.3-linux-x86_64.zip --output $GITHUB_WORKSPACE/protoc-release.zip
-        unzip $GITHUB_WORKSPACE/protoc-release.zip -d $GITHUB_WORKSPACE/protoc-release
-        echo "Clean, install, and test protobuf-javascript"
-        npm ci
-        npm install
-        PROTOC=$GITHUB_WORKSPACE/protoc-release/bin/protoc PROTOC_INC=$GITHUB_WORKSPACE/protoc-release/include npm test
+    - name: Install Protoc
+      run: |
+        echo "Fetching protoc"
+        curl --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          -L https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-${PROTOC_PLATFORM}.zip \
+          --output protoc-release.zip
+        unzip protoc-release.zip -d protoc-release
+        rm protoc-release.zip
+
+    - run: npm ci
+
+    - run: npm test
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
