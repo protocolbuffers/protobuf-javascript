@@ -139,7 +139,7 @@ jspb.BinaryReader.getInstanceCacheLength = function() {
  * @return {!jspb.BinaryReader}
  * @export
  */
-jspb.BinaryReader.alloc = function(opt_bytes, opt_start, opt_length) {
+jspb.BinaryReader.prototype.alloc = function(opt_bytes, opt_start, opt_length) {
   if (jspb.BinaryReader.instanceCache_.length) {
     var newReader = jspb.BinaryReader.instanceCache_.pop();
     if (opt_bytes) {
@@ -150,18 +150,6 @@ jspb.BinaryReader.alloc = function(opt_bytes, opt_start, opt_length) {
     return new jspb.BinaryReader(opt_bytes, opt_start, opt_length);
   }
 };
-
-
-/**
- * Alias for the above method.
- * @param {jspb.ByteSource=} opt_bytes The bytes we're reading from.
- * @param {number=} opt_start The optional offset to start reading at.
- * @param {number=} opt_length The optional length of the block to read -
- *     we'll throw an assertion if we go off the end of the block.
- * @return {!jspb.BinaryReader}
- * @export
- */
-jspb.BinaryReader.prototype.alloc = jspb.BinaryReader.alloc;
 
 
 /**
