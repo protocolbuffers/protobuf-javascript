@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package foo.bar.baz.v2;
+
+import "protos/proto2.proto";
+
+service FooService {
+  rpc Commands(CommandRequest) returns (CommandResponse) {}
+}
+
+message CommandRequest {
+  string session_id = 1;
+  repeated command.pkg.nesting.Command commands = 2; 
+  command.pkg.nesting.Command command = 3; 
+  map<string, command.pkg.nesting.Command> more_commands = 4;
+}
+
+message CommandResponse {
+  string result = 1;
+}

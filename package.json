@@ -12,18 +12,20 @@
     "package.json",
     "README.md"
   ],
-  "dependencies": {},
   "devDependencies": {
     "glob": "~7.1.4",
     "google-closure-compiler": "~20190819.0.0",
     "google-closure-deps": "^20210406.0.0",
     "google-closure-library": "~20200315.0.0",
+    "google-protobuf": "^3.21.2",
     "gulp": "~4.0.2",
-    "jasmine": "~3.5.0"
+    "jasmine": "~3.5.0",
+    "jest": "29.7.0"
   },
   "scripts": {
     "build": "node ./node_modules/gulp/bin/gulp.js dist",
     "test": "node ./node_modules/gulp/bin/gulp.js test",
+    "test:jest": "jest ./test-jest --runInBand",
     "clean": "node ./node_modules/gulp/bin/gulp.js clean"
   },
   "repository": {

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package command.pkg.nesting;
+
+message Command {
+  string id = 1;
+  string command = 2;
+}
