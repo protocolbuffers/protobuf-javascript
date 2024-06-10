@@ -7,3 +7,4 @@ bazel-*
 /testproto_libs1.js
 /testproto_libs2.js
 /google-protobuf.js
+test-jest/*_pb.js

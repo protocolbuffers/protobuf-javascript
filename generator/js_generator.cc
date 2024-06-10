@@ -228,7 +228,8 @@ std::string MaybeCrossFileRef(const GeneratorOptions& options,
                               const FileDescriptor* from_file,
                               const Descriptor* to_message) {
   if ((options.import_style == GeneratorOptions::kImportCommonJs ||
-       options.import_style == GeneratorOptions::kImportCommonJsStrict) &&
+       options.import_style == GeneratorOptions::kImportCommonJsStrict ||
+       options.import_style == GeneratorOptions::kImportCommonJsFlatStrict) &&
       from_file != to_message->file()) {
     // Cross-file ref in CommonJS needs to use the module alias instead of
     // the global name.
@@ -1737,7 +1738,7 @@ void Generator::GenerateProvides(const GeneratorOptions& options,
       //   foo.bar.Baz = function() { /* ... */ }
 
       // Do not use global scope in strict mode
-      if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
+      if (options.import_style == GeneratorOptions::kImportCommonJsStrict || options.import_style == GeneratorOptions::kImportCommonJsFlatStrict) {
         std::string namespaceObject = *it;
         // Remove "proto." from the namespace object
         ABSL_CHECK_EQ(0, namespaceObject.compare(0, 6, "proto."));
@@ -2315,7 +2316,7 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
     std::string value_to_object;
     if (value_field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
       value_to_object =
-          GetMessagePath(options, value_field->message_type()) + ".toObject";
+          SubmessageTypeRef(options, value_field) + ".toObject";
     } else {
       value_to_object = "undefined";
     }
@@ -2450,7 +2451,7 @@ void Generator::GenerateClassFieldFromObject(
           "$fieldclass$.fromObject));\n",
           "name", JSObjectFieldName(options, field), "index",
           JSFieldIndex(field), "fieldclass",
-          GetMessagePath(options, value_field->message_type()));
+          SubmessageTypeRef(options, value_field));
     } else {
       // `msg` is a newly-constructed message object that has not yet built any
       // map containers wrapping underlying arrays, so we can simply directly
@@ -2584,7 +2585,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
       printer->Print(
           ",\n"
           "      $messageType$",
-          "messageType", GetMessagePath(options, value_field->message_type()));
+          "messageType", SubmessageTypeRef(options, value_field));
     } else {
       printer->Print(
           ",\n"
@@ -2961,7 +2962,7 @@ void Generator::GenerateRepeatedMessageHelperMethods(
       "\n",
       "index", JSFieldIndex(field), "oneofgroup",
       (InRealOneof(field) ? (", " + JSOneofArray(options, field)) : ""), "ctor",
-      GetMessagePath(options, field->message_type()));
+      SubmessageTypeRef(options, field));
 }
 
 void Generator::GenerateClassExtensionFieldInfo(const GeneratorOptions& options,
@@ -3102,14 +3103,14 @@ void Generator::GenerateClassDeserializeBinaryField(
     if (value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
       printer->Print(", $messageType$.deserializeBinaryFromReader",
                      "messageType",
-                     GetMessagePath(options, value_field->message_type()));
+                     SubmessageTypeRef(options, value_field));
     } else {
       printer->Print(", null");
     }
     printer->Print(", $defaultKey$", "defaultKey", JSFieldDefault(key_field));
     if (value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
       printer->Print(", new $messageType$()", "messageType",
-                     GetMessagePath(options, value_field->message_type()));
+                     SubmessageTypeRef(options, value_field));
     } else {
       printer->Print(", $defaultValue$", "defaultValue",
                      JSFieldDefault(value_field));
@@ -3302,7 +3303,7 @@ void Generator::GenerateClassSerializeBinaryField(
 
     if (value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
       printer->Print(", $messageType$.serializeBinaryToWriter", "messageType",
-                     GetMessagePath(options, value_field->message_type()));
+                     SubmessageTypeRef(options, value_field));
     }
 
     printer->Print(");\n");
@@ -3482,6 +3483,8 @@ bool GeneratorOptions::ParseFromOptions(
         import_style = kImportCommonJs;
       } else if (option.second == "commonjs_strict") {
         import_style = kImportCommonJsStrict;
+      } else if (option.second == "commonjs_flat_strict") {
+        import_style = kImportCommonJsFlatStrict;
       } else if (option.second == "browser") {
         import_style = kImportBrowser;
       } else if (option.second == "es6") {
@@ -3618,12 +3621,14 @@ void Generator::GenerateFile(const GeneratorOptions& options,
 
   // Generate "require" statements.
   if ((options.import_style == GeneratorOptions::kImportCommonJs ||
-       options.import_style == GeneratorOptions::kImportCommonJsStrict)) {
+       options.import_style == GeneratorOptions::kImportCommonJsStrict || 
+       options.import_style == GeneratorOptions::kImportCommonJsFlatStrict)
+      ) {
     printer->Print("var jspb = require('google-protobuf');\n");
     printer->Print("var goog = jspb;\n");
 
     // Do not use global scope in strict mode
-    if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
+    if (options.import_style == GeneratorOptions::kImportCommonJsStrict || options.import_style == GeneratorOptions::kImportCommonJsFlatStrict) {
       printer->Print("var proto = {};\n\n");
     } else {
       // To get the global object we call a function with .call(null), this will
@@ -3691,7 +3696,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
   }
 
   // if provided is empty, do not export anything
-  if (options.import_style == GeneratorOptions::kImportCommonJs &&
+  if ((options.import_style == GeneratorOptions::kImportCommonJs || options.import_style == GeneratorOptions::kImportCommonJsFlatStrict) &&
       !provided.empty()) {
     printer->Print("goog.object.extend(exports, $package$);\n", "package",
                    GetNamespace(options, file));
