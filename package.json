@@ -18,7 +18,7 @@
     "google-closure-compiler": "~20190819.0.0",
     "google-closure-deps": "^20210406.0.0",
     "google-closure-library": "~20200315.0.0",
-    "gulp": "~4.0.2",
+    "gulp": "~5.0.0",
     "jasmine": "~3.5.0"
   },
   "scripts": {
