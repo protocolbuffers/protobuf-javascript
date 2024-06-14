@@ -27,7 +27,7 @@ jobs:
           node-version: 20
           cache: ${{ !env.ACT && 'npm' || '' }} # cache API not available in ACT
 
-      - uses: bazelbuild/setup-bazelisk@v3
+      - uses: bazel-contrib/setup-bazel@0.8.5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -92,7 +92,7 @@ jobs:
         with:
           name: js
 
-      - uses: bazelbuild/setup-bazelisk@v2
+      - uses: bazel-contrib/setup-bazel@0.8.5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
