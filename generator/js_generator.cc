@@ -452,9 +452,14 @@ bool IgnoreField(const FieldDescriptor* field) {
 // Do we ignore this message type?
 bool IgnoreMessage(const Descriptor* d) { return d->options().map_entry(); }
 
+bool IsSyntheticOneof(const OneofDescriptor* oneof) {
+  return oneof->field_count() == 1 &&
+      oneof->field(0)->real_containing_oneof() == nullptr;
+}
+
 // Does JSPB ignore this entire oneof? True only if all fields are ignored.
 bool IgnoreOneof(const OneofDescriptor* oneof) {
-  if (OneofDescriptorLegacy(oneof).is_synthetic()) return true;
+  if (IsSyntheticOneof(oneof)) { return true; }
   for (int i = 0; i < oneof->field_count(); i++) {
     if (!IgnoreField(oneof->field(i))) {
       return false;
@@ -563,7 +568,7 @@ std::string JSOneofIndex(const OneofDescriptor* oneof) {
   int index = -1;
   for (int i = 0; i < oneof->containing_type()->oneof_decl_count(); i++) {
     const OneofDescriptor* o = oneof->containing_type()->oneof_decl(i);
-    if (OneofDescriptorLegacy(o).is_synthetic()) continue;
+    if (IsSyntheticOneof(o)) { continue; }
     // If at least one field in this oneof is not JSPB-ignored, count the oneof.
     for (int j = 0; j < o->field_count(); j++) {
       const FieldDescriptor* f = o->field(j);
@@ -783,8 +788,7 @@ std::string DoubleToString(double value) {
 }
 
 bool InRealOneof(const FieldDescriptor* field) {
-  return field->containing_oneof() &&
-         !OneofDescriptorLegacy(field->containing_oneof()).is_synthetic();
+  return field->real_containing_oneof() != nullptr;
 }
 
 // Return true if this is an integral field that should be represented as string
@@ -984,7 +988,7 @@ bool DeclaredReturnTypeIsNullable(const GeneratorOptions& options,
     return false;
   }
 
-  if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
+  if (!field->has_presence() && !field->is_repeated() &&
       field->cpp_type() != FieldDescriptor::CPPTYPE_MESSAGE) {
     return false;
   }
@@ -2345,17 +2349,13 @@ void Generator::GenerateClassFieldToObject(const GeneratorOptions& options,
     printer->Print("msg.get$getter$()", "getter",
                    JSGetterName(options, field, BYTES_B64));
   } else {
-    bool use_default = field->has_default_value();
-
-    if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
-        // Repeated fields get initialized to their default in the constructor
-        // (why?), so we emit a plain getField() call for them.
-        !field->is_repeated()) {
-      // Proto3 puts all defaults (including implicit defaults) in toObject().
-      // But for proto2 we leave the existing semantics unchanged: unset fields
-      // without default are unset.
-      use_default = true;
-    }
+    // We rely on the default field value if it is explicit in the .proto file
+    // or if the field in question doesn't have presence semantics (consider
+    // proto3 fields without optional, repeated fields)
+    // Repeated fields get initialized to their default in the constructor
+    // (why?), so we emit a plain getField() call for them.
+    const bool use_default = !field->is_repeated() &&
+                       (field->has_default_value() || !field->has_presence());
 
     // We don't implement this by calling the accessors, because the semantics
     // of the accessors are changing independently of the toObject() semantics.
@@ -2755,9 +2755,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
                                         /* force_present = */ false,
                                         /* singular_if_not_packed = */ false));
 
-    if (FileDescriptorLegacy(field->file()).syntax() == FileDescriptorLegacy::Syntax::SYNTAX_PROTO3 &&
-        !field->is_repeated() && !field->is_map() &&
-        !HasFieldPresence(options, field)) {
+    if (!field->is_repeated() && !field->is_map() && !field->has_presence()) {
       // Proto3 non-repeated and non-map fields without presence use the
       // setProto3*Field function.
       printer->Print(
