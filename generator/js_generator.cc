@@ -1079,7 +1079,7 @@ std::string JSBinaryMethodType(const FieldDescriptor* field, bool is_writer) {
     name[0] = (name[0] - 'a') + 'A';
   }
   if (!is_writer && field->type() == FieldDescriptor::TYPE_STRING &&
-      field->file()->syntax() == FileDescriptor::SYNTAX_PROTO3) {
+      field->requires_utf8_validation()) {
     name = name + "RequireUtf8";
   }
   return IsIntegralFieldWithStringJSType(field) ? (name + "String") : name;
