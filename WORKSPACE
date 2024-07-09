@@ -10,8 +10,21 @@ http_archive(
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
 protobuf_deps()
+
+
+# Taken from
+# https://github.com/bazelbuild/rules_pkg/blob/main/pkg/deps.bzl.
+#
+# This is required under bazel 6 according to
+# https://github.com/bazelbuild/rules_pkg/issues/872, otherwise we
+# will see the same error.
+http_archive(
+    name = "rules_python",
+    sha256 = "0a8003b044294d7840ac7d9d73eef05d6ceb682d7516781a4ec62eeb34702578",
+    strip_prefix = "rules_python-0.24.0",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.24.0/rules_python-0.24.0.tar.gz",
+)
 
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
