@@ -36,8 +36,6 @@
 #include <google/protobuf/io/printer.h>
 #include <google/protobuf/io/strtod.h>
 #include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/descriptor_legacy.h>
 #include "absl/strings/escaping.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"

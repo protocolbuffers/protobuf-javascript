@@ -36,11 +36,8 @@
 #include <set>
 #include <string>
 
-#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/compiler/scc.h>
 #include <google/protobuf/compiler/code_generator.h>
-
-#include <google/protobuf/port_def.inc>
 
 namespace google {
 namespace protobuf {
@@ -133,7 +130,7 @@ struct GeneratorOptions {
 // header.  If you create your own protocol compiler binary and you want it to
 // support JavaScript output, you can do so by registering an instance of this
 // CodeGenerator with the CommandLineInterface in your main() function.
-class PROTOC_EXPORT Generator : public CodeGenerator {
+class Generator : public CodeGenerator {
  public:
   Generator() {}
   virtual ~Generator() {}
@@ -330,7 +327,5 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
 }  // namespace compiler
 }  // namespace protobuf
 }  // namespace google
-
-#include <google/protobuf/port_undef.inc>
 
 #endif  // GOOGLE_PROTOBUF_COMPILER_JS_GENERATOR_H__
