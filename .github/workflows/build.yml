@@ -46,7 +46,7 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: js
           path: |
@@ -85,9 +85,9 @@ jobs:
 #            cpu: darwin_x86_64
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         if: ${{ !env.ACT }}
         with:
           name: js
@@ -106,7 +106,7 @@ jobs:
       # need to copy to output directory as `bazel-bin` is a symlink and cannot be read by the actions/upload-artifact action
       - run: cp bazel-bin/protobuf-javascript-* out/
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: releases
           path: out
@@ -120,7 +120,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: releases
 
