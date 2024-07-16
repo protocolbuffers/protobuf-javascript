@@ -326,7 +326,7 @@ let textEncoderInstance;
 jspb.binary.utf8.textEncoderEncode = function (
     /** string */ s, /** boolean */ rejectUnpairedSurrogates) {
   if (rejectUnpairedSurrogates) {
-    checkWellFormed(s);
+    jspb.binary.utf8.checkWellFormed(s);
   }
 
   if (!textEncoderInstance) {
@@ -423,4 +423,3 @@ jspb.binary.utf8.encodeUtf8 = function (
     jspb.binary.utf8.textEncoderEncode(string, rejectUnpairedSurrogates) :
     jspb.binary.utf8.polyfillEncode(string, rejectUnpairedSurrogates);
 }
-
