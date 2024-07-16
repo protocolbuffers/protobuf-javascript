@@ -405,7 +405,7 @@ jspb.BinaryDecoder.prototype.readSplitFixed64 = function(convert) {
   */
 jspb.BinaryDecoder.prototype.checkCursor = function () {
   if (this.cursor_ > this.end_) {
-    asserts.fail('Read past the end ' + this.cursor_ + ' > ' + this.end_);
+    jspb.asserts.fail('Read past the end ' + this.cursor_ + ' > ' + this.end_);
   }
 }
 
@@ -902,22 +902,9 @@ jspb.BinaryDecoder.prototype.readString = function (length, requireUtf8) {
   this.cursor_ += length;
   this.checkCursor();
   const result =
-    jspb.binary.utf8.decodeUtf8(jspb.asserts.assert(this.bytes_), cursor, length, requireUtf8);
+	jspb.binary.utf8.decodeUtf8(jspb.asserts.assert(this.bytes_), cursor, length, requireUtf8);
   return result;
 };
-
-
-/**
- * Reads and parses a UTF-8 encoded unicode string (with length prefix) from
- * the stream.
- * @return {string} The decoded string.
- * @export
- */
-jspb.BinaryDecoder.prototype.readStringWithLength = function() {
-  var length = this.readUnsignedVarint32();
-  return this.readString(length);
-};
-
 
 /**
  * Reads a block of raw bytes from the binary stream.
