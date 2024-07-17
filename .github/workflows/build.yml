@@ -27,10 +27,6 @@ jobs:
           node-version: 20
           cache: ${{ !env.ACT && 'npm' || '' }} # cache API not available in ACT
 
-      - uses: bazel-contrib/setup-bazel@0.8.5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Install Protoc
         run: |
           echo "Fetching protoc"
@@ -108,7 +104,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: releases
+          name: release-${{ matrix.os }}-${{ matrix.cpu }}
           path: out
 
   release:
@@ -122,7 +118,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: releases
+          name: release-${{ matrix.os }}-${{ matrix.cpu }}
 
       - name: Release
         uses: svenstaro/upload-release-action@v2
