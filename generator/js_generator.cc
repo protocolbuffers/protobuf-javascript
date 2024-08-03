@@ -37,7 +37,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/stubs/common.h>
 #include <google/protobuf/stubs/logging.h>
-#include <google/protobuf/stubs/stringprintf.h>
+#include "absl/strings/str_format.h"
 #include <google/protobuf/stubs/strutil.h>
 
 #include <algorithm>
@@ -679,9 +679,9 @@ bool EscapeJSString(const std::string& in, std::string* out) {
         if (codepoint >= 0x20 && codepoint <= 0x7e) {
           *out += static_cast<char>(codepoint);
         } else if (codepoint >= 0x100) {
-          *out += StringPrintf("\\u%04x", codepoint);
+          *out += absl::StrFormat("\\u%04x", codepoint);
         } else {
-          *out += StringPrintf("\\x%02x", codepoint);
+          *out += absl::StrFormat("\\x%02x", codepoint);
         }
         break;
     }
@@ -1276,7 +1276,7 @@ std::string FieldDefinition(const GeneratorOptions& options,
     } else {
       value_type = ProtoTypeName(options, value_field);
     }
-    return StringPrintf("map<%s, %s> %s = %d;", key_type.c_str(),
+    return absl::StrFormat("map<%s, %s> %s = %d;", key_type.c_str(),
                         value_type.c_str(), field->name().c_str(),
                         field->number());
   } else {
@@ -1295,7 +1295,7 @@ std::string FieldDefinition(const GeneratorOptions& options,
       type = ProtoTypeName(options, field);
       name = field->name();
     }
-    return StringPrintf("%s %s %s = %d;", qualifier.c_str(), type.c_str(),
+    return absl::StrFormat("%s %s %s = %d;", qualifier.c_str(), type.c_str(),
                         name.c_str(), field->number());
   }
 }
@@ -3676,7 +3676,7 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
       " * @type {!jspb.ExtensionFieldInfo<$extensionType$>}\n"
       " */\n"
       "$class$.$name$ = new jspb.ExtensionFieldInfo(\n",
-      "class", extension_scope_name, "name", extension_object_field_name, "extensionType", 
+      "class", extension_scope_name, "name", extension_object_field_name, "extensionType",
       JSFieldTypeAnnotation(options, field,
                             /* is_setter_argument = */ false,
                             /* force_present = */ true,

@@ -21,7 +21,7 @@ pkg_files(
     name = "dist_files",
     srcs = glob([
         "google/protobuf/*.js",
-        "google/protobuf/compiler/*.js"
+        "google/protobuf/compiler/*.js",
     ]) + [
         "google-protobuf.js",
         "package.json",
@@ -58,5 +58,5 @@ filegroup(
     srcs = [
         ":dist_tar",
         ":dist_zip",
-    ]
+    ],
 )

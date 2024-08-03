@@ -1,4 +1,21 @@
-module(name = "protobuf_javascript_gonzojive", version = "3.21.5")
+module(
+    name = "protobuf_javascript_gonzojive",
+    version = "3.21.5",
+)
 
-bazel_dep(name = "protobuf", version = "27.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "protobuf", version = "21.7", repo_name = "com_google_protobuf")
+bazel_dep(name = "abseil-cpp", version = "20211102.0")
 bazel_dep(name = "rules_pkg", version = "0.7.0")
+
+# For VS Code autocompletion:
+# https://github.com/hedronvision/bazel-compile-commands-extractor#usage
+#
+# Not currently working due to https://github.com/hedronvision/bazel-compile-commands-extractor/issues/199
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    commit = "0e990032f3c5a866e72615cf67e5ce22186dcb97",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+)
