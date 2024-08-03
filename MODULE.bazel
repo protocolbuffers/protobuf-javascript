@@ -1,0 +1,4 @@
+module(name = "protobuf_javascript_gonzojive", version = "3.21.5")
+
+bazel_dep(name = "protobuf", version = "27.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "rules_pkg", version = "0.7.0")
