@@ -10,6 +10,8 @@ bazel_dep(name = "rules_pkg", version = "0.7.0")
 # For VS Code autocompletion:
 # https://github.com/hedronvision/bazel-compile-commands-extractor#usage
 #
+# Run bazel run @hedron_compile_commands//:refresh_all to get autocomplete
+# working in VS Code and other editors.
 # Not currently working due to https://github.com/hedronvision/bazel-compile-commands-extractor/issues/199
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
