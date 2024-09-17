@@ -2222,10 +2222,11 @@ void Generator::GenerateClassToObject(const GeneratorOptions& options,
       continue;
     }
 
+    auto indent = printer->WithIndent(4);
     if (!first) {
-      printer->Print(",\n    ");
+      printer->Emit(",\n");
     } else {
-      printer->Print("\n    ");
+      printer->Emit("\n");
       first = false;
     }
 
