@@ -15,7 +15,7 @@ permissions: read-all
 
 # update in build.yml and codeql.yml at same time
 env:
-  PROTOC_VERSION: 27.1
+  PROTOC_VERSION: 28.1
 
 on:
   push:
