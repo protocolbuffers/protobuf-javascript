@@ -1,7 +1,7 @@
 """Generates package naming variables for use with rules_pkg."""
 
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
-load("@rules_pkg//:providers.bzl", "PackageVariablesInfo")
+load("@rules_pkg//pkg:providers.bzl", "PackageVariablesInfo")
 
 _PROTOBUF_JAVASCRIPT_VERSION = "3.21.4"
 
