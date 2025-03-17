@@ -1,4 +1,5 @@
 module(name = "protobuf_javascript", version = "3.21.4")
 
-bazel_dep(name = "protobuf", version = "27.1", repo_name = "com_google_protobuf")
-bazel_dep(name = "rules_pkg", version = "0.7.0")
+bazel_dep(name = "protobuf", version = "30.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "abseil-cpp", version = "20250127.0")

@@ -89,7 +89,7 @@ enum BytesMode {
   BYTES_U8,       // Explicitly coerce to Uint8Array where needed.
 };
 
-bool IsReserved(const std::string& ident) {
+bool IsReserved(absl::string_view ident) {
   for (int i = 0; i < kNumKeyword; i++) {
     if (ident == kKeyword[i]) {
       return true;
@@ -98,9 +98,8 @@ bool IsReserved(const std::string& ident) {
   return false;
 }
 
-std::string GetSnakeFilename(const std::string& filename) {
-  std::string snake_name = filename;
-  return absl::StrReplaceAll(snake_name, {{"/", "_"}});
+std::string GetSnakeFilename(absl::string_view filename) {
+  return absl::StrReplaceAll(filename, {{"/", "_"}});
 }
 
 // Given a filename like foo/bar/baz.proto, returns the corresponding JavaScript
@@ -135,7 +134,7 @@ std::string GetRootPath(const std::string& from_filename,
 
 // Returns the alias we assign to the module of the given .proto filename
 // when importing.
-std::string ModuleAlias(const std::string& filename) {
+std::string ModuleAlias(absl::string_view filename) {
   // This scheme could technically cause problems if a file includes any 2 of:
   //   foo/bar_baz.proto
   //   foo_bar_baz.proto
@@ -157,7 +156,7 @@ std::string GetNamespace(const GeneratorOptions& options,
   if (!options.namespace_prefix.empty()) {
     return options.namespace_prefix;
   } else if (!file->package().empty()) {
-    return "proto." + file->package();
+    return absl::StrCat("proto.", file->package());
   } else {
     return "proto";
   }
@@ -204,7 +203,7 @@ std::string GetMessagePathPrefix(const GeneratorOptions& options,
 // message descriptor.
 std::string GetMessagePath(const GeneratorOptions& options,
                            const Descriptor* descriptor) {
-  return GetMessagePathPrefix(options, descriptor) + descriptor->name();
+  return absl::StrCat(GetMessagePathPrefix(options, descriptor), descriptor->name());
 }
 
 // Returns the fully normalized JavaScript path prefix for the given
@@ -219,7 +218,7 @@ std::string GetEnumPathPrefix(const GeneratorOptions& options,
 // enumeration descriptor.
 std::string GetEnumPath(const GeneratorOptions& options,
                         const EnumDescriptor* enum_descriptor) {
-  return GetEnumPathPrefix(options, enum_descriptor) + enum_descriptor->name();
+  return absl::StrCat(GetEnumPathPrefix(options, enum_descriptor), enum_descriptor->name());
 }
 
 std::string MaybeCrossFileRef(const GeneratorOptions& options,
@@ -230,9 +229,9 @@ std::string MaybeCrossFileRef(const GeneratorOptions& options,
       from_file != to_message->file()) {
     // Cross-file ref in CommonJS needs to use the module alias instead of
     // the global name.
-    return ModuleAlias(to_message->file()->name()) +
-           GetNestedMessageName(to_message->containing_type()) + "." +
-           to_message->name();
+    return absl::StrCat(ModuleAlias(to_message->file()->name()),
+           GetNestedMessageName(to_message->containing_type()), ".",
+           to_message->name());
   } else {
     // Within a single file we use a full name.
     return GetMessagePath(options, to_message);
@@ -262,7 +261,7 @@ char ToLowerASCII(char c) {
   }
 }
 
-std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
+std::vector<std::string> ParseLowerUnderscore(absl::string_view input) {
   std::vector<std::string> words;
   std::string running = "";
   for (auto c : input) {
@@ -281,7 +280,7 @@ std::vector<std::string> ParseLowerUnderscore(const std::string& input) {
   return words;
 }
 
-std::vector<std::string> ParseUpperCamel(const std::string& input) {
+std::vector<std::string> ParseUpperCamel(absl::string_view input) {
   std::vector<std::string> words;
   std::string running = "";
   for (auto c : input) {
@@ -326,7 +325,7 @@ std::string ToUpperCamel(const std::vector<std::string>& words) {
 // Based on code from descriptor.cc (Thanks Kenton!)
 // Uppercases the entire string, turning ValueName into
 // VALUENAME.
-std::string ToEnumCase(const std::string& input) {
+std::string ToEnumCase(absl::string_view input) {
   std::string result;
   result.reserve(input.size());
 
@@ -341,7 +340,7 @@ std::string ToEnumCase(const std::string& input) {
   return result;
 }
 
-std::string ToLower(const std::string& input) {
+std::string ToLower(absl::string_view input) {
   std::string result;
   result.reserve(input.size());
 
@@ -625,7 +624,7 @@ uint16_t DecodeUTF8Codepoint(uint8_t* bytes, size_t* length) {
 // Returns false if |out| was truncated because |in| contained invalid UTF-8 or
 // codepoints outside the BMP.
 // TODO(b/115551870): Support codepoints outside the BMP.
-bool EscapeJSString(const std::string& in, std::string* out) {
+bool EscapeJSString(absl::string_view in, std::string* out) {
   size_t decoded = 0;
   for (size_t i = 0; i < in.size(); i += decoded) {
     uint16_t codepoint = 0;
@@ -697,7 +696,7 @@ bool EscapeJSString(const std::string& in, std::string* out) {
   return true;
 }
 
-std::string EscapeBase64(const std::string& in) {
+std::string EscapeBase64(absl::string_view in) {
   static const char* kAlphabet =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   std::string result;
@@ -1074,7 +1073,7 @@ std::string JSFieldTypeAnnotation(const GeneratorOptions& options,
 }
 
 std::string JSBinaryMethodType(const FieldDescriptor* field, bool is_writer) {
-  std::string name = field->type_name();
+  std::string name = std::string(field->type_name());
   if (name[0] >= 'a' && name[0] <= 'z') {
     name[0] = (name[0] - 'a') + 'A';
   }
@@ -1226,9 +1225,9 @@ std::string RelativeTypeName(const FieldDescriptor* field) {
          field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE);
   // For a field with an enum or message type, compute a name relative to the
   // path name of the message type containing this field.
-  std::string package = field->file()->package();
-  std::string containing_type = field->containing_type()->full_name() + ".";
-  std::string type = (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM)
+  absl::string_view package = field->file()->package();
+  std::string containing_type = absl::StrCat(field->containing_type()->full_name(), ".");
+  absl::string_view type = (field->cpp_type() == FieldDescriptor::CPPTYPE_ENUM)
                          ? field->enum_type()->full_name()
                          : field->message_type()->full_name();
 
@@ -1245,7 +1244,7 @@ std::string RelativeTypeName(const FieldDescriptor* field) {
     }
   }
 
-  return type.substr(prefix);
+  return std::string(type).substr(prefix);
 }
 
 std::string JSExtensionsObjectName(const GeneratorOptions& options,
@@ -1285,8 +1284,8 @@ std::string FieldDefinition(const GeneratorOptions& options,
     } else {
       value_type = ProtoTypeName(options, value_field);
     }
-    return absl::StrFormat("map<%s, %s> %s = %d;", key_type.c_str(),
-                        value_type.c_str(), field->name().c_str(),
+    return absl::StrFormat("map<%s, %s> %s = %d;", key_type,
+                        value_type, field->name(),
                         field->number());
   } else {
     std::string qualifier =
@@ -3588,8 +3587,8 @@ bool Generator::GenerateFile(const FileDescriptor* file,
   std::string filename =
       options.output_dir + "/" +
       GetJSFilename(options, use_short_name
-                                 ? file->name().substr(file->name().rfind('/'))
-                                 : file->name());
+                                 ? std::string(file->name().substr(file->name().rfind('/')))
+                                 : std::string(file->name()));
   std::unique_ptr<io::ZeroCopyOutputStream> output(context->Open(filename));
   ABSL_CHECK(output);
   GeneratedCodeInfo annotations;
@@ -3649,12 +3648,12 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     }
 
     for (int i = 0; i < file->dependency_count(); i++) {
-      const std::string& name = file->dependency(i)->name();
+      const std::string name = std::string(file->dependency(i)->name());
       printer->Print(
           "var $alias$ = require('$file$');\n"
           "goog.object.extend(proto, $alias$);\n",
           "alias", ModuleAlias(name), "file",
-          GetRootPath(file->name(), name) + GetJSFilename(options, name));
+          GetRootPath(std::string(file->name()), name) + GetJSFilename(options, name));
     }
   }
 
