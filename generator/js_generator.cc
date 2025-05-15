@@ -964,7 +964,7 @@ bool UseBrokenPresenceSemantics(const GeneratorOptions& options,
 bool ReturnsNullWhenUnset(const GeneratorOptions& options,
                           const FieldDescriptor* field) {
   if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
-      field->is_optional()) {
+      !field->is_required() && !field->is_repeated()) {
     return true;
   }
 
@@ -1290,7 +1290,7 @@ std::string FieldDefinition(const GeneratorOptions& options,
   } else {
     std::string qualifier =
         field->is_repeated() ? "repeated"
-                             : (field->is_optional() ? "optional" : "required");
+                             : (field->is_required() ? "required" : "optional");
     std::string type, name;
     if (field->type() == FieldDescriptor::TYPE_ENUM ||
         field->type() == FieldDescriptor::TYPE_MESSAGE) {
@@ -2631,7 +2631,7 @@ void Generator::GenerateClassField(const GeneratorOptions& options,
         "rpt", (field->is_repeated() ? "Repeated" : ""), "index",
         JSFieldIndex(field), "wrapperclass", SubmessageTypeRef(options, field),
         "required",
-        (field->label() == FieldDescriptor::LABEL_REQUIRED ? ", 1" : ""));
+        (field->is_required() ? ", 1" : ""));
     printer->Annotate("gettername", field);
     printer->Print(
         "/**\n"
