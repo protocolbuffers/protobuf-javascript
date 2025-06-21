@@ -1,0 +1,42 @@
+https://status.firebase.google.com/?authuser=0
+inicio de genkit
+base de fuego-phobos-ai-1264941
+https://com-ia-gem_/genkit.dev/enterprises-gracida.html
+firebase projects:list
+Firebase CLI Installer
+<fbadcode-Q_GkBQE3TaFSl3wUs5FJVf9aR4L6Uk_aGv_rKIOOMIJQ9nEFbngfGNgIKfzJfh5M>FotMob details and GenKit configuration for predicting Real Madrid as the winner with 91% confidence<@Enterprises Gracida ------ ⚽FotMob Detail>
+flowchart TD
+    A[ingestFotMob_IA.js] --> B[predictOutcome.js]
+    B --> C[generateBadge.js]
+    C --> D[notifyUser.js]
+    D --> E[firebase.json + genkit.config]
+    E --> F[dashboard_futbol.html]
+/base_fuego_phobos/
+├── ingestFotMob_IA.js          🧠 Ingesta y análisis IA de partidos en vivo
+├── functions/
+│   ├── generateBadge.js        🏅 Generación de insignias NFT Soulbound
+│   ├── predictOutcome.js       📊 Lógica de predicción IA GEM
+│   └── notifyUser.js           🔔 Notificaciones en Firebase
+├── firebase.json               🔥 Configuración de hosting + funciones
+├── genkit.config.json          🤖 Config IA conectada a phobos-ai-1264941
+├── /data/
+│   └── fotmob_live_sample.json ⚽ Simulación JSON para pruebas locales
+└── /public/
+    └── dashboard_futbol.html   🧩 Mini App de predicción deportiva con GenKit
+®🏅Enterprises Gracida 🧬GenKit - 🧠IA GEM
+@Enterprises Gracida
+https://genkit.dev /support.google.com/adspolicy/#?
+https://com-ia-gem_/genkit.dev/enterprises-gracida.html
+inicio de genkit
+base de fuego-phobos-ai-1264941@Firebase 
+<inicio de genkit
+>--@Enterprises Gracida ------ ⚽FotMob Detail---<base de fuego-phobos-ai-1264941>®🏅Enterprises Gracida 🧬GenKit - 🧠IA GEM📁 /base_fuego_phobos/
+├── ingestFotMob_IA.js
+├── firebase.json
+├── genkit.config.json
+├── /data/fotmob_live_sample.json
+├── /public/dashboard_futbol.html
+└── /functions/
+    ├── generateBadge.js
+    ├── predictOutcome.js
+    └── notifyUser.jshttps://www.facebook.com/share/p/1HrLTXZYxk/<fbadcode-Q_GkBQE3TaFSl3wUs5FJVf9aR4L6Uk_aGv_rKIOOMIJQ9nEFbngfGNgIKfzJfh5M>FotMob details and GenKit configuration for predicting Real Madrid as the winner with 91% confidence<@Enterprises Gracida ------ ⚽FotMob Detail>
