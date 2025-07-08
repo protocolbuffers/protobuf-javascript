@@ -225,15 +225,15 @@ describe('proto3Test', () => {
     let msg = new proto.jspb.test.TestProto3();
 
     msg.setSingularInt32(-42);
-    msg.setSingularInt64(-0x7fffffff00000000);
+    msg.setSingularInt64(String(-BigInt('0x7fffffff00000000')));
     msg.setSingularUint32(0x80000000);
-    msg.setSingularUint64(0xf000000000000000);
+    msg.setSingularUint64(String(BigInt('0xf000000000000000')));
     msg.setSingularSint32(-100);
-    msg.setSingularSint64(-0x8000000000000000);
+    msg.setSingularSint64(String(-BigInt('0x8000000000000000')));
     msg.setSingularFixed32(1234);
-    msg.setSingularFixed64(0x1234567800000000);
+    msg.setSingularFixed64(String(BigInt('0x1234567800000000')));
     msg.setSingularSfixed32(-1234);
-    msg.setSingularSfixed64(-0x1234567800000000);
+    msg.setSingularSfixed64(String(-BigInt('0x1234567800000000')));
     msg.setSingularFloat(1.5);
     msg.setSingularDouble(-1.5);
     msg.setSingularBool(true);
@@ -245,15 +245,15 @@ describe('proto3Test', () => {
     msg.setSingularForeignEnum(proto.jspb.test.Proto3Enum.PROTO3_BAR);
 
     msg.setRepeatedInt32List([-42]);
-    msg.setRepeatedInt64List([-0x7fffffff00000000]);
+    msg.setRepeatedInt64List([String(-BigInt('0x7fffffff00000000'))]);
     msg.setRepeatedUint32List([0x80000000]);
-    msg.setRepeatedUint64List([0xf000000000000000]);
+    msg.setRepeatedUint64List([String(BigInt('0xf000000000000000'))]);
     msg.setRepeatedSint32List([-100]);
-    msg.setRepeatedSint64List([-0x8000000000000000]);
+    msg.setRepeatedSint64List([String(-BigInt('0x8000000000000000'))]);
     msg.setRepeatedFixed32List([1234]);
-    msg.setRepeatedFixed64List([0x1234567800000000]);
+    msg.setRepeatedFixed64List([String(BigInt('0x1234567800000000'))]);
     msg.setRepeatedSfixed32List([-1234]);
-    msg.setRepeatedSfixed64List([-0x1234567800000000]);
+    msg.setRepeatedSfixed64List([String(-BigInt('0x1234567800000000'))]);
     msg.setRepeatedFloatList([1.5]);
     msg.setRepeatedDoubleList([-1.5]);
     msg.setRepeatedBoolList([true]);
@@ -270,15 +270,15 @@ describe('proto3Test', () => {
     msg = proto.jspb.test.TestProto3.deserializeBinary(serialized);
 
     expect(msg.getSingularInt32()).toEqual(-42);
-    expect(msg.getSingularInt64()).toEqual(-0x7fffffff00000000);
+    expect(msg.getSingularInt64()).toEqual(String(-BigInt('0x7fffffff00000000')));
     expect(msg.getSingularUint32()).toEqual(0x80000000);
-    expect(msg.getSingularUint64()).toEqual(0xf000000000000000);
+    expect(msg.getSingularUint64()).toEqual(String(BigInt('0xf000000000000000')));
     expect(msg.getSingularSint32()).toEqual(-100);
-    expect(msg.getSingularSint64()).toEqual(-0x8000000000000000);
+    expect(msg.getSingularSint64()).toEqual(String(-BigInt('0x8000000000000000')));
     expect(msg.getSingularFixed32()).toEqual(1234);
-    expect(msg.getSingularFixed64()).toEqual(0x1234567800000000);
+    expect(msg.getSingularFixed64()).toEqual(String(BigInt('0x1234567800000000')));
     expect(msg.getSingularSfixed32()).toEqual(-1234);
-    expect(msg.getSingularSfixed64()).toEqual(-0x1234567800000000);
+    expect(msg.getSingularSfixed64()).toEqual(String(-BigInt('0x1234567800000000')));
     expect(msg.getSingularFloat()).toEqual(1.5);
     expect(msg.getSingularDouble()).toEqual(-1.5);
     expect(msg.getSingularBool()).toBeTrue();
@@ -289,15 +289,15 @@ describe('proto3Test', () => {
         .toEqual(proto.jspb.test.Proto3Enum.PROTO3_BAR);
 
     expect(msg.getRepeatedInt32List()).toEqual([-42]);
-    expect(msg.getRepeatedInt64List()).toEqual([-0x7fffffff00000000]);
+    expect(msg.getRepeatedInt64List()).toEqual([String(-BigInt('0x7fffffff00000000'))]);
     expect(msg.getRepeatedUint32List()).toEqual([0x80000000]);
-    expect(msg.getRepeatedUint64List()).toEqual([0xf000000000000000]);
+    expect(msg.getRepeatedUint64List()).toEqual([String(BigInt('0xf000000000000000'))]);
     expect(msg.getRepeatedSint32List()).toEqual([-100]);
-    expect(msg.getRepeatedSint64List()).toEqual([-0x8000000000000000]);
+    expect(msg.getRepeatedSint64List()).toEqual([String(-BigInt('0x8000000000000000'))]);
     expect(msg.getRepeatedFixed32List()).toEqual([1234]);
-    expect(msg.getRepeatedFixed64List()).toEqual([0x1234567800000000]);
+    expect(msg.getRepeatedFixed64List()).toEqual([String(BigInt('0x1234567800000000'))]);
     expect(msg.getRepeatedSfixed32List()).toEqual([-1234]);
-    expect(msg.getRepeatedSfixed64List()).toEqual([-0x1234567800000000]);
+    expect(msg.getRepeatedSfixed64List()).toEqual([String(-BigInt('0x1234567800000000'))]);
     expect(msg.getRepeatedFloatList()).toEqual([1.5]);
     expect(msg.getRepeatedDoubleList()).toEqual([-1.5]);
     expect(msg.getRepeatedBoolList()).toEqual([true]);

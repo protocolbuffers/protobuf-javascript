@@ -39,242 +39,21 @@
 goog.require('jspb.arith.Int64');
 goog.require('jspb.arith.UInt64');
 
-
-describe('binaryArithTest', function() {
-  /**
-   * Tests comparison operations.
-   */
-  it('testCompare', function() {
-    const a = new jspb.arith.UInt64(1234, 5678);
-    const b = new jspb.arith.UInt64(1234, 5678);
-    expect(a.cmp(b)).toEqual(0);
-    expect(b.cmp(a)).toEqual(0);
-    b.lo -= 1;
-    expect(a.cmp(b)).toEqual(1);
-    expect(b.cmp(a)).toEqual(-1);
-    b.lo += 2;
-    expect(a.cmp(b)).toEqual(-1);
-    expect(b.cmp(a)).toEqual(1);
-    b.lo = a.lo;
-    b.hi = a.hi - 1;
-    expect(a.cmp(b)).toEqual(1);
-    expect(b.cmp(a)).toEqual(-1);
-
-    expect(a.zero()).toEqual(false);
-    expect(a.msb()).toEqual(false);
-    expect(a.lsb()).toEqual(false);
-    a.hi = 0;
-    a.lo = 0;
-    expect(a.zero()).toEqual(true);
-    a.hi = 0x80000000;
-    expect(a.zero()).toEqual(false);
-    expect(a.msb()).toEqual(true);
-    a.lo = 0x00000001;
-    expect(a.lsb()).toEqual(true);
-  });
+const Int64 = goog.module.get('jspb.arith').Int64;
+const UInt64 = goog.module.get('jspb.arith').UInt64;
 
 
-  /**
-   * Tests shifts.
-   */
-  it('testShifts', function() {
-    let a = new jspb.arith.UInt64(1, 0);
-    expect(a.lo).toEqual(1);
-    expect(a.hi).toEqual(0);
-    const orig = a;
-    a = a.leftShift();
-    expect(orig.lo).toEqual(1);  // original unmodified.
-    expect(orig.hi).toEqual(0);
-    expect(a.lo).toEqual(2);
-    expect(a.hi).toEqual(0);
-    a = a.leftShift();
-    expect(a.lo).toEqual(4);
-    expect(a.hi).toEqual(0);
-    for (let i = 0; i < 29; i++) {
-      a = a.leftShift();
-    }
-    expect(a.lo).toEqual(0x80000000);
-    expect(a.hi).toEqual(0);
-    a = a.leftShift();
-    expect(a.lo).toEqual(0);
-    expect(a.hi).toEqual(1);
-    a = a.leftShift();
-    expect(a.lo).toEqual(0);
-    expect(a.hi).toEqual(2);
-    a = a.rightShift();
-    a = a.rightShift();
-    expect(a.lo).toEqual(0x80000000);
-    expect(a.hi).toEqual(0);
-    a = a.rightShift();
-    expect(a.lo).toEqual(0x40000000);
-    expect(a.hi).toEqual(0);
-  });
-
-
-  /**
-   * Tests additions.
-   */
-  it('testAdd', function() {
-    const a = new jspb.arith.UInt64(
-        /* lo = */ 0x89abcdef,
-        /* hi = */ 0x01234567);
-    const b = new jspb.arith.UInt64(
-        /* lo = */ 0xff52ab91,
-        /* hi = */ 0x92fa2123);
-    // Addition with carry.
-    let c = a.add(b);
-    expect(a.lo).toEqual(0x89abcdef);  // originals unmodified.
-    expect(a.hi).toEqual(0x01234567);
-    expect(b.lo).toEqual(0xff52ab91);
-    expect(b.hi).toEqual(0x92fa2123);
-    expect(c.lo).toEqual(0x88fe7980);
-    expect(c.hi).toEqual(0x941d668b);
-
-    // Simple addition without carry.
-    a.lo = 2;
-    a.hi = 0;
-    b.lo = 3;
-    b.hi = 0;
-    c = a.add(b);
-    expect(c.lo).toEqual(5);
-    expect(c.hi).toEqual(0);
-  });
-
-
-  /**
-   * Test subtractions.
-   */
-  it('testSub', function() {
-    const kLength = 10;
-    const hiValues = [
-      0x1682ef32, 0x583902f7, 0xb62f5955, 0x6ea99bbf, 0x25a39c20, 0x0700a08b,
-      0x00f7304d, 0x91a5b5af, 0x89077fd2, 0xe09e347c
-    ];
-    const loValues = [
-      0xe1538b18, 0xbeacd556, 0x74100758, 0x96e3cb26, 0x56c37c3f, 0xe00b3f7d,
-      0x859f25d7, 0xc2ee614a, 0xe1d21cd7, 0x30aae6a4
-    ];
-    for (let i = 0; i < kLength; i++) {
-      for (let j = 0; j < kLength; j++) {
-        const a = new jspb.arith.UInt64(loValues[i], hiValues[j]);
-        const b = new jspb.arith.UInt64(loValues[j], hiValues[i]);
-        const c = a.add(b).sub(b);
-        expect(c.hi).toEqual(a.hi);
-        expect(c.lo).toEqual(a.lo);
-      }
-    }
-  });
-
-
-  /**
-   * Tests 32-by-32 multiplication.
-   */
-  it('testMul32x32', function() {
-    const testData = [
-      // a        b          low(a*b)   high(a*b)
-      [0xc0abe2f8, 0x1607898a, 0x5de711b0, 0x109471b8],
-      [0x915eb3cb, 0x4fb66d0e, 0xbd0d441a, 0x2d43d0bc],
-      [0xfe4efe70, 0x80b48c37, 0xbcddea10, 0x7fdada0c],
-      [0xe222fd4a, 0xe43d524a, 0xd5e0eb64, 0xc99d549c],
-      [0xd171f469, 0xb94ebd01, 0x4be17969, 0x979bc4fa],
-      [0x829cc1df, 0xe2598b38, 0xf4157dc8, 0x737c12ad],
-      [0xf10c3767, 0x8382881e, 0x942b3612, 0x7bd428b8],
-      [0xb0f6dd24, 0x232597e1, 0x079c98a4, 0x184bbce7],
-      [0xfcdb05a7, 0x902f55bc, 0x636199a4, 0x8e69f412],
-      [0x0dd0bfa9, 0x916e27b1, 0x6e2542d9, 0x07d92e65]
-    ];
-
-    for (let i = 0; i < testData.length; i++) {
-      const a = testData[i][0] >>> 0;
-      const b = testData[i][1] >>> 0;
-      const cLow = testData[i][2] >>> 0;
-      const cHigh = testData[i][3] >>> 0;
-      const c = jspb.arith.UInt64.mul32x32(a, b);
-      expect(c.lo).toEqual(cLow);
-      expect(c.hi).toEqual(cHigh);
-    }
-  });
-
-
-  /**
-   * Tests 64-by-32 multiplication.
-   */
-  it('testMul', function() {
-    // 64x32 bits produces 96 bits of product. The multiplication function under
-    // test truncates the top 32 bits, so we compare against a 64-bit expected
-    // product.
-    const testData = [
-      // low(a)   high(a)               low(a*b)   high(a*b)
-      [0xec10955b, 0x360eb168, 0x4b7f3f5b, 0xbfcb7c59, 0x9517da5f],
-      [0x42b000fc, 0x9d101642, 0x6fa1ab72, 0x2584c438, 0x6a9e6d2b],
-      [0xf42d4fb4, 0xae366403, 0xa65a1000, 0x92434000, 0x1ff978df],
-      [0x17e2f56b, 0x25487693, 0xf13f98c7, 0x73794e2d, 0xa96b0c6a],
-      [0x492f241f, 0x76c0eb67, 0x7377ac44, 0xd4336c3c, 0xfc4b1ebe],
-      [0xd6b92321, 0xe184fa48, 0xd6e76904, 0x93141584, 0xcbf44da1],
-      [0x4bf007ea, 0x968c0a9e, 0xf5e4026a, 0x4fdb1ae4, 0x61b9fb7d],
-      [0x10a83be7, 0x2d685ba6, 0xc9e5fb7f, 0x2ad43499, 0x3742473d],
-      [0x2f261829, 0x1aca681a, 0x3d3494e3, 0x8213205b, 0x283719f8],
-      [0xe4f2ce21, 0x2e74b7bd, 0xd801b38b, 0xbc17feeb, 0xc6c44e0f]
-    ];
-
-    for (let i = 0; i < testData.length; i++) {
-      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      const prod = a.mul(testData[i][2]);
-      expect(prod.lo).toEqual(testData[i][3]);
-      expect(prod.hi).toEqual(testData[i][4]);
-    }
-  });
-
-
-  /**
-   * Tests 64-div-by-32 division.
-   */
-  it('testDiv', function() {
-    // Compute a/b, yielding quot = a/b and rem = a%b.
-    const testData = [
-      // --- divisors in (0, 2^32-1) to test full divisor range
-      // low(a)   high(a)    b          low(quot)  high(quot) rem
-      [0x712443f1, 0xe85cefcc, 0xc1a7050b, 0x332c79ad, 0x00000001, 0x92ffa882],
-      [0x11912915, 0xb2699eb5, 0x30467cbe, 0xb21b4be4, 0x00000003, 0x283465dd],
-      [0x0d917982, 0x201f2a6e, 0x3f35bf03, 0x8217c8e4, 0x00000000, 0x153402d6],
-      [0xa072c108, 0x74020c96, 0xc60568fd, 0x95f9613e, 0x00000000, 0x3f4676c2],
-      [0xd845d5d8, 0xcdd235c4, 0x20426475, 0x6154e78b, 0x00000006, 0x202fb751],
-      [0xa4dbf71f, 0x9e90465e, 0xf08e022f, 0xa8be947f, 0x00000000, 0xbe43b5ce],
-      [0x3dbe627f, 0xa791f4b9, 0x28a5bd89, 0x1f5dfe93, 0x00000004, 0x02bf9ed4],
-      [0x5c1c53ee, 0xccf5102e, 0x198576e7, 0x07e3ae31, 0x00000008, 0x02ea8fb7],
-      [0xfef1e581, 0x04714067, 0xca6540c1, 0x059e73ec, 0x00000000, 0x31658095],
-      [0x1e2dd90c, 0x13dd6667, 0x8b2184c3, 0x248d1a42, 0x00000000, 0x4ca6d0c6],
-      // --- divisors in (0, 2^16-1) to test larger quotient high-words
-      // low(a)   high(a)    b          low(quot)  high(quot) rem
-      [0x86722b47, 0x2cd57c9a, 0x00003123, 0x2ae41b7a, 0x0000e995, 0x00000f99],
-      [0x1dd7884c, 0xf5e839bc, 0x00009eeb, 0x5c886242, 0x00018c21, 0x000099b6],
-      [0x5c53d625, 0x899fc7e5, 0x000087d7, 0xd625007a, 0x0001035c, 0x000019af],
-      [0x6932d932, 0x9d0a5488, 0x000051fb, 0x9d976143, 0x0001ea63, 0x00004981],
-      [0x4d18bb85, 0x0c92fb31, 0x00001d9f, 0x03265ab4, 0x00006cac, 0x000001b9],
-      [0xbe756768, 0xdea67ccb, 0x00008a03, 0x58add442, 0x00019cff, 0x000056a2],
-      [0xe2466f9a, 0x2521f114, 0x0000c350, 0xa0c0860d, 0x000030ab, 0x0000a48a],
-      [0xf00ddad1, 0xe2f5446a, 0x00002cfc, 0x762697a6, 0x00050b96, 0x00000b69],
-      [0xa879152a, 0x0a70e0a5, 0x00007cdf, 0xb44151b3, 0x00001567, 0x0000363d],
-      [0x7179a74c, 0x46083fff, 0x0000253c, 0x4d39ba6e, 0x0001e17f, 0x00000f84]
-    ];
-
-    for (let i = 0; i < testData.length; i++) {
-      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      const result = a.div(testData[i][2]);
-      const quotient = result[0];
-      const remainder = result[1];
-      expect(quotient.lo).toEqual(testData[i][3]);
-      expect(quotient.hi).toEqual(testData[i][4]);
-      expect(remainder.lo).toEqual(testData[i][5]);
-    }
-  });
-
-
-  /**
-   * Tests .toString() and .fromString().
-   */
-  it('testStrings', function() {
-    const testData = [
+describe('binaryArithTest', () => {
+  describe('UInt64', () => {
+    const /** ReadonlyArray<[number, number, string]> */ testData = Object.freeze([
+      [0x0, 0x0, '0'],
+      [0xffffffff, 0xffffffff, '18446744073709551615'],
+      [0xffffffff, 0x00000000, '4294967295'],
+      [0x00000000, 0xffffffff, '18446744069414584320'],
+      [0x000f4240, 0x00000000, '1000000'],
+      [0x000f423f, 0x00000000, '999999'],
+      [0xd4a51000, 0x0000000e8, '1000000000000'],
+      [0xd4a50fff, 0x0000000e8, '999999999999'],
       [0x5e84c935, 0xcae33d0e, '14619595947299359029'],
       [0x62b3b8b8, 0x93480544, '10612738313170434232'],
       [0x319bfb13, 0xc01c4172, '13843011313344445203'],
@@ -294,37 +73,204 @@ describe('binaryArithTest', function() {
       [0x4a843d8a, 0x864e132b, '9677693725920476554'],
       [0x25b4e94d, 0x22b54dc6, '2500990681505655117'],
       [0x6bbe664b, 0x55a5cc0e, '6171563226690381387'],
-      [0xee916c81, 0xb00aabb3, '12685140089732426881']
-    ];
+      [0xee916c81, 0xb00aabb3, '12685140089732426881'],
+    ]);
 
-    for (let i = 0; i < testData.length; i++) {
-      const a = new jspb.arith.UInt64(testData[i][0], testData[i][1]);
-      const roundtrip = jspb.arith.UInt64.fromString(a.toString());
-      expect(roundtrip.lo).toEqual(a.lo);
-      expect(roundtrip.hi).toEqual(a.hi);
-      expect(a.toString()).toEqual(testData[i][2]);
+    // If BigInt is available, verify our test data with that.
+    if (typeof BigInt !== 'undefined') {
+      it('is tested with valid test data as verified with BigInt', () => {
+        for (const testCase of testData) {
+          const big = (BigInt(testCase[1]) << BigInt(32)) + BigInt(testCase[0]);
+          expect(big.toString()).toEqual(testCase[2]);
+        }
+      });
+
+      describe('fromBigInt', () => {
+        it(`parses testData`, () => {
+          for (const testCase of testData) {
+            const roundtrip = UInt64.fromBigInt(BigInt(testCase[2]));
+            expect(roundtrip.lo).withContext(testCase[2]).toEqual(testCase[0]);
+            expect(roundtrip.hi).withContext(testCase[2]).toEqual(testCase[1]);
+          }
+        });
+      });
     }
+
+    describe('toDecimalString', () => {
+      it(`serializes testData`, () => {
+        for (const testCase of testData) {
+          const a = new UInt64(testCase[0], testCase[1]);
+          const actualString = a.toDecimalString();
+          expect(actualString).withContext(testCase[2]).toEqual(testCase[2]);
+        }
+      });
+    });
+
+    describe('fromString', () => {
+      it(`parses testData`, () => {
+        for (const testCase of testData) {
+          const roundtrip = UInt64.fromString(testCase[2]);
+          expect(roundtrip.lo).withContext(testCase[2]).toEqual(testCase[0]);
+          expect(roundtrip.hi).withContext(testCase[2]).toEqual(testCase[1]);
+        }
+      });
+
+      it('parses empty string as zero', () => {
+        expect(UInt64.fromString('')).toEqual(UInt64.fromString('0'));
+      });
+
+      it('does not parse non-decimal strings', () => {
+        expect(UInt64.fromString('0x123')).toBeNull();
+        expect(UInt64.fromString(' 123')).toBeNull();
+      });
+
+      it('tolerates extra leading zeros', () => {
+        expect(UInt64.fromString('0018446744073709551615')).toEqual(
+          UInt64.fromString('18446744073709551615'),
+        );
+      });
+
+      it('truncates values that are too big', () => {
+        // 0x1_FFFF_FFFF_FFFF_FFFF = 36893488147419103231
+        // 0xFFFF_FFFF_FFFF_FFFF = 18446744073709551615
+        expect(UInt64.fromString('36893488147419103231')).toEqual(
+          UInt64.fromString('18446744073709551615'),
+        );
+      });
+    });
+
+    describe('negateInTwosComplement', () => {
+      if (typeof BigInt !== 'undefined') {
+        it('produces correct values', () => {
+          for (const testCase of testData) {
+            if (testCase[0] === 0 && testCase[1] === 0) continue;
+            const result = new UInt64(
+              testCase[0],
+              testCase[1],
+            ).negateInTwosComplement();
+            const resultBigInt =
+              (BigInt(result.hi) << BigInt(32)) + BigInt(result.lo);
+            const expected =
+              (BigInt(1) << BigInt(64)) -
+              ((BigInt(testCase[1]) << BigInt(32)) + BigInt(testCase[0]));
+            expect(resultBigInt).toEqual(expected);
+          }
+        });
+      }
+
+      it('round-trips', () => {
+        for (const testCase of testData) {
+          expect(
+            new UInt64(testCase[0], testCase[1])
+              .negateInTwosComplement()
+              .negateInTwosComplement()
+              .toDecimalString(),
+          ).toBe(testCase[2]);
+        }
+      });
+    });
   });
 
+  describe('Int64', () => {
+    const /** ReadonlyArray<[number, number, string]> */ testData = Object.freeze([
+      [0x0, 0x0, '0'],
+      [0xffffffff, 0xffffffff, '-1'],
+      [0x00000000, 0x80000000, '-9223372036854775808'],
+      [0xffffffff, 0x3fffffff, '4611686018427387903'],
+      [0xffffffff, 0x00000000, '4294967295'],
+      [0x00000000, 0xffffffff, '-4294967296'],
+      [0x000f4240, 0x00000000, '1000000'],
+      [0xd4a51000, 0x0000000e8, '1000000000000'],
+      [0xc5bb087e, 0x931814a6, '-7847499644178593666'],
+      [0xb58a5643, 0x3458a55b, '3771946501229139523'],
+      [0x7113da74, 0x27de6fcf, '2872856549054995060'],
+      [0x9d22f8c8, 0xafc92384, '-5780049594274350904'],
+      [0x48c45eb1, 0x2ef59f66, '3383785956695105201'],
+      [0x4f0a03e2, 0x294269f0, '2973055184857072610'],
+      [0xd4e95c3a, 0xca29805e, '-3879428459215627206'],
+      [0x934049d7, 0x3fb24a16, '4589812431064156631'],
+      [0xd272e654, 0x75bd7dc4, '8484075557333689940'],
+      [0x21f03f77, 0xeec5322, '1075325817098092407'],
+      [0x12158d26, 0xc3ad6da7, '-4346697501012292314'],
+      [0x7247925d, 0x22895b1f, '2488620459718316637'],
+      [0xb8d3e7a0, 0x54d48381, '6112655187423520672'],
+      [0xbf4836f8, 0xcd45d7c6, '-3655278273928612104'],
+      [0xf853f23c, 0x2fba545b, '3439154019435803196'],
+      [0xc004fc2d, 0xdef52fa, '1004112478843763757'],
+      [0x394e4b63, 0xa4937731, '-6587790776614368413'],
+      [0x596ed01a, 0x09382394, '664320065099714586'],
+      [0xe3244770, 0x42106251, '4760412909973292912'],
+      [0x92c2b290, 0x9233453d, '-7911903989602274672'],
+    ]);
 
-  /**
-   * Tests signed Int64s. These are built on UInt64s, so we only need to test
-   * the explicit overrides: .toString() and .fromString().
-   */
-  it('testSignedInt64', function() {
-    const testStrings = [
-      '-7847499644178593666', '3771946501229139523',  '2872856549054995060',
-      '-5780049594274350904', '3383785956695105201',  '2973055184857072610',
-      '-3879428459215627206', '4589812431064156631',  '8484075557333689940',
-      '1075325817098092407',  '-4346697501012292314', '2488620459718316637',
-      '6112655187423520672',  '-3655278273928612104', '3439154019435803196',
-      '1004112478843763757',  '-6587790776614368413', '664320065099714586',
-      '4760412909973292912',  '-7911903989602274672'
-    ];
+    // If BigInt is available, verify our test data with that.
+    if (typeof BigInt !== 'undefined') {
+      it('is tested with valid test data as verified with BigInt', () => {
+        for (const testCase of testData) {
+          let big = (BigInt(testCase[1]) << BigInt(32)) + BigInt(testCase[0]);
+          if (testCase[2][0] === '-') {
+            big -= BigInt(2 ** 64);
+          }
+          expect(big.toString()).toEqual(testCase[2]);
+        }
+      });
 
-    for (let i = 0; i < testStrings.length; i++) {
-      const roundtrip = jspb.arith.Int64.fromString(testStrings[i]).toString();
-      expect(roundtrip).toEqual(testStrings[i]);
+      describe('fromBigInt', () => {
+        it(`parses testData`, () => {
+          for (const testCase of testData) {
+            const roundtrip = Int64.fromBigInt(BigInt(testCase[2]));
+            expect(roundtrip.lo).withContext(testCase[2]).toEqual(testCase[0]);
+            expect(roundtrip.hi).withContext(testCase[2]).toEqual(testCase[1]);
+          }
+        });
+      });
     }
+
+    describe('toDecimalString', () => {
+      it(`serializes testData`, () => {
+        for (const testCase of testData) {
+          const a = new Int64(testCase[0], testCase[1]);
+          const actualString = a.toDecimalString();
+          expect(actualString).withContext(testCase[2]).toEqual(testCase[2]);
+        }
+      });
+    });
+
+    describe('fromString', () => {
+      it(`parses testData`, () => {
+        for (const testCase of testData) {
+          const roundtrip = Int64.fromString(testCase[2]);
+          expect(roundtrip.lo).withContext(testCase[2]).toEqual(testCase[0]);
+          expect(roundtrip.hi).withContext(testCase[2]).toEqual(testCase[1]);
+        }
+      });
+
+      it('parses empty string as zero', () => {
+        expect(Int64.fromString('')).toEqual(Int64.fromString('0'));
+      });
+
+      it('parses -0 string as zero', () => {
+        expect(Int64.fromString('-0')).toEqual(Int64.fromString('0'));
+      });
+
+      it('parses positive values that overflow into the negative space', () => {
+        expect(
+          Int64.fromString('9223372036854775808')?.toDecimalString(),
+        ).toEqual('-9223372036854775808');
+      });
+
+      it('truncates values that are too big', () => {
+        // 0x1_FFFF_FFFF_FFFF_FFFF = 36893488147419103231
+        // 0xFFFF_FFFF_FFFF_FFFF = 18446744073709551615
+        expect(Int64.fromString('36893488147419103231')).toEqual(
+          Int64.fromString('18446744073709551615'),
+        );
+      });
+
+      it('does not parse non-decimal strings', () => {
+        expect(Int64.fromString('0x123')).toBeNull();
+        expect(Int64.fromString(' 123')).toBeNull();
+      });
+    });
   });
 });

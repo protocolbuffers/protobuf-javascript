@@ -14,6 +14,7 @@ goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
 goog.require('jspb.ExtensionFieldBinaryInfo');
 goog.require('jspb.ExtensionFieldInfo');
+goog.require('jspb.internal.public_for_gencode');
 goog.require('jspb.Message');
 goog.require('jspb.Map');
 
@@ -27,6 +28,8 @@ if (typeof exports === 'object') {
   exports['BinaryWriter'] = jspb.BinaryWriter;
   exports['ExtensionFieldInfo'] = jspb.ExtensionFieldInfo;
   exports['ExtensionFieldBinaryInfo'] = jspb.ExtensionFieldBinaryInfo;
+  exports['internal'] = { public_for_gencode: jspb.internal.public_for_gencode };
+
 
   // These are used by generated code but should not be used directly by clients.
   exports['exportSymbol'] = goog.exportSymbol;

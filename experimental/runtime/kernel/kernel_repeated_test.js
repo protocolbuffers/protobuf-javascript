@@ -1,7 +1,7 @@
 /**
  * @fileoverview Tests for repeated methods in kernel.js.
  */
-goog.module('protobuf.runtime.KernelTest');
+goog.module('protobuf.runtime.KernelRepeatedTest');
 
 goog.setTestOnly();
 

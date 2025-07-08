@@ -31,9 +31,9 @@
 
 /**
  * @fileoverview
- * @suppress {missingRequire} TODO(b/152540451): this shouldn't be needed
  */
 goog.provide('jspb.Map');
+
 
 goog.require('jspb.asserts');
 
@@ -424,43 +424,6 @@ jspb.Map.prototype.has = function(key) {
   var keyValue = key.toString();
   return (keyValue in this.map_);
 };
-
-
-/**
- * Write this Map field in wire format to a BinaryWriter, using the given field
- * number.
- * @param {number} fieldNumber
- * @param {!jspb.BinaryWriter} writer
- * @param {function(this:jspb.BinaryWriter,number,K)} keyWriterFn
- *     The method on BinaryWriter that writes type K to the stream.
- * @param {function(this:jspb.BinaryWriter,number,V,?=)|
- *          function(this:jspb.BinaryWriter,number,V,?)} valueWriterFn
- *     The method on BinaryWriter that writes type V to the stream.  May be
- *     writeMessage, in which case the second callback arg form is used.
- * @param {function(V,!jspb.BinaryWriter)=} opt_valueWriterCallback
- *    The BinaryWriter serialization callback for type V, if V is a message
- *    type.
- * @export
- */
-jspb.Map.prototype.serializeBinary = function(
-    fieldNumber, writer, keyWriterFn, valueWriterFn, opt_valueWriterCallback) {
-  var strKeys = this.stringKeys_();
-  strKeys.sort();
-  for (var i = 0; i < strKeys.length; i++) {
-    var entry = this.map_[strKeys[i]];
-    writer.beginSubMessage(fieldNumber);
-    keyWriterFn.call(writer, 1, entry.key);
-    if (this.valueCtor_) {
-      valueWriterFn.call(writer, 2, this.wrapEntry_(entry),
-                         opt_valueWriterCallback);
-    } else {
-      /** @type {function(this:jspb.BinaryWriter,number,?)} */ (valueWriterFn)
-          .call(writer, 2, entry.value);
-    }
-    writer.endSubMessage();
-  }
-};
-
 
 /**
  * Read one key/value message from the given BinaryReader. Compatible as the
