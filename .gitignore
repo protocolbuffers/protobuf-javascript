@@ -1,4 +1,5 @@
 .idea
+.vscode
 node_modules
 commonjs_out
 google/protobuf
@@ -7,3 +8,6 @@ bazel-*
 /testproto_libs1.js
 /testproto_libs2.js
 /google-protobuf.js
+/google-protobuf-*.tgz
+/conformance/protos/*.js
+/conformance/package-lock.json

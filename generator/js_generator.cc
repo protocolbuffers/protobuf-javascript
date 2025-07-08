@@ -1087,13 +1087,16 @@ std::string JSBinaryMethodType(const FieldDescriptor* field, bool is_writer) {
 std::string JSBinaryReadWriteMethodName(const FieldDescriptor* field,
                                         bool is_writer) {
   std::string name = JSBinaryMethodType(field, is_writer);
-  if (field->is_packed()) {
+  if (is_writer && field->is_packed()) {
     name = "Packed" + name;
+  } else if (!is_writer && field->is_packable()) {
+    name = "Packable" + name + "Into";
   } else if (is_writer && field->is_repeated()) {
     name = "Repeated" + name;
   }
   return name;
 }
+
 
 std::string JSBinaryReaderMethodName(const GeneratorOptions& options,
                                      const FieldDescriptor* field) {
@@ -1857,6 +1860,7 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
                                      bool require_map) const {
   if (require_jspb) {
     required->insert("jspb.Message");
+    required->insert("jspb.internal.public_for_gencode");
     required->insert("jspb.BinaryReader");
     required->insert("jspb.BinaryWriter");
   }
@@ -3129,13 +3133,11 @@ void Generator::GenerateClassDeserializeBinaryField(
               : "");
     } else if (field->is_packable()) {
       printer->Print(
-          "      var values = /** @type {$fieldtype$} */ "
-          "(reader.isDelimited() "
-          "? reader.read$reader$() : [reader.read$reader$()]);\n",
-          "fieldtype",
-          JSFieldTypeAnnotation(options, field, false, true,
-                                /* singular_if_not_packed */ false, BYTES_U8),
-          "reader", JSBinaryReadWriteMethodName(field, /* is_writer=*/false));
+          "      reader.read$reader$(msg.get$name$());\n", "reader",
+          JSBinaryReadWriteMethodName(field, /* is_writer=*/false), "name",
+          JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ false));
+      printer->Print("      break;\n");
+      return;
     } else {
       printer->Print(
           "      var value = /** @type {$fieldtype$} */ "
@@ -3147,14 +3149,7 @@ void Generator::GenerateClassDeserializeBinaryField(
           JSBinaryReadWriteMethodName(field, /* is_writer = */ false));
     }
 
-    if (field->is_packable()) {
-      printer->Print(
-          "      for (var i = 0; i < values.length; i++) {\n"
-          "        msg.add$name$(values[i]);\n"
-          "      }\n",
-          "name",
-          JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true));
-    } else if (field->is_repeated()) {
+    if (field->is_repeated()) {
       printer->Print(
           "      msg.add$name$(value);\n", "name",
           JSGetterName(options, field, BYTES_DEFAULT, /* drop_list = */ true));
@@ -3215,6 +3210,30 @@ void Generator::GenerateClassSerializeBinary(const GeneratorOptions& options,
       "};\n"
       "\n"
       "\n");
+}
+
+// Generates the code to access a single field value for the binary serializer.
+void GenerateClassSerializeBinaryFieldAccess(const GeneratorOptions& options,
+                                             io::Printer* printer,
+                                             const FieldDescriptor* field) {
+  if (field->cpp_type() != FieldDescriptor::CPPTYPE_MESSAGE) {
+    std::string typed_annotation =
+        JSFieldTypeAnnotation(options, field,
+                              /* is_setter_argument = */ false,
+                              /* force_present = */ false,
+                              /* singular_if_not_packed = */ false,
+                              /* bytes_mode = */ BYTES_DEFAULT);
+    printer->Print(
+        "    /** @type {$type$} */ "
+        "(message.internal_getField($index$))",
+        "index", JSFieldIndex(field), "type", typed_annotation);
+  } else {
+    printer->Print(
+        "    message.get$name$($nolazy$)", "name",
+        JSGetterName(options, field, BYTES_U8),
+        // No lazy creation for maps containers -- fastpath the empty case.
+        "nolazy", field->is_map() ? "true" : "");
+  }
 }
 
 void Generator::GenerateClassSerializeBinaryField(
@@ -3292,15 +3311,20 @@ void Generator::GenerateClassSerializeBinaryField(
   if (field->is_map()) {
     const FieldDescriptor* key_field = MapFieldKey(field);
     const FieldDescriptor* value_field = MapFieldValue(field);
+    printer->Print("jspb.internal.public_for_gencode.serializeMapToBinary(\n");
+    GenerateClassSerializeBinaryFieldAccess(options, printer, field);
     printer->Print(
-        "    f.serializeBinary($index$, writer, "
-        "$keyWriterFn$, $valueWriterFn$",
+        ",\n    $index$,\n"
+        "    writer,\n"
+        "    $keyWriterFn$,\n"
+        "    $valueWriterFn$",
         "index", absl::StrCat(field->number()), "keyWriterFn",
         JSBinaryWriterMethodName(options, key_field), "valueWriterFn",
         JSBinaryWriterMethodName(options, value_field));
 
     if (value_field->type() == FieldDescriptor::TYPE_MESSAGE) {
-      printer->Print(", $messageType$.serializeBinaryToWriter", "messageType",
+      printer->Print(",\n    $messageType$.serializeBinaryToWriter",
+                     "messageType",
                      GetMessagePath(options, value_field->message_type()));
     }
 
@@ -3429,7 +3453,7 @@ void Generator::GenerateExtension(const GeneratorOptions& options,
           : "undefined");
 
   printer->Print("    $isPacked$);\n", "isPacked",
-                 (field->is_packed() ? "true" : "false"));
+                 (field->is_packable() ? "true" : "false"));
 
   printer->Print(
       "// This registers the extension field with the extended class, so that\n"

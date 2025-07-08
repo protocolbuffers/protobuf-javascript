@@ -91,7 +91,9 @@ goog.require('proto.jspb.test.extendRepeatedUint64List');
 // clang-format off
 // CommonJS-LoadFromFile: ../node_modules/google-protobuf/google/protobuf/any_pb proto.google.protobuf
 goog.require('proto.google.protobuf.Any');
+// clang-format on
 
+const BinaryWriter = goog.module.get('jspb.BinaryWriter');
 
 const suite = {};
 
@@ -108,15 +110,15 @@ function fillAllFields(msg) {
   msg.setOptionalInt32(-42);
   // can be exactly represented by JS number (64-bit double, i.e., 52-bit
   // mantissa).
-  msg.setOptionalInt64(-0x7fffffff00000000);
+  msg.setOptionalInt64(String(-BigInt('0x7fffffff00000000')));
   msg.setOptionalUint32(0x80000000);
-  msg.setOptionalUint64(0xf000000000000000);
+  msg.setOptionalUint64(String(BigInt('0xf000000000000000')));
   msg.setOptionalSint32(-100);
-  msg.setOptionalSint64(-0x8000000000000000);
+  msg.setOptionalSint64(String(-BigInt('0x8000000000000000')));
   msg.setOptionalFixed32(1234);
-  msg.setOptionalFixed64(0x1234567800000000);
+  msg.setOptionalFixed64(String(BigInt('0x1234567800000000')));
   msg.setOptionalSfixed32(-1234);
-  msg.setOptionalSfixed64(-0x1234567800000000);
+  msg.setOptionalSfixed64(String(-BigInt('0x1234567800000000')));
   msg.setOptionalFloat(1.5);
   msg.setOptionalDouble(-1.5);
   msg.setOptionalBool(true);
@@ -132,15 +134,15 @@ function fillAllFields(msg) {
 
 
   msg.setRepeatedInt32List([-42]);
-  msg.setRepeatedInt64List([-0x7fffffff00000000]);
+  msg.setRepeatedInt64List([String(-BigInt('0x7fffffff00000000'))]);
   msg.setRepeatedUint32List([0x80000000]);
-  msg.setRepeatedUint64List([0xf000000000000000]);
+  msg.setRepeatedUint64List([String(BigInt('0xf000000000000000'))]);
   msg.setRepeatedSint32List([-100]);
-  msg.setRepeatedSint64List([-0x8000000000000000]);
+  msg.setRepeatedSint64List([String(-BigInt('0x8000000000000000'))]);
   msg.setRepeatedFixed32List([1234]);
-  msg.setRepeatedFixed64List([0x1234567800000000]);
+  msg.setRepeatedFixed64List([String(BigInt('0x1234567800000000'))]);
   msg.setRepeatedSfixed32List([-1234]);
-  msg.setRepeatedSfixed64List([-0x1234567800000000]);
+  msg.setRepeatedSfixed64List([String(-BigInt('0x1234567800000000'))]);
   msg.setRepeatedFloatList([1.5]);
   msg.setRepeatedDoubleList([-1.5]);
   msg.setRepeatedBoolList([true]);
@@ -154,15 +156,15 @@ function fillAllFields(msg) {
   msg.setRepeatedForeignEnumList([proto.jspb.test.ForeignEnum.FOREIGN_FOO]);
 
   msg.setPackedRepeatedInt32List([-42]);
-  msg.setPackedRepeatedInt64List([-0x7fffffff00000000]);
+  msg.setPackedRepeatedInt64List([String(-BigInt('0x7fffffff00000000'))]);
   msg.setPackedRepeatedUint32List([0x80000000]);
-  msg.setPackedRepeatedUint64List([0xf000000000000000]);
+  msg.setPackedRepeatedUint64List([String(BigInt('0xf000000000000000'))]);
   msg.setPackedRepeatedSint32List([-100]);
-  msg.setPackedRepeatedSint64List([-0x8000000000000000]);
+  msg.setPackedRepeatedSint64List([String(-BigInt('0x8000000000000000'))]);
   msg.setPackedRepeatedFixed32List([1234]);
-  msg.setPackedRepeatedFixed64List([0x1234567800000000]);
+  msg.setPackedRepeatedFixed64List([String(BigInt('0x1234567800000000'))]);
   msg.setPackedRepeatedSfixed32List([-1234]);
-  msg.setPackedRepeatedSfixed64List([-0x1234567800000000]);
+  msg.setPackedRepeatedSfixed64List([String(-BigInt('0x1234567800000000'))]);
   msg.setPackedRepeatedFloatList([1.5]);
   msg.setPackedRepeatedDoubleList([-1.5]);
   msg.setPackedRepeatedBoolList([true]);
@@ -199,15 +201,15 @@ function bytesCompare(arr, expected) {
  */
 function checkAllFields(original, copy) {
   expect(copy.getOptionalInt32()).toEqual(-42);
-  expect(copy.getOptionalInt64()).toEqual(-0x7fffffff00000000);
+  expect(copy.getOptionalInt64()).toEqual(String(-BigInt('0x7fffffff00000000')));
   expect(copy.getOptionalUint32()).toEqual(0x80000000);
-  expect(copy.getOptionalUint64()).toEqual(0xf000000000000000);
+  expect(copy.getOptionalUint64()).toEqual(String(BigInt('0xf000000000000000')));
   expect(copy.getOptionalSint32()).toEqual(-100);
-  expect(copy.getOptionalSint64()).toEqual(-0x8000000000000000);
+  expect(copy.getOptionalSint64()).toEqual(String(-BigInt('0x8000000000000000')));
   expect(copy.getOptionalFixed32()).toEqual(1234);
-  expect(copy.getOptionalFixed64()).toEqual(0x1234567800000000);
+  expect(copy.getOptionalFixed64()).toEqual(String(BigInt('0x1234567800000000')));
   expect(copy.getOptionalSfixed32()).toEqual(-1234);
-  expect(copy.getOptionalSfixed64()).toEqual(-0x1234567800000000);
+  expect(copy.getOptionalSfixed64()).toEqual(String(-BigInt('0x1234567800000000')));
   expect(copy.getOptionalFloat()).toEqual(1.5);
   expect(copy.getOptionalDouble()).toEqual(-1.5);
   expect(copy.getOptionalBool()).toBeTrue();
@@ -215,38 +217,41 @@ function checkAllFields(original, copy) {
   expect(bytesCompare(copy.getOptionalBytes(), BYTES)).toEqual(true);
   expect(true).toEqual(bytesCompare(copy.getOptionalBytes_asU8(), BYTES));
   expect(copy.getOptionalBytes_asB64())
-      .toEqual(goog.crypt.base64.encodeByteArray(BYTES));
+    .toEqual(goog.crypt.base64.encodeByteArray(BYTES));
 
   expect(copy.getOptionalGroup().getA()).toEqual(100);
   expect(copy.getOptionalForeignMessage().getC()).toEqual(16);
   expect(proto.jspb.test.ForeignEnum.FOREIGN_FOO)
-      .toEqual(copy.getOptionalForeignEnum());
+    .toEqual(copy.getOptionalForeignEnum());
 
 
   expect(copy.getOneofString()).toEqual('oneof');
   expect(proto.jspb.test.TestAllTypes.OneofFieldCase.ONEOF_STRING)
-      .toEqual(copy.getOneofFieldCase());
+    .toEqual(copy.getOneofFieldCase());
 
   expect(copy.getRepeatedInt32List()).toEqual([-42]);
-  expect(copy.getRepeatedInt64List()).toEqual([-0x7fffffff00000000]);
+  expect(copy.getRepeatedInt64List())
+    .toEqual([String(-BigInt('0x7fffffff00000000'))]);
   expect(copy.getRepeatedUint32List()).toEqual([0x80000000]);
-  expect(copy.getRepeatedUint64List()).toEqual([0xf000000000000000]);
+  expect(copy.getRepeatedUint64List())
+    .toEqual([String(BigInt('0xf000000000000000'))]);
   expect(copy.getRepeatedSint32List()).toEqual([-100]);
-  expect(copy.getRepeatedSint64List()).toEqual([-0x8000000000000000]);
+  expect(copy.getRepeatedSint64List())
+    .toEqual([String(-BigInt('0x8000000000000000'))]);
   expect(copy.getRepeatedFixed32List()).toEqual([1234]);
-  expect(copy.getRepeatedFixed64List()).toEqual([0x1234567800000000]);
+  expect(copy.getRepeatedFixed64List()).toEqual([String(BigInt('0x1234567800000000'))]);
   expect(copy.getRepeatedSfixed32List()).toEqual([-1234]);
-  expect(copy.getRepeatedSfixed64List()).toEqual([-0x1234567800000000]);
+  expect(copy.getRepeatedSfixed64List()).toEqual([String(-BigInt('0x1234567800000000'))]);
   expect(copy.getRepeatedFloatList()).toEqual([1.5]);
   expect(copy.getRepeatedDoubleList()).toEqual([-1.5]);
   expect(copy.getRepeatedBoolList()).toEqual([true]);
   expect(copy.getRepeatedStringList()).toEqual(['hello world']);
   expect(copy.getRepeatedBytesList().length).toEqual(2);
   expect(true).toEqual(
-      bytesCompare(copy.getRepeatedBytesList_asU8()[0], BYTES));
+    bytesCompare(copy.getRepeatedBytesList_asU8()[0], BYTES));
   expect(true).toEqual(bytesCompare(copy.getRepeatedBytesList()[0], BYTES));
   expect(true).toEqual(
-      bytesCompare(copy.getRepeatedBytesList_asU8()[1], BYTES));
+    bytesCompare(copy.getRepeatedBytesList_asU8()[1], BYTES));
   expect(copy.getRepeatedBytesList_asB64()[0]).toEqual(BYTES_B64);
   expect(copy.getRepeatedBytesList_asB64()[1]).toEqual(BYTES_B64);
   expect(copy.getRepeatedGroupList().length).toEqual(1);
@@ -258,15 +263,18 @@ function checkAllFields(original, copy) {
   ]).toEqual(copy.getRepeatedForeignEnumList());
 
   expect(copy.getPackedRepeatedInt32List()).toEqual([-42]);
-  expect(copy.getPackedRepeatedInt64List()).toEqual([-0x7fffffff00000000]);
+  expect(copy.getPackedRepeatedInt64List())
+    .toEqual([String(-BigInt('0x7fffffff00000000'))]);
   expect(copy.getPackedRepeatedUint32List()).toEqual([0x80000000]);
-  expect(copy.getPackedRepeatedUint64List()).toEqual([0xf000000000000000]);
+  expect(copy.getPackedRepeatedUint64List())
+    .toEqual([String(BigInt('0xf000000000000000'))]);
   expect(copy.getPackedRepeatedSint32List()).toEqual([-100]);
-  expect(copy.getPackedRepeatedSint64List()).toEqual([-0x8000000000000000]);
+  expect(copy.getPackedRepeatedSint64List())
+    .toEqual([String(-BigInt('0x8000000000000000'))]);
   expect(copy.getPackedRepeatedFixed32List()).toEqual([1234]);
-  expect(copy.getPackedRepeatedFixed64List()).toEqual([0x1234567800000000]);
+  expect(copy.getPackedRepeatedFixed64List()).toEqual([String(BigInt('0x1234567800000000'))]);
   expect(copy.getPackedRepeatedSfixed32List()).toEqual([-1234]);
-  expect(copy.getPackedRepeatedSfixed64List()).toEqual([-0x1234567800000000]);
+  expect(copy.getPackedRepeatedSfixed64List()).toEqual([String(-BigInt('0x1234567800000000'))]);
   expect(copy.getPackedRepeatedFloatList()).toEqual([1.5]);
   expect(copy.getPackedRepeatedDoubleList()).toEqual([-1.5]);
 
@@ -282,65 +290,63 @@ function checkAllFields(original, copy) {
  */
 function checkExtensions(msg) {
   expect(0).toEqual(msg.getExtension(proto.jspb.test.extendOptionalInt32));
-  expect(-0x7fffffff00000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalInt64));
+  expect(String(-BigInt('0x7fffffff00000000')))
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalInt64));
   expect(0x80000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalUint32));
-  expect(0xf000000000000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalUint64));
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalUint32));
+  expect(String(BigInt('0xf000000000000000')))
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalUint64));
   expect(-100).toEqual(msg.getExtension(proto.jspb.test.extendOptionalSint32));
-  expect(-0x8000000000000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalSint64));
+  expect(String(-BigInt('0x8000000000000000')))
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalSint64));
   expect(1234).toEqual(msg.getExtension(proto.jspb.test.extendOptionalFixed32));
-  expect(0x1234567800000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalFixed64));
+  expect(String(BigInt('0x1234567800000000')))
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalFixed64));
   expect(-1234).toEqual(
-      msg.getExtension(proto.jspb.test.extendOptionalSfixed32));
-  expect(-0x1234567800000000)
-      .toEqual(msg.getExtension(proto.jspb.test.extendOptionalSfixed64));
+    msg.getExtension(proto.jspb.test.extendOptionalSfixed32));
+  expect(String(-BigInt('0x1234567800000000')))
+    .toEqual(msg.getExtension(proto.jspb.test.extendOptionalSfixed64));
   expect(msg.getExtension(proto.jspb.test.extendOptionalFloat)).toEqual(1.5);
   expect(msg.getExtension(proto.jspb.test.extendOptionalDouble)).toEqual(-1.5);
   expect(msg.getExtension(proto.jspb.test.extendOptionalBool)).toEqual(true);
   expect(msg.getExtension(proto.jspb.test.extendOptionalString))
-      .toEqual('hello world');
+    .toEqual('hello world');
   expect(bytesCompare(
-             msg.getExtension(proto.jspb.test.extendOptionalBytes), BYTES))
-      .toEqual(true);
+    msg.getExtension(proto.jspb.test.extendOptionalBytes), BYTES))
+    .toEqual(true);
   expect(msg.getExtension(proto.jspb.test.ExtendsWithMessage.optionalExtension)
-             .getFoo())
-      .toEqual(16);
+    .getFoo())
+    .toEqual(16);
 
 
   expect(msg.getExtension(proto.jspb.test.extendRepeatedInt32List)).toEqual([
     -42
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedInt64List)).toEqual([
-    -0x7fffffff00000000
+    String(-BigInt('0x7fffffff00000000'))
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedUint32List)).toEqual([
     0x80000000
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedUint64List)).toEqual([
-    0xf000000000000000
+    String(BigInt('0xf000000000000000'))
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedSint32List)).toEqual([
     -100
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedSint64List)).toEqual([
-    -0x8000000000000000
+    String(-BigInt('0x8000000000000000'))
   ]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedFixed32List)).toEqual([
     1234
   ]);
-  expect(msg.getExtension(proto.jspb.test.extendRepeatedFixed64List)).toEqual([
-    0x1234567800000000
-  ]);
+  expect(msg.getExtension(proto.jspb.test.extendRepeatedFixed64List))
+    .toEqual([String(BigInt('0x1234567800000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedSfixed32List)).toEqual([
     -1234
   ]);
-  expect(msg.getExtension(proto.jspb.test.extendRepeatedSfixed64List)).toEqual([
-    -0x1234567800000000
-  ]);
+  expect(msg.getExtension(proto.jspb.test.extendRepeatedSfixed64List))
+    .toEqual([String(-BigInt('0x1234567800000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendRepeatedFloatList)).toEqual([
     1.5
   ]);
@@ -354,45 +360,45 @@ function checkExtensions(msg) {
     'hello world'
   ]);
   expect(true).toEqual(bytesCompare(
-      msg.getExtension(proto.jspb.test.extendRepeatedBytesList)[0], BYTES));
+    msg.getExtension(proto.jspb.test.extendRepeatedBytesList)[0], BYTES));
   expect(1000).toEqual(
-      msg.getExtension(
-             proto.jspb.test.ExtendsWithMessage.repeatedExtensionList)[0]
-          .getFoo());
+    msg.getExtension(
+      proto.jspb.test.ExtendsWithMessage.repeatedExtensionList)[0]
+      .getFoo());
   expect([
     proto.jspb.test.ForeignEnum.FOREIGN_FOO
   ]).toEqual(msg.getExtension(proto.jspb.test.extendRepeatedForeignEnumList));
 
 
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedInt32List))
-      .toEqual([-42]);
+    .toEqual([-42]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedInt64List))
-      .toEqual([-0x7fffffff00000000]);
+    .toEqual([String(-BigInt('0x7fffffff00000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedUint32List))
-      .toEqual([0x80000000]);
+    .toEqual([0x80000000]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedUint64List))
-      .toEqual([0xf000000000000000]);
+    .toEqual([String(BigInt('0xf000000000000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedSint32List))
-      .toEqual([-100]);
+    .toEqual([-100]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedSint64List))
-      .toEqual([-0x8000000000000000]);
+    .toEqual([String(-BigInt('0x8000000000000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedFixed32List))
-      .toEqual([1234]);
+    .toEqual([1234]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedFixed64List))
-      .toEqual([0x1234567800000000]);
+    .toEqual([String(BigInt('0x1234567800000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedSfixed32List))
-      .toEqual([-1234]);
+    .toEqual([-1234]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedSfixed64List))
-      .toEqual([-0x1234567800000000]);
+    .toEqual([String(-BigInt('0x1234567800000000'))]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedFloatList))
-      .toEqual([1.5]);
+    .toEqual([1.5]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedDoubleList))
-      .toEqual([-1.5]);
+    .toEqual([-1.5]);
   expect(msg.getExtension(proto.jspb.test.extendPackedRepeatedBoolList))
-      .toEqual([true]);
+    .toEqual([true]);
   expect([proto.jspb.test.ForeignEnum.FOREIGN_FOO])
-      .toEqual(msg.getExtension(
-          proto.jspb.test.extendPackedRepeatedForeignEnumList));
+    .toEqual(msg.getExtension(
+      proto.jspb.test.extendPackedRepeatedForeignEnumList));
 }
 
 
@@ -460,20 +466,20 @@ describe('protoBinaryTest', () => {
       expect(typeof msg.getRepeatedBytesList_asB64()[0]).toEqual('string');
       expect(typeof msg.getRepeatedBytesList_asB64()[1]).toEqual('string');
       expect(msg.getRepeatedBytesList_asU8()[0] instanceof Uint8Array)
-          .toBeTrue();
+        .toBeTrue();
       expect(msg.getRepeatedBytesList_asU8()[1] instanceof Uint8Array)
-          .toBeTrue();
+        .toBeTrue();
 
       expect(bytesCompare(msg.getRepeatedBytesList()[0], BYTES)).toBeTrue();
       expect(bytesCompare(msg.getRepeatedBytesList()[1], BYTES)).toBeTrue();
       expect(bytesCompare(msg.getRepeatedBytesList_asB64()[0], BYTES))
-          .toBeTrue();
+        .toBeTrue();
       expect(bytesCompare(msg.getRepeatedBytesList_asB64()[1], BYTES))
-          .toBeTrue();
+        .toBeTrue();
       expect(bytesCompare(msg.getRepeatedBytesList_asU8()[0], BYTES))
-          .toBeTrue();
+        .toBeTrue();
       expect(bytesCompare(msg.getRepeatedBytesList_asU8()[1], BYTES))
-          .toBeTrue();
+        .toBeTrue();
     }
     msg.setRepeatedBytesList([BYTES, BYTES]);
     assertGetters();
@@ -493,16 +499,21 @@ describe('protoBinaryTest', () => {
    */
   function fillExtensions(msg) {
     msg.setExtension(proto.jspb.test.extendOptionalInt32, 0);
-    msg.setExtension(proto.jspb.test.extendOptionalInt64, -0x7fffffff00000000);
+    msg.setExtension(
+      proto.jspb.test.extendOptionalInt64, String(-BigInt('0x7fffffff00000000')));
     msg.setExtension(proto.jspb.test.extendOptionalUint32, 0x80000000);
-    msg.setExtension(proto.jspb.test.extendOptionalUint64, 0xf000000000000000);
+    msg.setExtension(
+      proto.jspb.test.extendOptionalUint64, String(BigInt('0xf000000000000000')));
     msg.setExtension(proto.jspb.test.extendOptionalSint32, -100);
-    msg.setExtension(proto.jspb.test.extendOptionalSint64, -0x8000000000000000);
+    msg.setExtension(
+      proto.jspb.test.extendOptionalSint64, String(-BigInt('0x8000000000000000')));
     msg.setExtension(proto.jspb.test.extendOptionalFixed32, 1234);
-    msg.setExtension(proto.jspb.test.extendOptionalFixed64, 0x1234567800000000);
+    msg.setExtension(
+      proto.jspb.test.extendOptionalFixed64, String(BigInt('0x1234567800000000')));
     msg.setExtension(proto.jspb.test.extendOptionalSfixed32, -1234);
     msg.setExtension(
-        proto.jspb.test.extendOptionalSfixed64, -0x1234567800000000);
+      proto.jspb.test.extendOptionalSfixed64,
+      String(-BigInt('0x1234567800000000')));
     msg.setExtension(proto.jspb.test.extendOptionalFloat, 1.5);
     msg.setExtension(proto.jspb.test.extendOptionalDouble, -1.5);
     msg.setExtension(proto.jspb.test.extendOptionalBool, true);
@@ -511,27 +522,32 @@ describe('protoBinaryTest', () => {
     let submsg = new proto.jspb.test.ExtendsWithMessage();
     submsg.setFoo(16);
     msg.setExtension(
-        proto.jspb.test.ExtendsWithMessage.optionalExtension, submsg);
+      proto.jspb.test.ExtendsWithMessage.optionalExtension, submsg);
     msg.setExtension(
-        proto.jspb.test.extendOptionalForeignEnum,
-        proto.jspb.test.ForeignEnum.FOREIGN_FOO);
+      proto.jspb.test.extendOptionalForeignEnum,
+      proto.jspb.test.ForeignEnum.FOREIGN_FOO);
 
 
     msg.setExtension(proto.jspb.test.extendRepeatedInt32List, [-42]);
-    msg.setExtension(
-        proto.jspb.test.extendRepeatedInt64List, [-0x7fffffff00000000]);
+    msg.setExtension(proto.jspb.test.extendRepeatedInt64List, [
+      String(-BigInt('0x7fffffff00000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendRepeatedUint32List, [0x80000000]);
-    msg.setExtension(
-        proto.jspb.test.extendRepeatedUint64List, [0xf000000000000000]);
+    msg.setExtension(proto.jspb.test.extendRepeatedUint64List, [
+      String(BigInt('0xf000000000000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendRepeatedSint32List, [-100]);
-    msg.setExtension(
-        proto.jspb.test.extendRepeatedSint64List, [-0x8000000000000000]);
+    msg.setExtension(proto.jspb.test.extendRepeatedSint64List, [
+      String(-BigInt('0x8000000000000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendRepeatedFixed32List, [1234]);
-    msg.setExtension(
-        proto.jspb.test.extendRepeatedFixed64List, [0x1234567800000000]);
+    msg.setExtension(proto.jspb.test.extendRepeatedFixed64List, [
+      String(BigInt('0x1234567800000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendRepeatedSfixed32List, [-1234]);
-    msg.setExtension(
-        proto.jspb.test.extendRepeatedSfixed64List, [-0x1234567800000000]);
+    msg.setExtension(proto.jspb.test.extendRepeatedSfixed64List, [
+      String(-BigInt('0x1234567800000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendRepeatedFloatList, [1.5]);
     msg.setExtension(proto.jspb.test.extendRepeatedDoubleList, [-1.5]);
     msg.setExtension(proto.jspb.test.extendRepeatedBoolList, [true]);
@@ -540,35 +556,39 @@ describe('protoBinaryTest', () => {
     submsg = new proto.jspb.test.ExtendsWithMessage();
     submsg.setFoo(1000);
     msg.setExtension(
-        proto.jspb.test.ExtendsWithMessage.repeatedExtensionList, [submsg]);
+      proto.jspb.test.ExtendsWithMessage.repeatedExtensionList, [submsg]);
     msg.setExtension(
-        proto.jspb.test.extendRepeatedForeignEnumList,
-        [proto.jspb.test.ForeignEnum.FOREIGN_FOO]);
+      proto.jspb.test.extendRepeatedForeignEnumList,
+      [proto.jspb.test.ForeignEnum.FOREIGN_FOO]);
 
 
     msg.setExtension(proto.jspb.test.extendPackedRepeatedInt32List, [-42]);
+    msg.setExtension(proto.jspb.test.extendPackedRepeatedInt64List, [
+      String(-BigInt('0x7fffffff00000000'))
+    ]);
     msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedInt64List, [-0x7fffffff00000000]);
-    msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedUint32List, [0x80000000]);
-    msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedUint64List, [0xf000000000000000]);
+      proto.jspb.test.extendPackedRepeatedUint32List, [0x80000000]);
+    msg.setExtension(proto.jspb.test.extendPackedRepeatedUint64List, [
+      String(BigInt('0xf000000000000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedSint32List, [-100]);
-    msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedSint64List, [-0x8000000000000000]);
+    msg.setExtension(proto.jspb.test.extendPackedRepeatedSint64List, [
+      String(-BigInt('0x8000000000000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedFixed32List, [1234]);
-    msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedFixed64List, [0x1234567800000000]);
+    msg.setExtension(proto.jspb.test.extendPackedRepeatedFixed64List, [
+      String(BigInt('0x1234567800000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedSfixed32List, [-1234]);
-    msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedSfixed64List,
-        [-0x1234567800000000]);
+    msg.setExtension(proto.jspb.test.extendPackedRepeatedSfixed64List, [
+      String(-BigInt('0x1234567800000000'))
+    ]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedFloatList, [1.5]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedDoubleList, [-1.5]);
     msg.setExtension(proto.jspb.test.extendPackedRepeatedBoolList, [true]);
     msg.setExtension(
-        proto.jspb.test.extendPackedRepeatedForeignEnumList,
-        [proto.jspb.test.ForeignEnum.FOREIGN_FOO]);
+      proto.jspb.test.extendPackedRepeatedForeignEnumList,
+      [proto.jspb.test.ForeignEnum.FOREIGN_FOO]);
   }
 
 
@@ -589,7 +609,7 @@ describe('protoBinaryTest', () => {
   it('testUnknownExtension', () => {
     const msg = new proto.jspb.test.TestExtendable();
     fillExtensions(msg);
-    const writer = new jspb.BinaryWriter();
+    const writer = new BinaryWriter();
     writer.writeBool((1 << 29) - 1, true);
     proto.jspb.test.TestExtendable.serializeBinaryToWriter(msg, writer);
     const encoded = writer.getResultBuffer();
@@ -606,12 +626,13 @@ describe('protoBinaryTest', () => {
     any.pack(msg.serializeBinary(), 'jspb.test.TestAllTypes');
 
     expect(any.getTypeUrl())
-        .toEqual('type.googleapis.com/jspb.test.TestAllTypes');
+      .toEqual('type.googleapis.com/jspb.test.TestAllTypes');
 
     const msg2 = any.unpack(
-        proto.jspb.test.TestAllTypes.deserializeBinary,
-        'jspb.test.TestAllTypes');
+      proto.jspb.test.TestAllTypes.deserializeBinary,
+      'jspb.test.TestAllTypes');
 
     checkAllFields(msg, msg2);
   });
+
 });

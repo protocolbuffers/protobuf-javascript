@@ -12,13 +12,18 @@ goog.provide('jspb.ExportTestDeps');
 goog.require('goog.crypt.base64');
 goog.require('goog.testing.PropertyReplacer');
 
+goog.require('jspb.arith');
 goog.require('jspb.debug');
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
+goog.require('jspb.BinaryConstants');
 goog.require('jspb.ExtensionFieldBinaryInfo');
 goog.require('jspb.ExtensionFieldInfo');
 goog.require('jspb.Message');
 goog.require('jspb.Map');
+goog.require('jspb.utils');
+goog.require('jspb.binary.utf8');
+goog.require('jspb.binary.test_utils');
 
 if (typeof exports === 'object') {
   exports['goog'] = {
@@ -46,6 +51,50 @@ if (typeof exports === 'object') {
   };
 
   exports['jspb'] = {
+    'arith': {
+      'Int64': jspb.arith.Int64,
+      'UInt64': jspb.arith.UInt64,
+    },
+    'binary': {
+      'decoder': {
+        'BinaryDecoder': jspb.binary.decoder.BinaryDecoder,
+      },
+      'encoder': {
+        'BinaryEncoder': jspb.binary.encoder.BinaryEncoder,
+      },
+      'utf8': {
+        'encodeUtf8': jspb.binary.utf8.encodeUtf8,
+      },
+      'test_utils': {
+        'toHexFields': jspb.binary.test_utils.toHexFields,
+      },
+    },
+    'bytestring': {
+      'ByteString': jspb.bytestring.ByteString,
+    },
+    'utils': {
+      'makeTag': jspb.utils.makeTag,
+      'countFixed32Fields': jspb.utils.countFixed32Fields,
+      'countFixed64Fields': jspb.utils.countFixed64Fields,
+      'splitDecimalString': jspb.utils.splitDecimalString,
+      'byteSourceToUint8Array': jspb.utils.byteSourceToUint8Array,
+      'getSplit64Low': jspb.utils.getSplit64Low,
+      'getSplit64High': jspb.utils.getSplit64High,
+      'countVarintFields': jspb.utils.countVarintFields,
+      'countDelimitedFields': jspb.utils.countDelimitedFields,
+      'countVarints': jspb.utils.countVarints,
+      'toZigzag64': jspb.utils.toZigzag64,
+      'fromZigzag64': jspb.utils.fromZigzag64,
+      'splitFloat64': jspb.utils.splitFloat64,
+      'joinFloat64': jspb.utils.joinFloat64,
+      'joinFloat32': jspb.utils.joinFloat32,
+      'splitFloat32': jspb.utils.splitFloat32,
+      'joinUnsignedDecimalString': jspb.utils.joinUnsignedDecimalString,
+      'sliceUint8Array': jspb.utils.sliceUint8Array,
+      'joinSignedDecimalString': jspb.utils.joinSignedDecimalString,
+    },
+    'BinaryConstants': jspb.BinaryConstants,
+
     'debug': jspb.debug,
     'BinaryReader': jspb.BinaryReader,
     'BinaryWriter': jspb.BinaryWriter,

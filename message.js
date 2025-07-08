@@ -43,7 +43,7 @@ goog.require('goog.array');
 goog.require('goog.crypt.base64');
 
 goog.require('jspb.asserts');
-goog.require('jspb.BinaryReader');
+goog.require('jspb.binary.reader');
 goog.require('jspb.Map');
 
 
@@ -657,7 +657,14 @@ jspb.Message.readBinaryExtension = function(
         reader, value, binaryFieldInfo.binaryMessageDeserializeFn);
   } else {
     // All other types.
-    value = binaryFieldInfo.binaryReaderFn.call(reader);
+    if (fieldInfo.isRepeated && binaryFieldInfo.isPacked) {
+      value = getExtensionFn.call(msg, fieldInfo) ?? [];
+      binaryFieldInfo.binaryReaderFn.call(reader, value);
+      setExtensionFn.call(msg, fieldInfo, value);
+      return;
+    } else {
+      value = binaryFieldInfo.binaryReaderFn.call(reader);
+    }
   }
 
   if (fieldInfo.isRepeated && !binaryFieldInfo.isPacked) {

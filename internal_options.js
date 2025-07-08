@@ -27,32 +27,20 @@
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/**
+ * @fileoverview Internal options for.
+ */
+goog.module('jspb.internal_options');
 
-// Test suite is written using Jasmine -- see http://jasmine.github.io/
+/**
+ * @return {boolean} True if BigInt is permitted for use and supported by the
+ *     platform.
+ * @nosideeffects
+ */
+function isBigIntAvailable() {
+  return goog.FEATURESET_YEAR >= 2021 || (typeof BigInt === 'function');
+}
 
-goog.setTestOnly();
-
-// CommonJS-LoadFromFile: ../protos/test_pb proto.jspb.test
-goog.require('proto.jspb.test.Deeply.Nested.Message');
-
-// CommonJS-LoadFromFile: ../protos/test2_pb proto.jspb.test
-goog.require('proto.jspb.test.ForeignNestedFieldMessage');
-
-describe('Message test suite', () => {
-  // Verify that we can successfully use a field referring to a nested message
-  // from a different .proto file.
-  it('testForeignNestedMessage', () => {
-    const msg = new proto.jspb.test.ForeignNestedFieldMessage();
-    const nested = new proto.jspb.test.Deeply.Nested.Message();
-    nested.setCount(5);
-    msg.setDeeplyNestedMessage(nested);
-    expect(msg.getDeeplyNestedMessage().getCount()).toEqual(5);
-
-    // After a serialization-deserialization round trip we should get back the
-    // same data we started with.
-    const serialized = msg.serializeBinary();
-    const deserialized =
-        proto.jspb.test.ForeignNestedFieldMessage.deserializeBinary(serialized);
-    expect(deserialized.getDeeplyNestedMessage().getCount()).toEqual(5);
-  });
-});
+exports = {
+  isBigIntAvailable,
+};

@@ -71,7 +71,13 @@ console.log("global.goog = testdeps.goog;");
 console.log("global.jspb = googleProtobuf.jspb;");
 console.log("");
 
-lineReader.on('line', function(line) {
+lineReader.on('line', function (line) {
+  const isModuleGet = line.match(/(.*)goog\.module\.get\('([^']*)'\)([^;]*);/);
+  if (isModuleGet) {
+    const fullSym = isModuleGet[2];
+    console.log(isModuleGet[1] + "testdeps." + fullSym + isModuleGet[3]);
+    return;
+  }
   var isRequire = line.match(/goog\.require\('([^']*)'\)/);
   var isLoadFromFile = line.match(/CommonJS-LoadFromFile: (\S*) (.*)/);
   var isSetTestOnly = line.match(/goog.setTestOnly()/);

@@ -32,7 +32,11 @@
  * @fileoverview Loader that handles goog.require() for Node.JS.
  */
 
-var oldLoader = goog.global.CLOSURE_IMPORT_SCRIPT;
+const fs = require('fs');
+const path = require('path');
+
+// For goog.require()
+const OLD_CLOSURE_IMPORT_SCRIPT = goog.global.CLOSURE_IMPORT_SCRIPT;
 
 goog.global.CLOSURE_IMPORT_SCRIPT = function(src, opt_sourceText) {
   if (opt_sourceText === undefined) {
@@ -45,5 +49,15 @@ goog.global.CLOSURE_IMPORT_SCRIPT = function(src, opt_sourceText) {
     }
   }
 
-  return oldLoader(src, opt_sourceText);
+  return OLD_CLOSURE_IMPORT_SCRIPT(src, opt_sourceText);
+};
+
+const OLD_CLOSURE_LOAD_FILE_SYNC = goog.global.CLOSURE_LOAD_FILE_SYNC;
+
+goog.global.CLOSURE_LOAD_FILE_SYNC = function (src) {
+  try {
+    return fs.readFileSync(path.resolve('.', src), { encoding: 'utf-8' });
+  } catch (e) {
+    return OLD_CLOSURE_LOAD_FILE_SYNC(src);
+  }
 };

@@ -1,0 +1,48 @@
+Recommended.Editions_Proto2.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: Expect: \202\007\014\022\012\010\001\020\001\310\005\001\310\005\001, but got: \
+Recommended.Editions_Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: Expect: \202\007\014\022\012\010\001\020\001\310\005\001\310\005\001, but got: \
+Recommended.Proto2.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: Expect: \202\007\014\022\012\010\001\020\001\310\005\001\310\005\001, but got: \
+Recommended.Proto2.ProtobufInput.ValidMessageSetEncoding.SubmessageEncoding.NotUnknown.ProtobufOutput # Output was not equivalent to reference message: added: message_set_correct.(protobuf_test_messages.proto2.TestAllTypesProto2.Ext
+Recommended.Proto3.ProtobufInput.ValidDataOneofBinary.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: Expect: \202\007\014\022\012\010\001\020\001\310\005\001\310\005\001, but got: \
+Required.Editions.ProtobufInput.ValidDelimitedExtension.GroupLike.ProtobufOutput # Failed to parse input or produce output.
+Required.Editions.ProtobufInput.ValidDelimitedExtension.NotGroupLike.ProtobufOutput # Failed to parse input or produce output.
+Required.Editions.ProtobufInput.ValidDelimitedField.GroupLike.ProtobufOutput # Output was not equivalent to reference message: added: delimited_field: { group_int32: 99 }
+Required.Editions.ProtobufInput.ValidDelimitedField.NotGroupLike.ProtobufOutput # Output was not equivalent to reference message: added: groupliketype: { group_int32: 99 }
+Required.Editions_Proto2.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput # Output was not equivalent to reference message: deleted: optional_nested_message.corecursive.optional_int64: 1234modified: optio
+Required.Editions_Proto2.ProtobufInput.UnknownOrdering.ProtobufOutput # Unknown field mismatch
+Required.Editions_Proto2.ProtobufInput.UnknownVarint.ProtobufOutput # Output was not equivalent to reference message: Expect: \250\037\001, but got: 
+Required.Editions_Proto2.ProtobufInput.UnmatchedEndGroup # Should have failed to parse, but didn't.
+Required.Editions_Proto2.ProtobufInput.UnmatchedEndGroupNestedLen # Should have failed to parse, but didn't.
+Required.Editions_Proto2.ProtobufInput.UnmatchedEndGroupUnknown # Should have failed to parse, but didn't.
+Required.Editions_Proto2.ProtobufInput.UnmatchedEndGroupWithData # Should have failed to parse, but didn't.
+Required.Editions_Proto2.ProtobufInput.UnmatchedEndGroupWrongType # Should have failed to parse, but didn't.
+Required.Editions_Proto2.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: deleted: oneof_nested_message.corecursive.optional_int32: 1deleted: oneof_nested
+Required.Editions_Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput # Output was not equivalent to reference message: deleted: optional_nested_message.corecursive.optional_int64: 1234modified: optio
+Required.Editions_Proto3.ProtobufInput.UnknownOrdering.ProtobufOutput # Unknown field mismatch
+Required.Editions_Proto3.ProtobufInput.UnknownVarint.ProtobufOutput # Output was not equivalent to reference message: Expect: \250\037\001, but got: 
+Required.Editions_Proto3.ProtobufInput.UnmatchedEndGroup # Should have failed to parse, but didn't.
+Required.Editions_Proto3.ProtobufInput.UnmatchedEndGroupNestedLen # Should have failed to parse, but didn't.
+Required.Editions_Proto3.ProtobufInput.UnmatchedEndGroupUnknown # Should have failed to parse, but didn't.
+Required.Editions_Proto3.ProtobufInput.UnmatchedEndGroupWithData # Should have failed to parse, but didn't.
+Required.Editions_Proto3.ProtobufInput.UnmatchedEndGroupWrongType # Should have failed to parse, but didn't.
+Required.Editions_Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: deleted: oneof_nested_message.corecursive.optional_int32: 1deleted: oneof_nested
+Required.Proto2.ProtobufInput.MessageSetEncoding.UnknownExtension.ProtobufOutput # Output was not equivalent to reference message: deleted: message_set_correct.4135300[0]: "\000c"
+Required.Proto2.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput # Output was not equivalent to reference message: deleted: optional_nested_message.corecursive.optional_int64: 1234modified: optio
+Required.Proto2.ProtobufInput.UnknownOrdering.ProtobufOutput # Unknown field mismatch
+Required.Proto2.ProtobufInput.UnknownVarint.ProtobufOutput # Output was not equivalent to reference message: Expect: \250\037\001, but got: 
+Required.Proto2.ProtobufInput.UnmatchedEndGroup # Should have failed to parse, but didn't.
+Required.Proto2.ProtobufInput.UnmatchedEndGroupNestedLen # Should have failed to parse, but didn't.
+Required.Proto2.ProtobufInput.UnmatchedEndGroupUnknown # Should have failed to parse, but didn't.
+Required.Proto2.ProtobufInput.UnmatchedEndGroupWithData # Should have failed to parse, but didn't.
+Required.Proto2.ProtobufInput.UnmatchedEndGroupWrongType # Should have failed to parse, but didn't.
+Required.Proto2.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: deleted: oneof_nested_message.corecursive.optional_int32: 1deleted: oneof_nested
+Required.Proto2.ProtobufInput.ValidMessageSetEncoding.OutOfOrderGroupsEntries.ProtobufOutput # Output was not equivalent to reference message: deleted: message_set_correct.(protobuf_test_messages.proto2.TestAllTypesProto2.M
+Required.Proto2.ProtobufInput.ValidMessageSetEncoding.ProtobufOutput # Output was not equivalent to reference message: deleted: message_set_correct.(protobuf_test_messages.proto2.TestAllTypesProto2.M
+Required.Proto3.ProtobufInput.RepeatedScalarMessageMerge.ProtobufOutput # Output was not equivalent to reference message: deleted: optional_nested_message.corecursive.optional_int64: 1234modified: optio
+Required.Proto3.ProtobufInput.UnknownOrdering.ProtobufOutput # Unknown field mismatch
+Required.Proto3.ProtobufInput.UnknownVarint.ProtobufOutput # Output was not equivalent to reference message: Expect: \250\037\001, but got: 
+Required.Proto3.ProtobufInput.UnmatchedEndGroup # Should have failed to parse, but didn't.
+Required.Proto3.ProtobufInput.UnmatchedEndGroupNestedLen # Should have failed to parse, but didn't.
+Required.Proto3.ProtobufInput.UnmatchedEndGroupUnknown # Should have failed to parse, but didn't.
+Required.Proto3.ProtobufInput.UnmatchedEndGroupWithData # Should have failed to parse, but didn't.
+Required.Proto3.ProtobufInput.UnmatchedEndGroupWrongType # Should have failed to parse, but didn't.
+Required.Proto3.ProtobufInput.ValidDataOneof.MESSAGE.Merge.ProtobufOutput # Output was not equivalent to reference message: deleted: oneof_nested_message.corecursive.optional_int32: 1deleted: oneof_nested

@@ -1,0 +1,18 @@
+{
+  "name": "google-protobuf-conformance",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Conformance test runner for google-protobuf",
+  "main": "runner.js",
+  "files": [
+    "runner.js",
+    "protos/*.proto",
+    "package.json",
+    "LICENSE.md"
+  ],
+  "dependencies": {
+    "google-protobuf": "file:../google-protobuf-3.21.4.tgz"
+  },
+  "author": "Google Protocol Buffers Team",
+  "license": "BSD-3-Clause"
+}
