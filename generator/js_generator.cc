@@ -430,20 +430,12 @@ std::string GetEnumFileName(const GeneratorOptions& options,
 // Returns the message/response ID, if set.
 std::string GetMessageId(const Descriptor* desc) { return std::string(); }
 
-bool IgnoreExtensionField(const FieldDescriptor* field) {
-  // Exclude descriptor extensions from output "to avoid clutter" (from original
-  // codegen).
-  if (!field->is_extension()) return false;
-  const FileDescriptor* file = field->containing_type()->file();
-  return file->name() == "net/proto2/proto/descriptor.proto" ||
-         file->name() == "google/protobuf/descriptor.proto";
-}
-
 // Used inside Google only -- do not remove.
 bool IsResponse(const Descriptor* desc) { return false; }
 
 bool IgnoreField(const FieldDescriptor* field) {
-  return IgnoreExtensionField(field);
+  // no-op in open source
+  return false;
 }
 
 // Do we ignore this message type?
