@@ -68,10 +68,10 @@ jobs:
 #          - ppc64
         include:
 # to ensure backwards compatibility as long as possible, use earliest versions of OSs available on Github Actions
-          - os: windows-2019
+          - os: windows-2022
             cpu: x64_windows
             bazel_target: dist_zip
-          - os: windows-2019
+          - os: windows-2022
             cpu: x64_x86_windows
             bazel_target: dist_zip
 # disabling Mac OS releases for now since they are working through existing build process
@@ -88,7 +88,7 @@ jobs:
         with:
           name: js
 
-      - uses: bazel-contrib/setup-bazel@0.8.5
+      - uses: bazel-contrib/setup-bazel@0.15.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
