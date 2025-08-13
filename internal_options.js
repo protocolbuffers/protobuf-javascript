@@ -28,14 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
- * @fileoverview Internal options for.
+ * @fileoverview Internal options.
  */
 goog.module('jspb.internal_options');
 
 /**
  * @return {boolean} True if BigInt is permitted for use and supported by the
  *     platform.
- * @nosideeffects
  */
 function isBigIntAvailable() {
   return goog.FEATURESET_YEAR >= 2021 || (typeof BigInt === 'function');
