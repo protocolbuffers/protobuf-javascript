@@ -74,11 +74,13 @@ jobs:
           - os: windows-2022
             cpu: x64_x86_windows
             bazel_target: dist_zip
-# disabling Mac OS releases for now since they are working through existing build process
-#          - os: macos-11
-#            cpu: darwin_arm64
-#          - os: macos-11
-#            cpu: darwin_x86_64
+          - os: macos-14
+            cpu: darwin_arm64
+            bazel_target: dist_zip
+          - os: macos-13
+            cpu: darwin_x86_64
+            bazel_target: dist_zip
+
 
     steps:
       - uses: actions/checkout@v4
