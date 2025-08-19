@@ -1,4 +1,4 @@
-name: Build, Test and Release
+name: Build and Test
 
 on: push
 
@@ -108,25 +108,3 @@ jobs:
         with:
           name: release-${{ matrix.os }}-${{ matrix.cpu }}
           path: out
-
-  release:
-    needs: package
-    if: startsWith(github.ref, 'refs/tags/')
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-${{ matrix.os }}-${{ matrix.cpu }}
-
-      - name: Release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: protobuf-javascript-*
-          file_glob: true
-          tag: ${{ github.ref }}
-          overwrite: true
