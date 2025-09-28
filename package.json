@@ -21,6 +21,7 @@
     "jasmine": "~3.5.0"
   },
   "scripts": {
+    "prebuild": "node update-bazel-versions.js",
     "build": "node ./node_modules/gulp/bin/gulp.js dist",
     "test": "node ./node_modules/gulp/bin/gulp.js test",
     "clean": "node ./node_modules/gulp/bin/gulp.js clean"
