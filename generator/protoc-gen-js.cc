@@ -29,10 +29,19 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <google/protobuf/compiler/plugin.h>
+#include <iostream>
+#include <string>
 
 #include "generator/js_generator.h"
+#include "generator/version.h"
 
 int main(int argc, char** argv) {
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--version") {
+      std::cout << "protoc-gen-js version " << kProtobufJavascriptVersion << std::endl;
+      return 0;
+    }
+  }
   std::unique_ptr<google::protobuf::compiler::CodeGenerator> generator(
       new google::protobuf::compiler::js::Generator());
   return google::protobuf::compiler::PluginMain(argc, argv, generator.get());
