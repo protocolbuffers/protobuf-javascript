@@ -1855,6 +1855,7 @@ void Generator::GenerateRequiresImpl(const GeneratorOptions& options,
     required->insert("jspb.internal.public_for_gencode");
     required->insert("jspb.BinaryReader");
     required->insert("jspb.BinaryWriter");
+    required->insert("jspb.binary.bytesource");
   }
   if (require_extension) {
     required->insert("jspb.ExtensionFieldBinaryInfo");
@@ -3016,7 +3017,7 @@ void Generator::GenerateClassDeserializeBinary(const GeneratorOptions& options,
   printer->Print(
       "/**\n"
       " * Deserializes binary data (in protobuf wire format).\n"
-      " * @param {jspb.ByteSource} bytes The bytes to deserialize.\n"
+      " * @param {jspb.binary.bytesource.ByteSource} bytes The bytes to deserialize.\n"
       " * @return {!$class$}\n"
       " */\n"
       "$class$.deserializeBinary = function(bytes) {\n"

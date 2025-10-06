@@ -192,6 +192,15 @@ class BinaryEncoder {
   }
 
   /**
+   * Encodes a BigInt into its wire-format, zigzag-encoded varint
+   * representation and stores it in the buffer.
+   * @param {bigint} value The BigInt to convert.
+   */
+  writeZigzagVarint64BigInt(value) {
+    this.writeZigzagVarint64String(value.toString());
+  }
+  
+  /**
    * Encodes a JavaScript decimal string into its wire-format, zigzag-encoded
    * varint representation and stores it in the buffer. Integers not
    * representable in 64 bits will be truncated.
