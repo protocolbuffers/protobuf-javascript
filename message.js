@@ -1876,7 +1876,7 @@ jspb.Message.clone_ = function(obj) {
         // NOTE:redundant null check existing for NTI compatibility.
         // see b/70515949
         clonedArray[i] = (typeof o == 'object') ?
-            jspb.Message.clone_(jspb.asserts.assert(o)) :
+            jspb.Message.clone_(/** @type {!Object} */(jspb.asserts.assert(o))) :
             o;
       }
     }
@@ -1892,7 +1892,7 @@ jspb.Message.clone_ = function(obj) {
       // NOTE:redundant null check existing for NTI compatibility.
       // see b/70515949
       clone[key] = (typeof o == 'object') ?
-          jspb.Message.clone_(jspb.asserts.assert(o)) :
+          jspb.Message.clone_(/** @type {!Object} */(jspb.asserts.assert(o))) :
           o;
     }
   }

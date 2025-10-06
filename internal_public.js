@@ -12,7 +12,7 @@ goog.module.declareLegacyNamespace();
 const asserts = goog.require('goog.asserts');
 const { BinaryReader } = goog.require('jspb.binary.reader');
 const { BinaryWriter } = goog.requireType('jspb.binary.writer');
-const {Map: JspbMap} = goog.requireType('jspb.Map');
+const JspbMap = goog.requireType('jspb.Map');
 
 /**
  * Write this Map field in wire format to a BinaryWriter, using the given

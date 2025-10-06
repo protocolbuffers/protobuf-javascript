@@ -12,6 +12,7 @@ goog.module.declareLegacyNamespace();
 const BinaryConstants = goog.require('jspb.BinaryConstants');
 const { assert } = goog.require('goog.asserts');
 const { isBigIntAvailable } = goog.require('jspb.internal_options');
+const { ByteSource } = goog.require('jspb.binary.bytesource');
 const { ByteString } = goog.require('jspb.bytestring');
 const { decodeStringToUint8Array } = goog.require('goog.crypt.base64');
 const { unsafeUint8ArrayFromByteString } = goog.require('jspb.unsafe_bytestring');
