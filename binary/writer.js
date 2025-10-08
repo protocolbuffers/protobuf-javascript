@@ -430,10 +430,6 @@ class BinaryWriter {
         this.encoder_.writeZigzagVarint64(/** @type {number} */(value));
         break;
 
-      case 'bigint':
-        this.encoder_.writeZigzagVarint64BigInt(/** @type {bigint} */(value));
-        break;
-
       default:
         this.encoder_.writeZigzagVarint64String(/** @type {string} */(value));
         break;
@@ -1423,10 +1419,6 @@ class BinaryWriter {
       switch (typeof v) {
         case 'number':
           this.encoder_.writeZigzagVarint64(v);
-          break;
-
-        case 'bigint':
-          this.encoder_.writeZigzagVarint64BigInt(/** @type {bigint} */(v));
           break;
 
         default:
