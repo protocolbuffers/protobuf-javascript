@@ -190,15 +190,6 @@ class BinaryEncoder {
     utils.splitZigzag64(value);
     this.writeSplitVarint64(utils.getSplit64Low(), utils.getSplit64High());
   }
-
-  /**
-   * Encodes a BigInt into its wire-format, zigzag-encoded varint
-   * representation and stores it in the buffer.
-   * @param {bigint} value The BigInt to convert.
-   */
-  writeZigzagVarint64BigInt(value) {
-    this.writeZigzagVarint64String(value.toString());
-  }
   
   /**
    * Encodes a JavaScript decimal string into its wire-format, zigzag-encoded
