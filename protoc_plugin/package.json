@@ -6,7 +6,7 @@
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/protocolbuffers/protobuf-javascript.git"
+    "url": "git+https://github.com/protocolbuffers/protobuf-javascript.git"
   },
   "type": "commonjs",
   "main": "index.js",
