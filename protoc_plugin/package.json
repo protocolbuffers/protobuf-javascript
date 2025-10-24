@@ -1,9 +1,10 @@
 {
   "name": "@protocolbuffers/protoc-gen-js",
-  "version": "4.0.0",
-  "description": "Standalone distribution of the protoc-gen-js plugin for Protocol Buffers",
+  "version": "4.0.0-1",
+  "description": "Official standalone distribution of the protoc-gen-js plugin for Protocol Buffers",
   "author": "Google Protocol Buffers Team",
   "license": "BSD-3-Clause",
+  "keywords": ["protocol buffers", "protobuf", "protoc-gen-js", "google-protobuf", "protobuf-javascript"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/protocolbuffers/protobuf-javascript.git"
