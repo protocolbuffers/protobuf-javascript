@@ -31,7 +31,8 @@ To use Protocol Buffers with JavaScript, you need two main components:
 Project Status
 ===
 
-This project is currently in a working state.
+As of v4.0.0, you can directly install the `protoc-gen-js` plugin from npm as
+[@protocolbuffers/protoc-gen-js](https://www.npmjs.com/package/@protocolbuffers/protoc-gen-js).
 
 **Support Status**
 
