@@ -1,4 +1,4 @@
-module(name = "protobuf_javascript", version = "4.0.0")
+module(name = "protobuf_javascript", version = "4.0.1")
 
 bazel_dep(name = "protobuf", version = "33.0", repo_name = "com_google_protobuf")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
