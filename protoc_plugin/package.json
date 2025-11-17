@@ -1,6 +1,6 @@
 {
   "name": "@protocolbuffers/protoc-gen-js",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Standalone distribution of the protoc-gen-js plugin for Protocol Buffers",
   "author": "Google Protocol Buffers Team",
   "license": "BSD-3-Clause",
