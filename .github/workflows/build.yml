@@ -77,7 +77,7 @@ jobs:
           - os: macos-14
             cpu: darwin_arm64
             bazel_target: dist_zip
-          - os: macos-13
+          - os: macos-14-large
             cpu: darwin_x86_64
             bazel_target: dist_zip
 
