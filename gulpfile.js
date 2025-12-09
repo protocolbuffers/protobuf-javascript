@@ -177,6 +177,8 @@ function getClosureCompilerCommand(exportsFile, outputFile) {
     '--js=internal_public.js',
     '--js=map.js',
     '--js=message.js',
+    '--js=extension_field_info.js',
+    '--js=extension_field_binary_info.js',
     '--js=bytestring.js',
     '--js=unsafe_bytestring.js',
     '--js=binary/**.js',
@@ -228,7 +230,7 @@ function commonjs_out(cb) {
 
 function closure_make_deps(cb) {
   exec(
-    './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js bytestring.js internal_bytes.js internal_options.js internal_public.js binary/arith.js binary/bytesource.js binary/binary_constants.js binary/decoder.js binary/decoder_alias.js binary/encoder.js binary/encoder_alias.js binary/errors.js binary/internal_buffer.js binary/reader.js binary/reader_alias.js binary/test_utils.js binary/utf8.js binary/utils.js binary/writer.js binary/writer_alias.js asserts.js debug.js map.js message.js node_loader.js test_bootstrap.js unsafe_bytestring.js > deps.js',
+    './node_modules/.bin/closure-make-deps --closure-path=. --file=node_modules/google-closure-library/closure/goog/deps.js bytestring.js internal_bytes.js internal_options.js internal_public.js binary/arith.js binary/bytesource.js binary/binary_constants.js binary/decoder.js binary/decoder_alias.js binary/encoder.js binary/encoder_alias.js binary/errors.js binary/internal_buffer.js binary/reader.js binary/reader_alias.js binary/test_utils.js binary/utf8.js binary/utils.js binary/writer.js binary/writer_alias.js asserts.js debug.js map.js message.js extension_field_info.js extension_field_binary_info.js node_loader.js test_bootstrap.js unsafe_bytestring.js > deps.js',
     make_exec_logging_callback(cb));
 }
 
