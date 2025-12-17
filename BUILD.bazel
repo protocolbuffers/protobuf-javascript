@@ -6,7 +6,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_files", "strip_prefix")
 load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//:protobuf_javascript_release.bzl", "package_naming")
 
-exports_files(["generate-version-header.js", "package.json"])
+exports_files(["package.json"])
 
 config_setting(
     name = "x64_x86_windows",
@@ -36,13 +36,13 @@ config_setting(
 package_naming(
     name = "protobuf_javascript_pkg_naming",
     platform = select({
-        ":k8": "linux-x86_64", # currently the only supported build type in Github Actions
+        ":k8": "linux-x86_64",  # currently the only supported build type in Github Actions
         ":x64_x86_windows": "win32",
         ":x64_windows": "win64",
         ":darwin_arm64": "osx-aarch_64",
         ":darwin_x86_64": "osx-x86_64",
-        "//conditions:default": "" # continues with current behavior when no --cpu is specified allowing existing internal builds to function
-    })
+        "//conditions:default": "",  # continues with current behavior when no --cpu is specified allowing existing internal builds to function
+    }),
 )
 
 pkg_files(
@@ -54,15 +54,18 @@ pkg_files(
 
 pkg_files(
     name = "dist_files",
-    srcs = glob([
-        "google/protobuf/*.js",
-        "google/protobuf/compiler/*.js"
-    ], allow_empty = True) + [
-        "google-protobuf.js",
-        "package.json",
-        "README.md",
+    srcs = glob(
+        [
+            "google/protobuf/*.js",
+            "google/protobuf/compiler/*.js",
+        ],
+        allow_empty = True,
+    ) + [
         "LICENSE.md",
         "LICENSE-asserts.md",
+        "README.md",
+        "google-protobuf.js",
+        "package.json",
     ],
     strip_prefix = strip_prefix.from_root(""),
 )
@@ -93,5 +96,5 @@ filegroup(
     srcs = [
         ":dist_tar",
         ":dist_zip",
-    ]
+    ],
 )

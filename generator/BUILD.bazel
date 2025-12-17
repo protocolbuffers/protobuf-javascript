@@ -1,9 +1,16 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "generate-version-header",
+    srcs = ["generate-version-header.cc"],
+)
+
 genrule(
     name = "generate_version_header",
     srcs = ["//:package.json"],
     outs = ["version.h"],
-    cmd = "node $(location //:generate-version-header.js) $(OUTS)",
-    tools = ["//:generate-version-header.js"],
+    cmd = "$(location :generate-version-header) $(location //:package.json) $(OUTS)",
+    tools = [":generate-version-header"],
 )
 
 cc_binary(
@@ -18,15 +25,13 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
         "@com_google_protobuf//:protobuf",
+        "@com_google_protobuf//:protoc_lib",
         "@com_google_protobuf//src/google/protobuf/compiler:code_generator",
         "@com_google_protobuf//src/google/protobuf/io",
         "@com_google_protobuf//src/google/protobuf/io:printer",
         "@com_google_protobuf//src/google/protobuf/io:tokenizer",
-        "@com_google_protobuf//:protoc_lib",
-        "@abseil-cpp//absl/strings",
-        "@abseil-cpp//absl/strings:str_format",
     ],
 )
-
-

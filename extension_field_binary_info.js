@@ -36,15 +36,15 @@ goog.module('jspb.ExtensionFieldBinaryInfo');
 goog.module.declareLegacyNamespace();
 
 const ExtensionFieldInfo = goog.require('jspb.ExtensionFieldInfo');
-goog.requireType('jspb.BinaryReader');
-goog.requireType('jspb.BinaryWriter');
+const BinaryReader = goog.requireType('jspb.BinaryReader');
+const BinaryWriter = goog.requireType('jspb.BinaryWriter');
 
 /**
  * Stores binary-related information for a single extension field.
  * @param {!ExtensionFieldInfo<T>} fieldInfo
- * @param {function(this:jspb.BinaryReader,number,?,?)} binaryReaderFn
- * @param {function(this:jspb.BinaryWriter,number,?)
- *        |function(this:jspb.BinaryWriter,number,?,?,?,?,?)} binaryWriterFn
+ * @param {function(this:BinaryReader,number,?,?)} binaryReaderFn
+ * @param {function(this:BinaryWriter,number,?)
+ *        |function(this:BinaryWriter,number,?,?,?,?,?)} binaryWriterFn
  * @param {function(?,?)=} opt_binaryMessageSerializeFn
  * @param {function(?,?)=} opt_binaryMessageDeserializeFn
  * @param {boolean=} opt_isPacked
