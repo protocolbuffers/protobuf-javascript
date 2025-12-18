@@ -68,12 +68,8 @@
 goog.module('jspb.Map');
 goog.module.declareLegacyNamespace();
 
-
 const asserts = goog.require('jspb.asserts');
-
-goog.requireType('jspb.BinaryReader');
-goog.requireType('jspb.BinaryWriter');
-
+const BinaryReader = goog.requireType('jspb.BinaryReader');
 
 
 /**
@@ -268,13 +264,13 @@ const ArrayIteratorIterable_ = function (arr) {
 /** @override @final */
 ArrayIteratorIterable_.prototype.next = function () {
   if (this.idx_ < this.arr_.length) {
-    return {done: false, value: this.arr_[this.idx_++]};
+    return { done: false, value: this.arr_[this.idx_++] };
   } else {
-    return {done: true, value: undefined};
+    return { done: true, value: undefined };
   }
 };
 
-if (typeof(Symbol) != 'undefined') {
+if (typeof (Symbol) != 'undefined') {
   /** @override */
   ArrayIteratorIterable_.prototype[Symbol.iterator] = function () {
     return this;
@@ -488,17 +484,17 @@ Map.prototype.has = function (key) {
  * we should default it to 0.
  * @template K, V
  * @param {!Map} map
- * @param {!jspb.BinaryReader} reader
- * @param {function(this:jspb.BinaryReader):K} keyReaderFn
+ * @param {!BinaryReader} reader
+ * @param {function(this:BinaryReader):K} keyReaderFn
  *     The method on BinaryReader that reads type K from the stream.
  *
- * @param {function(this:jspb.BinaryReader):V|
- *          function(this:jspb.BinaryReader,V,
- *                  function(V,!jspb.BinaryReader))} valueReaderFn
+ * @param {function(this:BinaryReader):V|
+ *          function(this:BinaryReader,V,
+ *                  function(V,!BinaryReader))} valueReaderFn
  *    The method on BinaryReader that reads type V from the stream. May be
  *    readMessage, in which case the second callback arg form is used.
  *
- * @param {?function(V,!jspb.BinaryReader)=} opt_valueReaderCallback
+ * @param {?function(V,!BinaryReader)=} opt_valueReaderCallback
  *    The BinaryReader parsing callback for type V, if V is a message type
  *
  * @param {K=} opt_defaultKey
@@ -514,8 +510,8 @@ Map.prototype.has = function (key) {
  *
  */
 Map.deserializeBinary = function (map, reader, keyReaderFn, valueReaderFn,
-                                      opt_valueReaderCallback, opt_defaultKey,
-                                      opt_defaultValue) {
+  opt_valueReaderCallback, opt_defaultKey,
+  opt_defaultValue) {
   var key = opt_defaultKey;
   var value = opt_defaultValue;
 
@@ -540,8 +536,8 @@ Map.deserializeBinary = function (map, reader, keyReaderFn, valueReaderFn,
         valueReaderFn.call(reader, value, opt_valueReaderCallback);
       } else {
         value =
-            (/** @type {function(this:jspb.BinaryReader):?} */ (valueReaderFn))
-                .call(reader);
+          (/** @type {function(this:BinaryReader):?} */ (valueReaderFn))
+            .call(reader);
       }
     }
   }
