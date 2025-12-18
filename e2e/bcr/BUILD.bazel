@@ -1,0 +1,30 @@
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+
+proto_library(
+    name = "simple_proto",
+    srcs = ["simple.proto"],
+)
+
+genrule(
+    name = "simple_js",
+    srcs = [":simple_proto"],
+    outs = ["simple.js"],
+    cmd = """
+$(location @protobuf//:protoc) \
+  --descriptor_set_in=$(location :simple_proto) \
+  --plugin=protoc-gen-js=$(location @protobuf_javascript//generator:protoc-gen-js) \
+  --js_out=$(RULEDIR) \
+  simple.proto
+""",
+    tools = [
+        "@protobuf//:protoc",
+        "@protobuf_javascript//generator:protoc-gen-js",
+    ],
+)
+
+sh_test(
+    name = "simple_js_test",
+    srcs = ["simple_js_test.sh"],
+    data = [":simple.js"],
+)

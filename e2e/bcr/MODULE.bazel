@@ -1,0 +1,6 @@
+"MODULE.bazel file for bcr smoke test"
+
+bazel_dep(name = "rules_shell", version = "0.6.1")
+bazel_dep(name = "protobuf", version = "33.0")
+bazel_dep(name = "protobuf_javascript", version = "0.0.0", dev_dependency = True)
+local_path_override(module_name = "protobuf_javascript", path = "../..")
