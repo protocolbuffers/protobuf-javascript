@@ -26,5 +26,12 @@ $(location @protobuf//:protoc) \
 sh_test(
     name = "simple_js_test",
     srcs = ["simple_js_test.sh"],
-    data = [":simple.js"],
+    args = [
+        "$(location :simple.js)",
+        "$(locations @protobuf_javascript//:javascript)",
+    ],
+    data = [
+        ":simple.js",
+        "@protobuf_javascript//:javascript",
+    ],
 )
