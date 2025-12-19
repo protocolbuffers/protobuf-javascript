@@ -1,5 +1,6 @@
 build:linux --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
 build:macos --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
+build:windows --cxxopt=/std:c++17 --host_cxxopt=/std:c++17
 
 build:dbg --compilation_mode=dbg
 
@@ -29,12 +30,12 @@ build:ubsan --copt=-fno-sanitize=function --copt=-fno-sanitize=vptr
 build --features=layering_check
 common --enable_platform_specific_config
 
-build:windows --cxxopt=/std:c++17
-build:windows --host_cxxopt=/std:c++17
-
 common --repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1
 
 
 # Allow building with MSVC, which is being deprecated.
 # See: https://github.com/protocolbuffers/protobuf/issues/20085
 build --define=protobuf_allow_msvc=true
+
+# To facilitate testing in bazelci incompatible flags
+build --incompatible_autoload_externally=

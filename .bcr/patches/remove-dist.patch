@@ -1,0 +1,88 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index b64b057..a7d6524 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -2,10 +2,6 @@
+ #
+ # See also code generation logic under generator/
+ 
+-load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_files", "strip_prefix")
+-load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_zip")
+-load("//:protobuf_javascript_release.bzl", "package_naming")
+-
+ exports_files(["package.json"])
+ 
+ config_setting(
+@@ -33,72 +29,6 @@ config_setting(
+     values = {"cpu": "darwin_x86_64"},
+ )
+ 
+-package_naming(
+-    name = "protobuf_javascript_pkg_naming",
+-    platform = select({
+-        ":k8": "linux-x86_64",  # currently the only supported build type in Github Actions
+-        ":x64_x86_windows": "win32",
+-        ":x64_windows": "win64",
+-        ":darwin_arm64": "osx-aarch_64",
+-        ":darwin_x86_64": "osx-x86_64",
+-        "//conditions:default": "",  # continues with current behavior when no --cpu is specified allowing existing internal builds to function
+-    }),
+-)
+-
+-pkg_files(
+-    name = "plugin_files",
+-    srcs = ["//generator:protoc-gen-js"],
+-    attributes = pkg_attributes(mode = "0555"),
+-    prefix = "bin/",
+-)
+-
+-pkg_files(
+-    name = "dist_files",
+-    srcs = glob(
+-        [
+-            "google/protobuf/*.js",
+-            "google/protobuf/compiler/*.js",
+-        ],
+-        allow_empty = True,
+-    ) + [
+-        "LICENSE.md",
+-        "LICENSE-asserts.md",
+-        "README.md",
+-        "google-protobuf.js",
+-        "package.json",
+-    ],
+-    strip_prefix = strip_prefix.from_root(""),
+-)
+-
+-pkg_tar(
+-    name = "dist_tar",
+-    srcs = [
+-        ":dist_files",
+-        ":plugin_files",
+-    ],
+-    extension = "tar.gz",
+-    package_file_name = "protobuf-javascript-{version}-{platform}.tar.gz",
+-    package_variables = ":protobuf_javascript_pkg_naming",
+-)
+-
+-pkg_zip(
+-    name = "dist_zip",
+-    srcs = [
+-        ":dist_files",
+-        ":plugin_files",
+-    ],
+-    package_file_name = "protobuf-javascript-{version}-{platform}.zip",
+-    package_variables = ":protobuf_javascript_pkg_naming",
+-)
+-
+-filegroup(
+-    name = "dist_all",
+-    srcs = [
+-        ":dist_tar",
+-        ":dist_zip",
+-    ],
+-)
+-
+ filegroup(
+     name = "javascript",
+     srcs = [

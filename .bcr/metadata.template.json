@@ -1,0 +1,15 @@
+{
+    "homepage": "https://github.com/protocolbuffers/protobuf-javascript",
+    "maintainers": [
+        {
+            "name": "Stephanie DiBenedetto",
+            "email": "dibenede@google.com",
+            "github": "dibenede"
+        }
+    ],
+    "repository": [
+        "github:protocolbuffers/protobuf-javascript"
+    ],
+    "versions": [],
+    "yanked_versions": {}
+}
