@@ -27,6 +27,8 @@ jobs:
             tag_name: ${{ inputs.tag_name }}
             # GitHub repository which is a fork of the upstream where the Pull Request will be opened.
             registry_fork: protocolbuffers/bazel-central-registry
+            # Require pull request to be created manually in order to avoid using a classic PAT
+            open_pull_request: false
         permissions:
             attestations: write
             contents: write
