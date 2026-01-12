@@ -22,6 +22,7 @@ jobs:
     release:
         uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.3
         with:
+            bazel_test_command: "bazel build //:dist_tar"
             prerelease: false
             release_files: protobuf-javascript-*.tar.gz
             tag_name: ${{ inputs.tag_name || github.ref_name }}
