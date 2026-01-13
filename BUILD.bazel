@@ -81,6 +81,16 @@ pkg_tar(
     package_variables = ":protobuf_javascript_pkg_naming",
 )
 
+pkg_tar(
+    name = "bcr_dist_tar",
+    srcs = [
+        ":javascript",
+    ],
+    extension = "tar.gz",
+    package_file_name = "protobuf-javascript-{version}.tar.gz",
+    package_variables = ":protobuf_javascript_pkg_naming",
+)
+
 pkg_zip(
     name = "dist_zip",
     srcs = [
