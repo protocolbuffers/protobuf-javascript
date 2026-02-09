@@ -51,5 +51,4 @@ package_naming = rule(
         "platform": attr.string(),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
-    incompatible_use_toolchain_transition = True,
 )
