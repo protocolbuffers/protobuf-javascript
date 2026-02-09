@@ -143,6 +143,10 @@ filegroup(
         "map.js",
         "message.js",
         "unsafe_bytestring.js",
+    ] + [
+        "MODULE.bazel",
+        "LICENSE.md",
+        "LICENSE-asserts.md",
     ],
     visibility = ["//visibility:public"],
 )

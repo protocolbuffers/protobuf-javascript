@@ -1,6 +1,6 @@
 "Bazel module that provides protoc-gen-js."
 
-module(name = "protobuf_javascript", version = "4.0.2-rc5")  # updated by release action
+module(name = "protobuf_javascript", version = "4.0.2-rc7")  # updated by release action
 
 bazel_dep(name = "abseil-cpp", version = "20250814.1")
 bazel_dep(name = "protobuf", version = "33.4", repo_name = "com_google_protobuf")

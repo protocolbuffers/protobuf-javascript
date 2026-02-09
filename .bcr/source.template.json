@@ -1,5 +1,4 @@
 {
     "integrity": "",
-    "strip_prefix": "{REPO}-{TAG}",
-    "url": "https://github.com/{OWNER}/{REPO}/archive/refs/tags/{TAG}.tar.gz"
+    "url": "https://github.com/{OWNER}/{REPO}/releases/download/{TAG}/protobuf-javascript-{VERSION}.tar.gz"
 }
