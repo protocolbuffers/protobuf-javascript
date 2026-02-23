@@ -3,7 +3,8 @@ const os = require('os');
 const path = require('path');
 const AdmZip = require('adm-zip');
 
-const VERSION = '4.0.0';
+const pkg = require('./package.json');
+const VERSION = pkg.version;
 const BIN_DIR = path.join(__dirname, 'bin');
 
 function getZipFilename(currentSystem) {
