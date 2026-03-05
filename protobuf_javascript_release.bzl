@@ -25,6 +25,10 @@ def _package_naming_impl(ctx):
         cpu = "aarch_64"
     elif cpu == "ppc64":
         cpu = "ppcle_64"
+    elif cpu == "i686":
+        cpu = "x86_32"
+    elif cpu == "x86_64":
+        cpu = "x86_64"
 
     # use the system name to determine the os and then create platform names
     if "apple" in system_name:
