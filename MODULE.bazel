@@ -6,3 +6,18 @@ bazel_dep(name = "abseil-cpp", version = "20250814.1")
 bazel_dep(name = "protobuf", version = "33.4", repo_name = "com_google_protobuf")
 bazel_dep(name = "rules_cc", version = "0.2.15")
 bazel_dep(name = "rules_pkg", version = "1.0.1", dev_dependency = True)
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "apple_support", version = "1.17.1", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+register_toolchains(
+    "//toolchain:osx-x86_64-toolchain",
+    "//toolchain:osx-aarch_64-toolchain",
+    "//toolchain:linux-aarch_64-toolchain",
+    "//toolchain:linux-ppcle_64-toolchain",
+    "//toolchain:linux-s390_64-toolchain",
+    "//toolchain:linux-x86_32-toolchain",
+    "//toolchain:linux-x86_64-toolchain",
+    "//toolchain:win32-toolchain",
+    "//toolchain:win64-toolchain",
+)

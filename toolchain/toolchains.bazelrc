@@ -1,0 +1,15 @@
+build:cross_config --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build:cross_config --//toolchain:release=true
+
+build:linux-aarch_64 --config=cross_config --platforms=//toolchain:linux-aarch_64
+build:linux-aarch64 --config=cross_config --platforms=//toolchain:linux-aarch_64
+build:linux-ppcle_64 --config=cross_config --platforms=//toolchain:linux-ppcle_64
+build:linux-ppc64le --config=cross_config --platforms=//toolchain:linux-ppcle_64
+build:linux-s390_64 --config=cross_config --platforms=//toolchain:linux-s390_64
+build:linux-s390x --config=cross_config --platforms=//toolchain:linux-s390_64
+build:linux-x86_32 --config=cross_config --platforms=//toolchain:linux-x86_32
+build:linux-x86_64 --config=cross_config --platforms=//toolchain:linux-x86_64
+build:osx-aarch_64 --config=cross_config --action_env=MACOSX_DEPLOYMENT_TARGET=11.0 --platforms=//toolchain:osx-aarch_64
+build:osx-x86_64 --config=cross_config --action_env=MACOSX_DEPLOYMENT_TARGET=12.0 --platforms=//toolchain:osx-x86_64
+build:win32 --config=cross_config --platforms=//toolchain:win32
+build:win64 --config=cross_config --platforms=//toolchain:win64

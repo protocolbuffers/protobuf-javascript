@@ -39,3 +39,7 @@ build --define=protobuf_allow_msvc=true
 
 # To facilitate testing in bazelci incompatible flags
 build --incompatible_autoload_externally=
+
+import %workspace%/toolchain/toolchains.bazelrc
+
+build:offline --nofetch
