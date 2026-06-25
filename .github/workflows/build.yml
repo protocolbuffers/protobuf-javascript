@@ -2,7 +2,9 @@ name: Build and Test
 
 on: push
 
-permissions: read-all
+permissions:
+  contents: read
+
 
 # update in build.yml and codeql.yml at same time
 env:
@@ -19,9 +21,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           node-version: 24
@@ -42,7 +46,7 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: js
           path: |
@@ -83,14 +87,16 @@ jobs:
 
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         if: ${{ !env.ACT }}
         with:
           name: js
 
-      - uses: bazel-contrib/setup-bazel@0.19.0
+      - uses: bazel-contrib/setup-bazel@c5acdfb288317d0b5c0bbd7a396a3dc868bb0f86 # 0.19.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -104,7 +110,7 @@ jobs:
       # need to copy to output directory as `bazel-bin` is a symlink and cannot be read by the actions/upload-artifact action
       - run: cp bazel-bin/protobuf-javascript-* out/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-${{ matrix.os }}-${{ matrix.cpu }}
           path: out
