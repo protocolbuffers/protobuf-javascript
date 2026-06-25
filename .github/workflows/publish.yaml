@@ -21,7 +21,7 @@ on:
                 type: string
 jobs:
     publish:
-        uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@v0.2.3
+        uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@1a42c3dca6566cf3a07689768259f1a35066ed01 # v0.2.3
         with:
             draft: false
             tag_name: ${{ inputs.tag_name }}

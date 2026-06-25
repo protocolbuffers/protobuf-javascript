@@ -15,20 +15,26 @@ on:
         tags:
             - "v*.*.*"
 permissions:
-    id-token: write
-    attestations: write
-    contents: write
+    contents: read
+
 jobs:
     release:
-        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.3
+        permissions:
+            id-token: write
+            attestations: write
+            contents: write
+        uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@a841d62420f41a87a601fb331f3c2c2cc088506e # v7.2.3
         with:
             bazel_test_command: "bazel build //:bcr_dist_tar"
             prerelease: false
             release_files: "bazel-bin/protobuf-javascript-*.tar.gz"
             tag_name: ${{ inputs.tag_name || github.ref_name }}
-        secrets: inherit
     publish:
         needs: release
+        permissions:
+            id-token: write
+            attestations: write
+            contents: write
         uses: ./.github/workflows/publish.yaml
         with:
             tag_name: ${{ inputs.tag_name || github.ref_name }}
