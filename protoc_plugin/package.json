@@ -18,7 +18,7 @@
     "postinstall": "node download-protoc-gen-js.js"
   },
   "dependencies": {
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.6.0"
   },
   "engines": {
     "node": ">=18.0.0"
