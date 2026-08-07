@@ -3693,7 +3693,7 @@ void Generator::GenerateFile(const GeneratorOptions& options,
     printer->Print("goog.object.extend(exports, $package$);\n", "package",
                    GetNamespace(options, file));
   } else if (options.import_style == GeneratorOptions::kImportCommonJsStrict) {
-    printer->Print("goog.object.extend(exports, proto);\n", "package",
+    printer->Print("goog.object.extend(exports, $package$);\n", "package",
                    GetNamespace(options, file));
   }
 
