@@ -30,8 +30,6 @@ build:ubsan --copt=-fno-sanitize=function --copt=-fno-sanitize=vptr
 build --features=layering_check
 common --enable_platform_specific_config
 
-common --repo_env=BAZEL_NO_APPLE_CPP_TOOLCHAIN=1
-
 
 # Allow building with MSVC, which is being deprecated.
 # See: https://github.com/protocolbuffers/protobuf/issues/20085
