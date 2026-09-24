@@ -21,11 +21,11 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           node-version: 24
@@ -46,7 +46,7 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: js
           path: |
@@ -81,13 +81,13 @@ jobs:
           - os: macos-14
             cpu: darwin_arm64
             bazel_target: dist_zip
-          - os: macos-14-large
+          - os: macos-15-intel
             cpu: darwin_x86_64
             bazel_target: dist_zip
 
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -110,7 +110,7 @@ jobs:
       # need to copy to output directory as `bazel-bin` is a symlink and cannot be read by the actions/upload-artifact action
       - run: cp bazel-bin/protobuf-javascript-* out/
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-${{ matrix.os }}-${{ matrix.cpu }}
           path: out
